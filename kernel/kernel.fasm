@@ -1,0 +1,43 @@
+.data
+
+kernel:
+    jmp _k_main
+    
+_welcome_msg:
+    .byte 0x0D
+    .byte 0x0A
+    .ascii	"RhysOS Boot Initialise!"
+    .byte 0x0D
+    .byte 0x0A
+    .byte 0x00
+
+_print_code:
+    .byte 0x0E
+
+print_string:
+    lodsb
+    or al, al
+    jz .done
+    
+	mov ah, [_print_code]
+	
+	int 0x10
+	jmp print_string
+.done:
+    ret
+
+
+_k_main:
+	push cs          ; save the cs reg
+	pop  ds          ; use as ds also
+
+    mov al, [_welcome_msg]
+    cbw
+	mov si, ax
+	call print_string
+
+.k_main_loop:
+	jmp .k_main_loop
+    
+cli
+hlt
