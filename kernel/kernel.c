@@ -1,18 +1,26 @@
 #asm
-kernel:
+export _main
+_main:
     jmp _kmain
+
+MACRO PROLOG
+push bp
+mov bp, sp
+MEND
+
+MACRO EPILOG
+pop bp
+MEND
 #endasm
 
-int welcome_msg[] = "This is a test message";
-int print_code = 0x0E;
-int set_cursor_code = 0x0200;
+#include "util.h"
+#include "shell.h"
+#include "tty.h"
+#include "fat.h"
 
-void print_string(int*);
-int getch();
-void set_resolution(int);
-void print_char(int);
-void set_cursor(int, int);
-void clear_screen(void);
+int welcome_msg[] = "Welcome to RhysOS\r\n";
+
+int init();
 
 void kmain() {
 #asm
@@ -20,21 +28,12 @@ void kmain() {
     pop  ds          ; use as ds also
     
 #endasm
-    int c;
-    
-    clear_screen();
-    set_resolution(0x03); // 0x03 = 80x25 All modes
+    int err;
 
-    print_string(welcome_msg);
+    err = init();
     
-    for(;;){
-        c = getch();
-        if((c>>8) == 0x1c){ // On enter, print newline
-            print_char('\n');
-            print_char('\r');
-        } else{
-            print_char(c);
-        }
+    if(err){
+        print_string("\r\nError in kernel, halting!\r\n");
     }
 
 #asm
@@ -43,57 +42,21 @@ void kmain() {
 #endasm
 }
 
-void clear_screen() {
-#asm
-    mov ax, 0x0700  ; function 07, AL=0 means scroll whole window
-    mov bh, 0x07    ; character attribute = white on black
-    mov cx, 0x0000  ; row = 0, col = 0
-    mov dx, 0x184f  ; row = 24 (0x18), col = 79 (0x4f)
-    int 0x10        ; call BIOS video interrupt
-#endasm
-}
 
-void set_resolution(int mode) { // Mode = http://www.columbia.edu/~em36/wpdos/videomodes.txt
-#asm
-    xor ah, ah
-    mov al, [bp-8]
-    int 0x10
-#endasm
-}
-
-void print_char(c) {
-#asm
-     mov ah, [_print_code]
-     
-     mov bx, sp
-     mov al, [bp-8]
-     xor bx, bx
-     int 0x10
-#endasm
-}
-
-void print_string(int* str) {
-    char* c;
-    for(c=*str ; *c!=0 ; ++c){
-        print_char(*c);
-    }
-}
-
-void set_cursor(int col, int row) { // BROKEN: from https://www.codeproject.com/articles/737545/writing-a-bit-dummy-kernel-in-c-cplusplus
-    int val;
+int init(){
+    int c;
     
-    val = (row <<= 8) | col;
-#asm
-    mov al, [_set_cursor_code]
-    mov dl, al
+    clear_screen();
+    set_resolution(0x03); // 0x03 = 80x25 All modes
+
+    print_string(welcome_msg);
     
-    int 0x10
-#endasm
+    fat_test();
+    
+    return 0;
 }
 
-int getch() {
-#asm
-    xor ax, ax
-    int 0x16
-#endasm
-}
+#include "util.c"
+#include "shell.c"
+#include "tty.c"
+#include "fat.c"
