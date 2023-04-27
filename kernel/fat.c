@@ -112,7 +112,7 @@ void list_directory(char* dirName) {
   }
 }
 
-void read_file(char buf[], char* filename) {
+int read_file(char buf[], char* filename) {
   int x, index;
   char entryChar;
   char directory[SECTOR_SIZE];
@@ -124,7 +124,7 @@ void read_file(char buf[], char* filename) {
   
   if (index == -1) {
     print_string("ERROR: No such file in Directory\n"); 
-    return;
+    return 1;
   }
 
   for(x = HEADER_SIZE; x < ENTRY_SIZE; x++) {
@@ -133,4 +133,6 @@ void read_file(char buf[], char* filename) {
       read_sector((buf + (x - HEADER_SIZE) * SECTOR_SIZE), (int)entryChar);
     }
   }
+  
+  return 0;
 }

@@ -24,17 +24,17 @@ int shell() {
     
     read_file(&buf, "/shell.bin");
     
-    ret = run_exe(&buf, sizeof(buf), LOAD_SHELL);
+    return run_exe(&buf, sizeof(buf), LOAD_SHELL);
 }
 
 int exec(char* file_name) {
-	int ret;
-	int size;
 	char buf[1024];
     
-    read_file(&buf, file_name);
+    if(!read_file(&buf, file_name)) {
+	    return run_exe(&buf, sizeof(buf), LOAD_EXE);
+    }
     
-    ret = run_exe(&buf, sizeof(buf), LOAD_EXE);
+    return 1;
 }
 
 int handleInterrupt21(int ax, int bx, int cx, int dx) {
@@ -55,6 +55,7 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 		print_string("Unknown interrupt: ");
 		print_hex(ax);
 		print_string("!\r\n");
+		break;
   }
 }
 
