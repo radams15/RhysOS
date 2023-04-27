@@ -5,5 +5,6 @@ extern int interrupt (int number, int AX, int BX, int CX, int DX);
 
 int print(char* str);
 int readline(char* buffer);
+int exec(char* file);
 
 #endif

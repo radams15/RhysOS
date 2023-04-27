@@ -1,6 +1,8 @@
 # Interrupt Table:
 
 0 - print\_string
-	- ax - data
+	- bx - data
 1 - readline
-	- ax - buffer
+	- bx - buffer
+2 - exec
+	- bx - file name

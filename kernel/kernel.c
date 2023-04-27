@@ -1,10 +1,9 @@
 #include "fat.h"
 #include "tty.h"
+#include "proc.h"
 
 void main();
 void entry() {main();}
-
-char msg[] = "Welcome!!!\r\n";
 
 void main() {
 	int err;
@@ -18,6 +17,25 @@ void main() {
 	while(1){}
 }
 
+int shell() {
+	int ret;
+	int size;
+	char buf[1024];
+    
+    read_file(&buf, "/shell.bin");
+    
+    ret = run_exe(&buf, sizeof(buf), LOAD_SHELL);
+}
+
+int exec(char* file_name) {
+	int ret;
+	int size;
+	char buf[1024];
+    
+    read_file(&buf, file_name);
+    
+    ret = run_exe(&buf, sizeof(buf), LOAD_EXE);
+}
 
 int handleInterrupt21(int ax, int bx, int cx, int dx) {
   switch(ax) {
@@ -27,6 +45,10 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 	
     case 1:
 		return readline(bx);
+		break;
+		
+    case 2:
+		return exec(bx);
 		break;
       
     default:
@@ -40,8 +62,10 @@ int init(){
 	clear_screen();
 	
 	makeInterrupt21();
-
-	fat_test();
+	
+	shell();
+	
+	print_string("\n\nDone.");
 
 	return 0;
 }

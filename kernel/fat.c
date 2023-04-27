@@ -9,23 +9,16 @@
 
 extern int interrupt(int number, int AX, int BX, int CX, int DX);
 
-void copyString(char* from, char* to, int length) {
+void strcpy(char* to, char* from, int length) {
   int i;
   for(i = 0; i < length; i++) {
     *(to + i) = *(from + i);
   }
 }
 
-void clearString(char* str, int length) {
-  int i;
-  for(i = 0; i < length; i++) {
-    *(str + i) = 0;
-  }
-}
-
-void moveString(char* from, char* to, int length) {
-  copyString(from, to, length);
-  clearString(from, length);
+void moveString(char* to, char* from, int length) {
+  strcpy(to, from, length);
+  clear(from, length);
 }
 
 
@@ -36,9 +29,10 @@ void parseFileName(char* name, char* top, char* sub) {
   id = sub;
 
   if (*name == '/') {i++;}
+  
   while((*(name + i) != '\0') && (*(name + i) != 0xA)) {
     if (*(name + i) == '/') {
-      moveString(id, top, NAME_SIZE);
+      moveString(top, id, NAME_SIZE);
       for(z = x; z < NAME_SIZE && z > 0; z++) {*(top + z) = 0;}
       x = 0;
     } else {
@@ -91,6 +85,7 @@ int getDirIndex(char* filename, char* directory) {
 }
 
 void loadRootDirectory(char* buffer) {read_sector(buffer, ROOT_DIR_SECTOR);}
+
 void loadDirectory(char* buffer, char* name) {
   int sector;
   if (*name == '/') {
@@ -101,7 +96,7 @@ void loadDirectory(char* buffer, char* name) {
   }
 }
 
-void directory(char* dirName) {
+void list_directory(char* dirName) {
   int x, y;
   char directory[SECTOR_SIZE];
 
@@ -117,7 +112,7 @@ void directory(char* dirName) {
   }
 }
 
-void readFile (char* filename, char outbuf[]) {
+void read_file(char buf[], char* filename) {
   int x, index;
   char entryChar;
   char directory[SECTOR_SIZE];
@@ -135,24 +130,7 @@ void readFile (char* filename, char outbuf[]) {
   for(x = HEADER_SIZE; x < ENTRY_SIZE; x++) {
     entryChar = directory[index + x];
     if (entryChar != 0) {
-      read_sector((outbuf + (x - HEADER_SIZE) * SECTOR_SIZE), (int)entryChar);
+      read_sector((buf + (x - HEADER_SIZE) * SECTOR_SIZE), (int)entryChar);
     }
   }
-}
-
-
-void fat_test() {
-	int ret;
-	int size;
-	char buf[1024];
-    
-    readFile("/test.bin", &buf);
-    
-    ret = run_exe(&buf, sizeof(buf));
-    
-    print_string("\r\nReturn code: ");
-    print_hex(ret);
-    print_string("\n");
-    
-    return;
 }

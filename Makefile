@@ -1,5 +1,6 @@
 KERNEL_ADDR?=0x1000
-EXE_ADDR?=0x4000
+SHELL_ADDR?=0x4000
+EXE_ADDR?=0x6000
 
 all: img
 
@@ -18,7 +19,7 @@ krnl:
 	bcc -ansi -c kernel/fat.c -o build/fat.o
 	bcc -ansi -c kernel/tty.c -o build/tty.o
 	bcc -ansi -c kernel/util.c -o build/util.o
-	bcc -ansi -DEXE_ADDRESS=${EXE_ADDR} -c kernel/proc.c -o build/proc.o
+	bcc -ansi -DEXE_ADDRESS=${EXE_ADDR} -DSHELL_ADDRESS=${SHELL_ADDR} -c kernel/proc.c -o build/proc.o
 	
 	nasm -fas86 kernel/interrupt.nasm -o build/interrupt.o
 	nasm -fas86 kernel/proc.nasm -o build/proc_nasm.o
@@ -37,8 +38,8 @@ progs: stdlb
 	bcc -ansi -c programs/test.c -Iprograms/ -Istdlib -o build/programs/test.bin.o
 	ld86 -o build/programs/test.bin -T${EXE_ADDR} -d build/programs/test.bin.o -Lbuild/stdlib -lstdlib
 	
-	nasm -fas86 programs/hello.nasm -Iprograms/ -Istdlib -o build/programs/hello.bin.o
-	ld86 -o build/programs/hello.bin -T${EXE_ADDR} -d build/programs/hello.bin.o -Lbuild/stdlib -lstdlib
+	bcc -ansi -c programs/shell.c -Iprograms/ -Istdlib -o build/programs/shell.bin.o
+	ld86 -o build/programs/shell.bin -T${SHELL_ADDR} -d build/programs/shell.bin.o -Lbuild/stdlib -lstdlib
 
 img: bload krnl progs
 	dd if=/dev/zero of=build/system.img bs=512 count=2880 # Empty disk
@@ -48,12 +49,11 @@ img: bload krnl progs
 	dd if=build/kernel.bin of=build/system.img bs=512 seek=3 conv=notrunc
 	
 	dd if=map.img of=build/system.img bs=512 count=1 seek=1 conv=notrunc
-	#dd if=dir.img of=build/system.img bs=512 count=1 seek=2 conv=notrunc
 	
 	./make_dir
 	./load_file testfl
 	cp build/programs/test.bin . && ./load_file test.bin && rm test.bin
-	cp build/programs/hello.bin . && ./load_file hello.bin && rm hello.bin
+	cp build/programs/shell.bin . && ./load_file shell.bin && rm shell.bin
 	
 run: img
 	qemu-system-i386 -machine pc -fda build/system.img -boot a -m 1M
