@@ -5,6 +5,7 @@ int set_cursor_code = 0x0200;
 int zero = 0x00;
 char hex_chars[] = "0123456789ABCDEF";
 
+int interrupt (int number, int AX, int BX, int CX, int DX);
 
 void clear_screen() {
 	interrupt(0x10, 0x0200, 0, 0, 0);
@@ -40,19 +41,28 @@ void print_string(char* str) {
         print_char(*c);
 }
 
-void print_hex(int n) { // TODO Improve this to handle > 2 bytes.
+void print_hex(int n) { // TODO Improve this to handle > 3 bytes.
     print_string("0x");
     print_char(hex_chars[(n & 0xF00)>>8]);
     print_char(hex_chars[(n & 0xF0)>>4]);
     print_char(hex_chars[(n & 0xF)>>0]);
 }
 
-#asm
-_getch:
-	push bp
-	mov bp, sp
-    xor ax, ax
-    int 0x16
-	pop bp
-	ret
-#endasm
+int readline(char* buffer) {
+	char c;
+	
+	while((c=getch()) != 0x0D) {
+		*(buffer++) = c;
+	}
+	
+	*(buffer++) = 0; // null-terminate
+}
+
+char getch() {
+	char out;
+	
+	out = interrupt(0x16, 0, 0, 0, 0);
+	print_char(out); // echo back char
+	
+	return out;
+}

@@ -13,6 +13,7 @@ void print_string(char* str);
 void print_hex(int i);
 void set_cursor(int col, int row);
 
-int getch();
+int readline(char* buffer);
+char getch();
 
 #endif

@@ -1,7 +1,11 @@
 #include <stdio.h>
 
 int main() {
-	print("\nHello from stdlib!\n");
+	char name[32];
+	
+	print("\nName: ");
+	readline(&name);
+	print("\nHello, "); print(name); print("\n");
 
 	return 0x6;
 }

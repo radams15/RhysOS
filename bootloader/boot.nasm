@@ -1,8 +1,8 @@
-org 0x0
+org 0
 
-KSEG	equ	KERNEL_ADDR
-KSIZE	equ	15
-KSTART	equ	3
+KSEG	equ	KERNEL_ADDR ; address to place kernel in
+KSIZE	equ	15 ; sectors in kernel
+KSTART	equ	3 ; start sector
 
 mov ax,KSEG
 mov ds,ax

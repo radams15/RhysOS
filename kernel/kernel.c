@@ -19,10 +19,14 @@ void main() {
 }
 
 
-void handleInterrupt21(int ax, int bx, int cx, int dx) {
+int handleInterrupt21(int ax, int bx, int cx, int dx) {
   switch(ax) {
-    case 0 :
+    case 0:
 		print_string((char *)bx);
+		break;
+	
+    case 1:
+		return readline(bx);
 		break;
       
     default:
@@ -32,9 +36,7 @@ void handleInterrupt21(int ax, int bx, int cx, int dx) {
   }
 }
 
-void putInMemory (int segment, int address, char character);
-
-int init(){
+int init(){	
 	clear_screen();
 	
 	makeInterrupt21();
