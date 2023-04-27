@@ -1,10 +1,11 @@
-EXE_LOAD=0x4000
+KERNEL_ADDR?=0x1000
+EXE_ADDR?=0x4000
 
 all: img
 
 bload:
 	@mkdir -p build
-	nasm -fbin bootloader/boot.nasm -Ibootloader -o build/boot.bin
+	nasm -fbin bootloader/boot.nasm -DKERNEL_ADDR=${KERNEL_ADDR} -Ibootloader -o build/boot.bin
 	
 make_dir:
 	gcc make_dir.c -o make_dir
@@ -17,7 +18,7 @@ krnl:
 	bcc -ansi -c kernel/fat.c -o build/fat.o
 	bcc -ansi -c kernel/tty.c -o build/tty.o
 	bcc -ansi -c kernel/util.c -o build/util.o
-	bcc -ansi -DEXE_ADDRESS=${EXE_LOAD} -c kernel/proc.c -o build/proc.o
+	bcc -ansi -DEXE_ADDRESS=${EXE_ADDR} -c kernel/proc.c -o build/proc.o
 	
 	nasm -fas86 kernel/interrupt.nasm -o build/interrupt.o
 	nasm -fas86 kernel/proc.nasm -o build/proc_nasm.o
@@ -31,13 +32,13 @@ stdlb:
 	
 	ar -rcs build/stdlib/libstdlib.a build/stdlib/*.o
 
-progs:
+progs: stdlb
 	@mkdir -p build/programs
-	bcc -ansi -c programs/test.c -Iprograms/ -o build/programs/test.bin.o
-	ld86 -o build/programs/test.bin -T${EXE_LOAD} -d build/programs/test.bin.o build/interrupt.o
+	bcc -ansi -c programs/test.c -Iprograms/ -Istdlib -o build/programs/test.bin.o
+	ld86 -o build/programs/test.bin -T${EXE_ADDR} -d build/programs/test.bin.o -Lbuild/stdlib -lstdlib
 	
-	nasm -fas86 programs/hello.nasm -Iprograms/ -o build/programs/hello.bin.o
-	ld86 -o build/programs/hello.bin -T${EXE_LOAD} -d build/programs/hello.bin.o
+	nasm -fas86 programs/hello.nasm -Iprograms/ -Istdlib -o build/programs/hello.bin.o
+	ld86 -o build/programs/hello.bin -T${EXE_ADDR} -d build/programs/hello.bin.o -Lbuild/stdlib -lstdlib
 
 img: bload krnl progs
 	dd if=/dev/zero of=build/system.img bs=512 count=2880 # Empty disk

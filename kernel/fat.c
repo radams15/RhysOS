@@ -145,8 +145,6 @@ void fat_test() {
 	int ret;
 	int size;
 	char buf[1024];
-	
-    directory("/");
     
     readFile("/test.bin", &buf);
     

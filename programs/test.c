@@ -1,7 +1,7 @@
-extern int interrupt (int number, int AX, int BX, int CX, int DX);
+#include <stdio.h>
 
 int main() {
-	interrupt(0x21, 0, "Hello world\r\n", 0, 0);
+	print("\nHello from stdlib!\n");
 
 	return 0x6;
 }
