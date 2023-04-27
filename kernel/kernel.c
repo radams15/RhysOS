@@ -1,62 +1,45 @@
-#asm
-export _main
-_main:
-    jmp _kmain
-
-MACRO PROLOG
-push bp
-mov bp, sp
-MEND
-
-MACRO EPILOG
-pop bp
-MEND
-#endasm
-
-#include "util.h"
-#include "shell.h"
-#include "tty.h"
 #include "fat.h"
+#include "tty.h"
 
-int welcome_msg[] = "Welcome to RhysOS\r\n";
+void main();
+void entry() {main();}
 
-int init();
+char msg[] = "Welcome!!!\r\n";
 
-void kmain() {
-#asm
-    push cs          ; save the cs reg
-    pop  ds          ; use as ds also
-    
-#endasm
-    int err;
+void main() {
+	int err;
 
-    err = init();
-    
-    if(err){
-        print_string("\r\nError in kernel, halting!\r\n");
-    }
+	err = init();
 
-#asm
-    .k_main_loop:
-    jmp .k_main_loop
-#endasm
+	if(err){
+		print_string("\r\nError in kernel, halting!\r\n");
+	}
+
+	while(1){}
 }
 
+
+void handleInterrupt21(int ax, int bx, int cx, int dx) {
+  switch(ax) {
+    case 0 :
+		print_string((char *)bx);
+		break;
+      
+    default:
+		print_string("Unknown interrupt: ");
+		print_hex(ax);
+		print_string("!\r\n");
+  }
+}
+
+void putInMemory (int segment, int address, char character);
 
 int init(){
-    int c;
-    
-    clear_screen();
-    set_resolution(0x03); // 0x03 = 80x25 All modes
+	clear_screen();
+	
+	makeInterrupt21();
 
-    print_string(welcome_msg);
-    
-    fat_test();
-    
-    return 0;
+	fat_test();
+
+	return 0;
 }
-
-#include "util.c"
-#include "shell.c"
-#include "tty.c"
-#include "fat.c"

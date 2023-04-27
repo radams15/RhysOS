@@ -1,33 +1,20 @@
-jmp _start
+org 0x4000
 
+global _main
 
-_start:
-    mov si, [msg]
-    call print_string
-    
-    mov ax, 0
-    ret
+; Works but needs to be loaded into memory for the string pointers to work!
 
-print_string:
-    pusha       ; Pushes CPU registers
-    mov ah, 0x0e    ; BIOS teletype
+_main:
+	push bp
+	
+	mov ax, 0 ; interrupt num
+	mov bx, msg
+	mov cx, 0
+	mov dx, 0
+	
+	int 0x21
+	
+	pop bp
+	ret
 
-    loop:
-        ; Is it null yet
-        cmp byte [bx], 0        ; value at bx == 0
-        je outside_loop
-
-        ; Print
-        mov al, [bx]
-        int 0x10    ; Print Char in al
-
-        ; Increment and loop
-        add bx, 1
-        jmp loop
-
-    outside_loop:
-        popa        ; Restores CPU registers 
-        ret         ; return to Caller
-
-
-msg db "Hello world!", 0xb, 0xa, 0;
+msg db "Test message!", 0xa, 0

@@ -8,7 +8,8 @@ void set_resolution(int mode);
 
 void print_char(c);
 
-void print_string(int* str);
+void print_stringn(char* str, int n);
+void print_string(char* str);
 void print_hex(int i);
 void set_cursor(int col, int row);
 

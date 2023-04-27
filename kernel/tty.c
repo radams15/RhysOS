@@ -1,73 +1,58 @@
+#include "tty.h"
+
 int print_code = 0x0E;
 int set_cursor_code = 0x0200;
 int zero = 0x00;
 char hex_chars[] = "0123456789ABCDEF";
 
 
-#asm
-_clear_screen:
-    PROLOG
-    mov ax, 0x0700  ; function 07, AL=0 means scroll whole window
-    mov bh, 0x07    ; character attribute = white on black
-    mov cx, 0x0000  ; row = 0, col = 0
-    mov dx, 0x184f  ; row = 24 (0x18), col = 79 (0x4f)
-    int 0x10        ; call BIOS video interrupt
-    EPILOG
-    ret
-#endasm
+void clear_screen() {
+	interrupt(0x10, 0x0200, 0, 0, 0);
+	interrupt(0x10, 0x0600, 0x0f00, 0, 0x184f);
+}
 
-#asm
-_set_resolution: ; Mode = http://www.columbia.edu/~em36/wpdos/videomodes.txt
-    PROLOG
+void set_resolution(int mode) {
+	interrupt(0x10, mode, 0, 0, 0);
+}
 
-    xor ah, ah
-    mov al, 4[bp]
-    int 0x10
-    EPILOG
-    ret
-#endasm
+void print_char(int c) {
+	if(c == '\t') {
+		print_string("    ");
+		return;
+	}
 
-#asm
-_print_char:
-    PROLOG
+	if(c == '\n')
+		interrupt(0x10, 0x0E00 + '\r', 0, 0, 0);
+	
+	interrupt(0x10, 0x0E00 + c, 0, 0, 0);
+}
 
-    mov al, 4[bp]
-    mov ah, [_print_code]
-    int 0x10
+void print_stringn(char* str, int n) {
+	int i;
+	for(i=0 ; i<n ; i++) {
+		print_char(str[i]);
+	};
+}
 
-    EPILOG
-    
-    ret
-#endasm
-
-void print_string(int* str) {
+void print_string(char* str) {
     char* c;
-    for(c=*str ; *c!=0 ; ++c)
+    for(c=str ; *c != 0 ; ++c)
         print_char(*c);
 }
 
 void print_hex(int n) { // TODO Improve this to handle > 2 bytes.
+    print_string("0x");
+    print_char(hex_chars[(n & 0xF00)>>8]);
     print_char(hex_chars[(n & 0xF0)>>4]);
-    print_char(hex_chars[(n & 0x0F)>>0]);
+    print_char(hex_chars[(n & 0xF)>>0]);
 }
 
-void set_cursor(int col, int row) { // BROKEN: from https://www.codeproject.com/articles/737545/writing-a-bit-dummy-kernel-in-c-cplusplus
-    int val;
-    
-    val = (row <<= 8) | col;
 #asm
-    mov dl, al
-    mov al, [_set_cursor_code]
-    
-    int 0x10
-#endasm
-}
-
-int getch() {
-#asm
-    PROLOG
+_getch:
+	push bp
+	mov bp, sp
     xor ax, ax
     int 0x16
-    EPILOG
+	pop bp
+	ret
 #endasm
-}
