@@ -1,23 +1,5 @@
-global _putInMemory
 global _makeInterrupt21
-global _launchProgram
-global _putInMemory
-
 extern _handleInterrupt21
-
-;void putInMemory (int segment, int address, byte b)
-_putInMemory:
-	push bp
-	mov bp,sp
-	push ds
-	mov ax,[bp+4]
-	mov si,[bp+6]
-	mov cl,[bp+8]
-	mov ds,ax
-	mov [si],cl
-	pop ds
-	pop bp
-	ret
 
 _makeInterrupt21:
 	;get the address of the service routine
@@ -48,23 +30,3 @@ _interrupt21ServiceRoutine:
 	pop dx
 
 	iret
-	
-
-_launchProgram:
-	mov bp,sp
-	mov bx,[bp+2]	;get the segment into bx
-
-	mov ax,cs	;modify the jmp below to jump to our segment
-	mov ds,ax	;this is self-modifying code
-	mov si,jump
-	mov [si+3],bx	;change the first 0000 to the segment
-
-	mov ds,bx	;set up the segment registers
-	mov ss,bx
-	mov es,bx
-
-	mov sp,0xfff0	;set up the stack pointer
-	mov bp,0xfff0
-
-	sti
-jump:	jmp 0x0000:0x0000	;and start running (the first 0000 is changed above)

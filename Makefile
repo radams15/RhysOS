@@ -1,4 +1,4 @@
-PROGRAMS=build/programs/test.bin
+EXE_LOAD=0x4000
 
 all: img
 
@@ -17,18 +17,27 @@ krnl:
 	bcc -ansi -c kernel/fat.c -o build/fat.o
 	bcc -ansi -c kernel/tty.c -o build/tty.o
 	bcc -ansi -c kernel/util.c -o build/util.o
+	bcc -ansi -DEXE_ADDRESS=${EXE_LOAD} -c kernel/proc.c -o build/proc.o
 	
 	nasm -fas86 kernel/interrupt.nasm -o build/interrupt.o
-	nasm -fas86 kernel/proc.nasm -o build/proc.o
+	nasm -fas86 kernel/proc.nasm -o build/proc_nasm.o
 	
-	ld86 -o build/kernel.bin -d build/kernel.o build/tty.o build/fat.o build/interrupt.o build/proc.o build/util.o
+	ld86 -o build/kernel.bin -d build/kernel.o build/tty.o build/fat.o build/interrupt.o build/proc_nasm.o build/proc.o build/util.o
+
+stdlb:
+	@mkdir -p build/stdlib
+	bcc -ansi -c stdlib/stdio.c -Istdlib/ -o build/stdlib/stdio.o
+	nasm -fas86 stdlib/stdio.nasm -Istdlib/ -o build/stdlib/stdlib_nasm.o
+	
+	ar -rcs build/stdlib/libstdlib.a build/stdlib/*.o
 
 progs:
 	@mkdir -p build/programs
 	bcc -ansi -c programs/test.c -Iprograms/ -o build/programs/test.bin.o
-	ld86 -o build/programs/test.bin -d build/programs/test.bin.o build/interrupt.o
+	ld86 -o build/programs/test.bin -T${EXE_LOAD} -d build/programs/test.bin.o build/interrupt.o
 	
-	nasm -fbin programs/hello.nasm -Iprograms/ -o build/programs/hello.bin
+	nasm -fas86 programs/hello.nasm -Iprograms/ -o build/programs/hello.bin.o
+	ld86 -o build/programs/hello.bin -T${EXE_LOAD} -d build/programs/hello.bin.o
 
 img: bload krnl progs
 	dd if=/dev/zero of=build/system.img bs=512 count=2880 # Empty disk

@@ -1,4 +1,5 @@
 #include "util.h"
+#include "proc.h"
 
 #define ROOT_DIR_SECTOR 2
 #define SECTOR_SIZE 512
@@ -139,21 +140,21 @@ void readFile (char* filename, char outbuf[]) {
   }
 }
 
-typedef void (*func)(void);
 
-char* buf = (char*) 0x4000;
 void fat_test() {
-	void* prog;
+	int ret;
+	int size;
+	char buf[1024];
 	
     directory("/");
     
-    readFile("/hello.bin", buf);
+    readFile("/test.bin", &buf);
     
-    //print_stringn(buf, 64);
+    ret = run_exe(&buf, sizeof(buf));
     
-    ((func)buf)();
-    
-    print_string("\r\nDone!\r\n");
+    print_string("\r\nReturn code: ");
+    print_hex(ret);
+    print_string("\n");
     
     return;
 }

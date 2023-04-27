@@ -1,5 +1,3 @@
-org 0x4000
-
 global _main
 
 ; Works but needs to be loaded into memory for the string pointers to work!
@@ -13,6 +11,8 @@ _main:
 	mov dx, 0
 	
 	int 0x21
+	
+	mov ax, 0x1 ; return 0x1
 	
 	pop bp
 	ret
