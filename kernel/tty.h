@@ -14,7 +14,11 @@ void print_char(c);
 
 void print_stringn(char* str, int n);
 void print_string(char* str);
-void print_hex(int i);
+void print_hex_1(unsigned int n);
+void print_hex_2(unsigned int n);
+void print_hex_4(unsigned int n);
+void print_hex_8(unsigned int n);
+
 void set_cursor(int col, int row);
 
 int readline(char* buffer);

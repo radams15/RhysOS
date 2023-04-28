@@ -11,4 +11,5 @@ void memcpy(int *dest, int *src, unsigned int n);
 
 void clear(int *ptr, unsigned int n);
 
+int strlen(char* str); 
 #endif

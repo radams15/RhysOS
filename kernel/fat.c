@@ -84,9 +84,11 @@ int getDirIndex(char* filename, char* directory) {
   return index;
 }
 
-void loadRootDirectory(char* buffer) {read_sector(buffer, ROOT_DIR_SECTOR);}
+void loadRootDirectory(char* buffer) {
+	read_sector(buffer, ROOT_DIR_SECTOR);
+}
 
-void loadDirectory(char* buffer, char* name) {
+void read_directory(char* buffer, char* name) {
   int sector;
   if (*name == '/') {
     loadRootDirectory(buffer);
@@ -100,7 +102,7 @@ void list_directory(char* dirName) {
   int x, y;
   char directory[SECTOR_SIZE];
 
-  loadDirectory(directory, dirName);
+  read_directory(directory, dirName);
 
   for (x = 0; x < SECTOR_SIZE; x += ENTRY_SIZE) {
     if (directory[x] != 0) {
@@ -112,26 +114,32 @@ void list_directory(char* dirName) {
   }
 }
 
-int read_file(char buf[], char* filename) {
+int read_file(char* buf, char* filename) {
   int x, index;
   char entryChar;
   char directory[SECTOR_SIZE];
   char topName[NAME_SIZE], subName[NAME_SIZE];
 
   parseFileName(filename, topName, subName);
-  loadDirectory(directory, topName);
-  index = getDirIndex(subName, directory);
   
-  if (index == -1) {
-    print_string("ERROR: No such file in Directory\n"); 
-    return 1;
-  }
+  read_directory(directory, topName);
+  
+  if(strlen(subName) == 0) { // just read directory
+      memcpy(buf, &directory, SECTOR_SIZE);
+  } else {
+	  index = getDirIndex(subName, directory);
+	  
+	  if (index == -1) {
+		print_string("ERROR: No such file in Directory\n"); 
+		return 1;
+	  }
 
-  for(x = HEADER_SIZE; x < ENTRY_SIZE; x++) {
-    entryChar = directory[index + x];
-    if (entryChar != 0) {
-      read_sector((buf + (x - HEADER_SIZE) * SECTOR_SIZE), (int)entryChar);
-    }
+	  for(x = HEADER_SIZE; x < ENTRY_SIZE; x++) {
+		entryChar = directory[index + x];
+		if (entryChar != 0) {
+		  read_sector((buf + (x - HEADER_SIZE) * SECTOR_SIZE), (int)entryChar);
+		}
+	  }
   }
   
   return 0;

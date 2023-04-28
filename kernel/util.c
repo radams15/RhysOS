@@ -25,3 +25,15 @@ void memcpy(int *dest, int *src, unsigned int n) {
 void clear(int *ptr, unsigned int n) {
   memset(ptr, 0, n);
 }
+
+int strlen(char* str) {
+	int i = 0;
+	char* c;
+	
+	for(c=str ; *c != 0 ; c++) {
+		i++;
+	}
+	
+	return i;
+}
+

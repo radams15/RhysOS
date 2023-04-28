@@ -3,7 +3,6 @@
 int print_code = 0x0E;
 int set_cursor_code = 0x0200;
 int zero = 0x00;
-char hex_chars[] = "0123456789ABCDEF";
 
 int graphics_mode = GRAPHICS_CGA_80x25; // CGA 80x24
 
@@ -36,12 +35,28 @@ void print_string(char* str) {
         print_char(*c);
 }
 
-void print_hex(int n) { // TODO Improve this to handle > 3 bytes.
-    print_string("0x");
-    print_char(hex_chars[(n & 0xF00)>>8]);
-    print_char(hex_chars[(n & 0xF0)>>4]);
-    print_char(hex_chars[(n & 0xF)>>0]);
+void print_hex_1(unsigned int n) {
+    if (n < 10)
+        print_char(n + '0');
+    else
+        print_char(n - 10 + 'A');
 }
+
+void print_hex_2(unsigned int n) {
+    print_hex_1(n >> 4);
+    print_hex_1(n & 15);
+}
+
+void print_hex_4(unsigned int n) {
+    print_hex_2(n >> 8);
+    print_hex_2(n & 255);
+}
+
+void print_hex_8(unsigned int n) { // TODO Broken
+    print_hex_4(n >> 12);
+    print_hex_4(n & 4095);
+}
+
 
 int readline(char* buffer) {
 	char c;

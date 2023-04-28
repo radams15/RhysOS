@@ -17,7 +17,7 @@ void main() {
 		print_string("\r\nError in kernel, halting!\r\n");
 	}
 
-	while(1){}
+	for(;;){}
 }
 
 int shell() {
@@ -64,10 +64,30 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
       
     default:
 		print_string("Unknown interrupt: ");
-		print_hex(ax);
+		print_hex_4(ax);
 		print_string("!\r\n");
 		break;
   }
+}
+
+void test() {
+	int i;
+	char* buf;
+	int* a;
+	
+	buf = malloc(512);
+	
+	//print_hex_8(0xabcdEF);
+	
+	/*for(i=0 ; i<512 ; i++) {
+		buf[i] = i;
+	}*/
+	
+	/*read_file(buf, "/test.bin");
+
+	for(i=0 ; i<512 ; i++) {
+		print_char(buf[i]);
+	}*/
 }
 
 int init(){	
@@ -75,7 +95,8 @@ int init(){
 	
 	makeInterrupt21();
 	
-	shell();
+	//shell();
+	test();
 	
 	print_string("\n\nDone.");
 
