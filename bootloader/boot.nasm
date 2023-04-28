@@ -1,7 +1,7 @@
 org 0
 
 KSEG	equ	KERNEL_ADDR ; address to place kernel in
-KSIZE	equ	15 ; sectors in kernel
+KSIZE	equ	KERNEL_SECTORS ; sectors in kernel
 KSTART	equ	3 ; start sector
 
 mov ax,KSEG

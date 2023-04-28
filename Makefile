@@ -1,12 +1,13 @@
 KERNEL_ADDR?=0x1000
-SHELL_ADDR?=0x4000
-EXE_ADDR?=0x6000
+SHELL_ADDR?=0x3000
+EXE_ADDR?=0x15000
+KERNEL_SECTORS?=15
 
 all: img
 
 bload:
 	@mkdir -p build
-	nasm -fbin bootloader/boot.nasm -DKERNEL_ADDR=${KERNEL_ADDR} -Ibootloader -o build/boot.bin
+	nasm -fbin bootloader/boot.nasm -DKERNEL_ADDR=${KERNEL_ADDR} -DKERNEL_SECTORS=${KERNEL_SECTORS} -Ibootloader -o build/boot.bin
 	
 make_dir:
 	gcc make_dir.c -o make_dir
@@ -29,7 +30,10 @@ krnl:
 stdlb:
 	@mkdir -p build/stdlib
 	bcc -ansi -c stdlib/stdio.c -Istdlib/ -o build/stdlib/stdio.o
-	nasm -fas86 stdlib/stdio.nasm -Istdlib/ -o build/stdlib/stdlib_nasm.o
+	bcc -ansi -c stdlib/string.c -Istdlib/ -o build/stdlib/string.o
+	bcc -ansi -c stdlib/syscall.c -Istdlib/ -o build/stdlib/syscall.o
+	
+	nasm -fas86 stdlib/syscall.nasm -Istdlib/ -o build/stdlib/syscall_nasm.o
 	
 	ar -rcs build/stdlib/libstdlib.a build/stdlib/*.o
 

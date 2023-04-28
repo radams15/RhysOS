@@ -1,14 +1,16 @@
 #ifndef STDIO_H
 #define STDIO_H
 
-#define NULL ((void*) 0)
+#include "stddef.h"
 
-extern int interrupt (int number, int AX, int BX, int CX, int DX);
+enum {
+	GRAPHICS_CGA_80x25 = 0,
+	GRAPHICS_CGA_40x25 = 1,
+} GraphicsMode;
 
-int print(char* str);
-int readline(char* buffer);
-int exec(char* file);
+void printf(char* text, ...);
 
-char* strtok(register char* s, register char* delim);
+int set_graphics_mode(int mode);
+int cls();
 
 #endif

@@ -2,6 +2,9 @@
 #include "tty.h"
 #include "proc.h"
 
+#define EXE_SIZE 8096
+#define SHELL_SIZE EXE_SIZE
+
 void main();
 void entry() {main();}
 
@@ -20,7 +23,7 @@ void main() {
 int shell() {
 	int ret;
 	int size;
-	char buf[1024];
+	char buf[SHELL_SIZE];
     
     read_file(&buf, "/shell.bin");
     
@@ -28,7 +31,7 @@ int shell() {
 }
 
 int exec(char* file_name) {
-	char buf[1024];
+	char buf[EXE_SIZE];
     
     if(!read_file(&buf, file_name)) {
 	    return run_exe(&buf, sizeof(buf), LOAD_EXE);
@@ -42,13 +45,21 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
     case 0:
 		print_string((char *)bx);
 		break;
-	
+
     case 1:
+		print_char((char) bx);
+		break;
+	
+    case 2:
 		return readline(bx);
 		break;
 		
-    case 2:
+    case 3:
 		return exec(bx);
+		break;
+		
+    case 4:
+		return set_graphics_mode(bx);
 		break;
       
     default:

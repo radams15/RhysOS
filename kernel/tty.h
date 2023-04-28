@@ -1,6 +1,10 @@
 #ifndef RHYSOS_TTY_H
 #define RHYSOS_TTY_H
 
+enum {
+	GRAPHICS_CGA_80x25 = 0,
+	GRAPHICS_CGA_40x25 = 1,
+} GraphicsMode;
 
 void clear_screen();
 
@@ -15,5 +19,8 @@ void set_cursor(int col, int row);
 
 int readline(char* buffer);
 char getch();
+
+void set_graphics_mode(int mode);
+void cls();
 
 #endif
