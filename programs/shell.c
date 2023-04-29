@@ -1,9 +1,28 @@
 #include <stdio.h>
 #include <string.h>
+#include <syscall.h>
 
 int entry() {return main();}
 
 static char* prompt = "> ";
+
+void dir_listing(char* dir) {
+	int i;
+	File_t dir_buf[20]; // allow for 20 files max.
+	File_t* file;
+
+	printf("Files in directory '/'");
+	dir_list(dir, &dir_buf);
+	
+	for(i=0 ; i<20 ; i++) {
+		file = &dir_buf[i];
+		
+		if(strlen(file->name) == 0)
+			break;
+
+		printf("- %s\n", file->name);
+	}
+}
 
 int check_builtins(char* exe, char* args) {
 	if(STREQ(exe, "clear")) {
@@ -18,8 +37,8 @@ int check_builtins(char* exe, char* args) {
 		}
 		
 		return 0;
-	} else if(STREQ(exe, "ls")) {
-		printf("Files in directory '/'");
+	} else if(STREQ(exe, "dir")) {
+		dir_listing("/");
 		return 0;
 	}
 	

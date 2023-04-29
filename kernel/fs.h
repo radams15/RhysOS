@@ -34,15 +34,15 @@ union tar_t {
         char raw[512];
 };
 
-struct File {
+typedef struct File {
 	char name[100];
 	unsigned int sector_start;
 	unsigned int size; // size in bytes.
 } File_t;
 
-typedef int (*FsCallback)(union tar_t);
+typedef int (*FsCallback)(struct File*);
 
 int read_file(char* buf, char* filename);
-int list_directory(char* dir_name, FsCallback callback, void* data);
+int list_directory(char* dir_name, struct File* buf);
 
 #endif

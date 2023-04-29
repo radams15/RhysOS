@@ -2,7 +2,7 @@
 #include "tty.h"
 #include "proc.h"
 
-#define EXE_SIZE 8096
+#define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
 
 void main();
@@ -51,15 +51,19 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 		break;
 	
     case 2:
-		return readline(bx);
+		readline(bx);
 		break;
 		
     case 3:
-		return exec(bx);
+		exec(bx);
 		break;
 		
     case 4:
-		return set_graphics_mode(bx);
+		set_graphics_mode(bx);
+		break;
+		
+    case 5:
+		list_directory(bx, cx);
 		break;
       
     default:
@@ -71,11 +75,7 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 }
 
 void test() {
-	char buf[SHELL_SIZE];
-    
-    read_file(&buf, "/fs_spec.md.md");
-    
-    print_string(buf);
+
 }
 
 int init(){	

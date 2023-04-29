@@ -1,8 +1,8 @@
 KERNEL_ADDR?=0x1000
-SHELL_ADDR?=0x3000
-EXE_ADDR?=0x12000
+SHELL_ADDR?=0x2000
+EXE_ADDR?=0x6000
 HEAP_ADDR?=0x20000
-KERNEL_SECTORS?=30
+KERNEL_SECTORS?=15
 
 all: img
 
@@ -44,6 +44,9 @@ progs: stdlb
 	bcc -ansi -c programs/test.c -Iprograms/ -Istdlib -o build/programs/test.bin.o
 	ld86 -o build/programs/test.bin -T${EXE_ADDR} -d build/programs/test.bin.o -Lbuild/stdlib -lstdlib
 	
+	bcc -ansi -c programs/type.c -Iprograms/ -Istdlib -o build/programs/type.bin.o
+	ld86 -o build/programs/type.bin -T${EXE_ADDR} -d build/programs/type.bin.o -Lbuild/stdlib -lstdlib
+	
 	bcc -ansi -c programs/shell.c -Iprograms/ -Istdlib -o build/programs/shell.bin.o
 	ld86 -o build/programs/shell.bin -T${SHELL_ADDR} -d build/programs/shell.bin.o -Lbuild/stdlib -lstdlib
 
@@ -58,7 +61,7 @@ img: bload krnl progs make_dir load_file
 	#cp build/programs/test.bin . && ./load_file test.bin && rm test.bin
 	#cp build/programs/shell.bin . && ./load_file shell.bin && rm shell.bin
 	
-	tar --format=ustar --xform s:^.*/:: -cf build/initrd.tar build/kernel.bin build/programs/test.bin build/programs/shell.bin docs/syscalls.md docs/fs_spec.md
+	tar --format=ustar --xform s:^.*/:: -cf build/initrd.tar build/kernel.bin build/programs/test.bin build/programs/shell.bin build/programs/type.bin docs/syscalls.md docs/fs_spec.md
 	dd if=build/initrd.tar of=build/system.img bs=512 seek=1 conv=notrunc
 	
 run: img

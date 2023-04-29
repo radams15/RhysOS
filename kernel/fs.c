@@ -86,11 +86,19 @@ int getDirIndex(char* filename, char* directory) {
   return index;
 }
 
-int list_directory(char* dir_name, FsCallback callback, void* data) {
+void file_struct_copy(struct File* out, union tar_t* in, int sector, int size) {
+	memcpy(out->name, in->old.name, strlen(in->old.name));
+	out->sector_start = sector+1; // +1 to remove header sector
+	out->size = size;
+}
+
+int list_directory(char* dir_name, struct File* buf) {
 	int sector;
 	int size_sectors;
 	int size;
+	int i;
 	union tar_t file;
+	struct File out_file;
 	
 	if(dir_name[0] == '/' && dir_name[1] == 0) {
 		sector = ROOT_DIR_SECTOR;
@@ -101,15 +109,17 @@ int list_directory(char* dir_name, FsCallback callback, void* data) {
 	
 	read_sector(&file, sector);
 	
+	i=0;
 	while(strcmp("ustar", file.new.ustar) == 0) {
 		size = oct2bin(file.old.size, 11);
 		
 		size_sectors = (size / SECTOR_SIZE) + 2;
 		
-		if(callback != NULL) {
-			if(! callback(file, data)) {
-				break;
-			}
+		if(buf != NULL) {
+			file_struct_copy(&out_file, &file, sector, size);
+			
+			memcpy(&buf[i], &out_file, sizeof(struct File));
+			i++;
 		} else {
 			print_string(file.old.name);
 			print_char('\n');
@@ -164,9 +174,7 @@ int find_file(struct File* out, char* filename) {
 	
 found:
 
-	memcpy(out->name, file.old.name, strlen(file.old.name));
-	out->sector_start = sector+1; // +1 to remove header sector
-	out->size = size;
+	file_struct_copy(out, &file, sector, size);
   
 	return 0;
 }

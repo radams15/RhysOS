@@ -19,3 +19,7 @@ int exec(char* file) {
 int sys_set_graphics_mode(int mode) {
 	return SYSCALL(4, mode, 0, 0);
 }
+
+int dir_list(char* dir_name, struct File* buf) {
+	return SYSCALL(5, dir_name, buf, 0);
+}
