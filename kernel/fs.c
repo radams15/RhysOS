@@ -173,16 +173,19 @@ int find_file(struct File* out, char* filename) {
 	return 1;
 	
 found:
-
 	file_struct_copy(out, &file, sector, size);
   
 	return 0;
 }
 
-int read_file(char* buf, char* filename) {
+int read_file(char* buf, int n, char* filename) {
 	int sector;
+	int read;
 	int size_sectors;
 	int end_sector;
+	int to_copy;
+	
+	char sect_buf[SECTOR_SIZE];
 	
 	struct File file;
 	
@@ -193,10 +196,21 @@ int read_file(char* buf, char* filename) {
 	
 	size_sectors = (file.size/SECTOR_SIZE);
 	end_sector = file.sector_start + size_sectors;
+	read = 0;
 	
-	for(sector=file.sector_start ; sector <= end_sector ; sector++) {
-		read_sector(buf, sector);
-		buf += SECTOR_SIZE;
+	for(sector=file.sector_start ; sector <= end_sector ; sector++) {	
+		read_sector(&sect_buf, sector);
+		
+		if(read + SECTOR_SIZE > n) {
+			to_copy = n-read;
+		} else {
+			to_copy = SECTOR_SIZE;
+		}
+		
+		memcpy(buf, &sect_buf, to_copy);
+		
+		buf += to_copy;
+		read += SECTOR_SIZE;
 	}
 	
 	return 0;

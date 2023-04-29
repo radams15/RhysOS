@@ -6,6 +6,6 @@ enum {
 	LOAD_SHELL
 } LoadType;
 
-int run_exe(char* buf, unsigned int size, LoadType type);
+int run_exe(char* buf, unsigned int size, LoadType type, int argc, char** argv);
 
 #endif

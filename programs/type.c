@@ -1,14 +1,25 @@
 #include <stdio.h>
 
-int main() {
-	char file[32];
-	char buffer[1024];
+#define CHUNK_SIZE 4096
+
+int entry(int argc, char** argv) { return main(argc, argv); }
+
+int type(char* file) {
+	int n;
+	char buffer[CHUNK_SIZE+1];
 	
-	printf("\nFile: ");
-	readline(&file);
-	printf("\n");
+	file_read(&buffer, CHUNK_SIZE, file);
 	
-	printf("OK!\n");
+	printf("%s\n", buffer);
+}
+
+int main(int argc, char** argv) {
+	int i;
+	
+	for(i=1 ; i<argc ; i++) {
+		printf("Type: '%s'\n", argv[i]);
+		type(argv[i]);
+	}
 	
 	return 0;
 }

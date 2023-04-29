@@ -2,6 +2,8 @@
 #include <string.h>
 #include <syscall.h>
 
+#define MAX_PARAMS 16
+
 int entry() {return main();}
 
 static char* prompt = "> ";
@@ -45,6 +47,26 @@ int check_builtins(char* exe, char* args) {
 	return 1;
 }
 
+static int run_external(char* exe, char* rest) {
+	int argc;
+	char* argv[MAX_PARAMS];
+	char* tok;
+	
+	argc = 1;
+	argv[0] = exe;
+	
+	tok = strtok(rest, " ");
+	
+	while(tok != NULL) {		
+		*(tok-1) = 0; // null terminate section (replacing space)		
+		argv[argc++] = tok;
+		
+		tok = strtok(NULL, " ");
+	}
+	
+	exec(exe, argc, argv);
+}
+
 int run_line(char* line, int length) {
 	char* tok;
 	char* exe;
@@ -57,7 +79,7 @@ int run_line(char* line, int length) {
 		return 0;
 	}
 	
-	exec(exe);
+	run_external(exe, line+strlen(exe)+1);
 }
 
 int loop() {

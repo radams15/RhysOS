@@ -6,7 +6,7 @@ typedef int (*proc_func)(void);
 static char* proc_buf = (char*) EXE_ADDRESS;
 static char* shell_buf = (char*) SHELL_ADDRESS;
 
-int run_exe(char* buf, unsigned int size, int type) {
+int run_exe(char* buf, unsigned int size, int type, int argc, char** argv) {
 	int ret;
 	char* out_buf;
 	
@@ -24,7 +24,8 @@ int run_exe(char* buf, unsigned int size, int type) {
 			return -1;
 	}
 	memcpy(out_buf, buf, size);
-	ret = ((proc_func)out_buf)();
+	
+	ret = ((proc_func)out_buf)(argc, argv);
 	
 	return ret;
 }

@@ -42,7 +42,7 @@ typedef struct File {
 
 typedef int (*FsCallback)(struct File*);
 
-int read_file(char* buf, char* filename);
+int read_file(char* buf, int n, char* filename);
 int list_directory(char* dir_name, struct File* buf);
 
 #endif

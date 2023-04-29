@@ -74,3 +74,5 @@ void printf(char* text, va_list va_alist) {
 	
 	va_end(ptr);
 }
+
+int __mkargv() {}
