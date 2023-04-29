@@ -164,7 +164,7 @@ int find_file(struct File* out, char* filename) {
 	
 found:
 
-	memcpy(out->name, file.old.name, sizeof(out->name));
+	memcpy(out->name, file.old.name, strlen(file.old.name));
 	out->sector_start = sector+1; // +1 to remove header sector
 	out->size = size;
   
@@ -183,12 +183,12 @@ int read_file(char* buf, char* filename) {
 		return 1;
 	}
 	
-	size_sectors = (file.size/512);
+	size_sectors = (file.size/SECTOR_SIZE);
 	end_sector = file.sector_start + size_sectors;
 	
 	for(sector=file.sector_start ; sector <= end_sector ; sector++) {
 		read_sector(buf, sector);
-		buf += 512;
+		buf += SECTOR_SIZE;
 	}
 	
 	return 0;
