@@ -26,20 +26,6 @@ void dir_listing(char* dir) {
 	}
 }
 
-int check_builtins(char* exe, char* args) {
-	if(STREQ(exe, "mode")) {
-		if(STREQ("40", args)) {
-			set_graphics_mode(GRAPHICS_CGA_40x25);
-		} else {
-			set_graphics_mode(GRAPHICS_CGA_80x25);
-		}
-		
-		return 0;
-	}
-	
-	return 1;
-}
-
 static int run_external(char* exe, char* rest) {
 	int argc;
 	char* argv[MAX_PARAMS];
@@ -54,6 +40,8 @@ static int run_external(char* exe, char* rest) {
 		*(tok-1) = 0; // null terminate section (replacing space)		
 		argv[argc++] = tok;
 		
+		printf("'%s' ", tok);
+		
 		tok = strtok(NULL, " ");
 	}
 	
@@ -67,10 +55,6 @@ int run_line(char* line, int length) {
 	tok = strtok(line, " ");
 	
 	exe = tok;
-	
-	if(check_builtins(exe, line+strlen(exe)+1) == 0) {
-		return 0;
-	}
 	
 	run_external(exe, line+strlen(exe)+1);
 }

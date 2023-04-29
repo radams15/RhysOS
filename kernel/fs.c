@@ -146,12 +146,6 @@ int find_file(struct File* out, char* filename) {
 
 	parseFileName(filename, topName, subName);
 	
-	/*if(topName[0] == '/' && topName[1] == 0) {
-		sector = ROOT_DIR_SECTOR;
-	} else {
-		print_string("Unknown Directory");
-		return;
-	}*/
 	sector = ROOT_DIR_SECTOR;
 	
 	read_sector(&file, sector);

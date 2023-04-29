@@ -25,15 +25,15 @@ int shell() {
 	int size;
 	char buf[SHELL_SIZE];
     
-    read_file(&buf, SHELL_SIZE, "/shell.bin");
+    read_file(&buf, SHELL_SIZE, "/shell");
     
-    return run_exe(&buf, SHELL_SIZE, LOAD_SHELL);
+    return run_exe(&buf, SHELL_SIZE, LOAD_SHELL, 0, NULL);
 }
 
 int exec(char* file_name, int argc, char** argv) {
 	char buf[EXE_SIZE];
     
-    if(!read_file(&buf, EXE_SIZE, file_name)) {
+    if(! read_file(&buf, EXE_SIZE, file_name)) {
 	    return run_exe(&buf, EXE_SIZE, LOAD_EXE, argc, argv);
     }
     
@@ -49,27 +49,27 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
     case 1:
 		print_char((char) bx);
 		break;
-	
+
     case 2:
 		readline(bx);
 		break;
-		
+
     case 3:
 		exec(bx, cx, dx);
 		break;
-		
+
     case 4:
 		set_graphics_mode(bx);
 		break;
-		
+
     case 5:
 		list_directory(bx, cx);
 		break;
-		
+
     case 6:
 		read_file((char*) bx, (int) cx, (char*) dx);
 		break;
-      
+
     default:
 		print_string("Unknown interrupt: ");
 		print_hex_4(ax);
@@ -88,6 +88,7 @@ int init(){
 	makeInterrupt21();
 	
 	shell();
+	list_directory("/", NULL);
 	//test();
 	
 	print_string("\n\nDone.");

@@ -4,7 +4,7 @@ jmp _main
 
 extern _cls
 
-_main
+_main:
 	push bp
 
 	call _cls
