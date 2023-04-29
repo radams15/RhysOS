@@ -22,12 +22,12 @@ krnl:
 	bcc -ansi -c kernel/tty.c -o build/tty.o
 	bcc -ansi -c kernel/util.c -o build/util.o
 	bcc -ansi -DHEAP_ADDRESS=${HEAP_ADDR} -c kernel/malloc.c -o build/malloc.o
-	bcc -ansi -DEXE_ADDRESS=${EXE_ADDR} -DSHELL_ADDRESS=${SHELL_ADDR} -c kernel/proc.c -o build/proc.o
+	bcc -ansi -DHEAP_ADDRESS=${HEAP_ADDR} -DEXE_ADDRESS=${EXE_ADDR} -DSHELL_ADDRESS=${SHELL_ADDR} -c kernel/proc.c -o build/proc.o
 	
-	nasm -fas86 kernel/interrupt.nasm -o build/interrupt.o
+	nasm -fas86 kernel/interrupt.nasm -o build/interrupt_nasm.o
 	nasm -fas86 kernel/proc.nasm -o build/proc_nasm.o
 	
-	ld86 -o build/kernel.bin -d build/kernel.o build/tty.o build/fs.o build/interrupt.o build/proc_nasm.o build/proc.o build/util.o build/malloc.o
+	ld86 -o build/kernel.bin -d build/kernel.o build/tty.o build/fs.o build/interrupt_nasm.o build/proc_nasm.o build/proc.o build/util.o build/malloc.o
 
 stdlb:
 	@mkdir -p build/stdlib
