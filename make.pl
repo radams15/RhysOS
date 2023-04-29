@@ -46,8 +46,7 @@ sub kernel {
 		push @objs, $out;
 	}
 	
-	#&run("$LD -o build/kernel.bin -d build/kernel.o ".(join ' ', @objs));
-	&run("ld86 -o build/kernel.bin -d build/kernel.o build/tty.o build/fs.o build/interrupt.o build/proc_nasm.o build/proc.o build/util.o build/malloc.o");
+	&run("$LD -o build/kernel.bin -d build/kernel.o ".(join ' ', @objs));
 	
 	"build/kernel.bin";
 }
@@ -69,8 +68,7 @@ sub stdlib {
 		push @objs, $out;
 	}
 	
-	#&run("ar -rcs build/stdlib/libstdlib.a ".(join ' ', @objs));
-	&run("ar -rcs build/stdlib/libstdlib.a build/stdlib/*.o");
+	&run("ar -rcs build/stdlib/libstdlib.a ".(join ' ', @objs));
 	
 	"-Lbuild/stdlib -lstdlib";
 }
@@ -82,7 +80,6 @@ sub programs {
 	
 	my @programs;
 	
-	mkdir "build/programs/" if !(-e 'build/programs/');
 	for my $c_file (<programs/*.c>) {
 		my $load_addr = $c_file =~ 'shell.c'? $SHELL_ADDR : $EXE_ADDR;
 		
@@ -90,6 +87,18 @@ sub programs {
 		(my $out = $out_obj) =~ s:\.o$::;
 		&run("$CC -ansi -c $c_file -Iprograms/ -Istdlib -o $out_obj");
 		&run("$LD -o $out -T$load_addr -d $out_obj $stdlib");
+		
+		push @programs, $out;
+	}
+	
+	for my $asm_file (<programs/*.nasm>) {
+		my $load_addr = $asm_file =~ 'shell.c'? $SHELL_ADDR : $EXE_ADDR;
+		
+		(my $out_obj = $asm_file) =~ s:programs/(.*)\.nasm:build/programs/$1.o:;
+		(my $out = $out_obj) =~ s:\.o$::;
+		
+		&run("$ASM -fas86 $asm_file -Iprograms/ -Istdlib -o $out_obj");
+		&run("$LD -o $out -T$EXE_ADDR -d $out_obj $stdlib");
 		
 		push @programs, $out;
 	}
@@ -125,10 +134,19 @@ sub build {
 	my $kernel = &kernel;
 	my $stdlib = &stdlib;
 	my @programs = &programs($stdlib);
+	&img($bootloader, $kernel, \@programs);
+}
+
+sub clean {
+	&run("rm -rf build");
 }
 
 if($ARGV[0] eq 'build') {
 	&build;
+}
+
+if($ARGV[0] eq 'clean') {
+	&clean;
 }
 
 if($ARGV[0] eq 'run') {

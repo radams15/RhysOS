@@ -27,11 +27,7 @@ void dir_listing(char* dir) {
 }
 
 int check_builtins(char* exe, char* args) {
-	if(STREQ(exe, "clear")) {
-		printf("Clearing\n");
-		cls();
-		return 0;
-	} if(STREQ(exe, "mode")) {
+	if(STREQ(exe, "mode")) {
 		if(STREQ("40", args)) {
 			set_graphics_mode(GRAPHICS_CGA_40x25);
 		} else {
