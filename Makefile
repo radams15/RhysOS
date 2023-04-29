@@ -2,7 +2,7 @@ KERNEL_ADDR?=0x1000
 SHELL_ADDR?=0x3000
 EXE_ADDR?=0x12000
 HEAP_ADDR?=0x20000
-KERNEL_SECTORS?=15
+KERNEL_SECTORS?=30
 
 all: img
 
@@ -18,7 +18,7 @@ load_file:
 
 krnl:
 	bcc -ansi -c kernel/kernel.c -o build/kernel.o
-	bcc -ansi -c kernel/fat.c -o build/fat.o
+	bcc -ansi -c kernel/fs.c -o build/fs.o
 	bcc -ansi -c kernel/tty.c -o build/tty.o
 	bcc -ansi -c kernel/util.c -o build/util.o
 	bcc -ansi -DHEAP_ADDRESS=${HEAP_ADDR} -c kernel/malloc.c -o build/malloc.o
@@ -27,7 +27,7 @@ krnl:
 	nasm -fas86 kernel/interrupt.nasm -o build/interrupt.o
 	nasm -fas86 kernel/proc.nasm -o build/proc_nasm.o
 	
-	ld86 -o build/kernel.bin -d build/kernel.o build/tty.o build/fat.o build/interrupt.o build/proc_nasm.o build/proc.o build/util.o build/malloc.o
+	ld86 -o build/kernel.bin -d build/kernel.o build/tty.o build/fs.o build/interrupt.o build/proc_nasm.o build/proc.o build/util.o build/malloc.o
 
 stdlb:
 	@mkdir -p build/stdlib
@@ -58,7 +58,7 @@ img: bload krnl progs make_dir load_file
 	#cp build/programs/test.bin . && ./load_file test.bin && rm test.bin
 	#cp build/programs/shell.bin . && ./load_file shell.bin && rm shell.bin
 	
-	tar --xform s:^.*/:: -cf build/initrd.tar build/kernel.bin build/programs/test.bin build/programs/shell.bin
+	tar --format=ustar --xform s:^.*/:: -cf build/initrd.tar build/kernel.bin build/programs/test.bin build/programs/shell.bin docs/syscalls.md docs/fs_spec.md
 	dd if=build/initrd.tar of=build/system.img bs=512 seek=1 conv=notrunc
 	
 run: img

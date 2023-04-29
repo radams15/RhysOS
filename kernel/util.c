@@ -37,3 +37,30 @@ int strlen(char* str) {
 	return i;
 }
 
+
+int strncmp(char* a, char*b, int length) {
+	int i;
+	
+	for(i=0 ; i<length ; i++) {
+		if(a[i] != b[i])
+			return 1;
+	}
+	
+	return 0;
+}
+
+int strcmp(char* a, char* b) {
+	return strncmp(a, b, strlen(a));
+}
+
+int oct2bin(unsigned char* str, int size) {
+    int n = 0;
+    unsigned char *c = str;
+    while (size-- > 0) {
+        n *= 8;
+        n += *c - '0';
+        c++;
+    }
+    return n;
+}
+

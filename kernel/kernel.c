@@ -1,4 +1,4 @@
-#include "fat.h"
+#include "fs.h"
 #include "tty.h"
 #include "proc.h"
 
@@ -71,23 +71,11 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 }
 
 void test() {
-	int i;
-	char* buf;
-	int* a;
-	
-	buf = malloc(512);
-	
-	//print_hex_8(0xabcdEF);
-	
-	/*for(i=0 ; i<512 ; i++) {
-		buf[i] = i;
-	}*/
-	
-	/*read_file(buf, "/test.bin");
-
-	for(i=0 ; i<512 ; i++) {
-		print_char(buf[i]);
-	}*/
+	char buf[SHELL_SIZE];
+    
+    read_file(&buf, "/fs_spec.md.md");
+    
+    print_string(buf);
 }
 
 int init(){	

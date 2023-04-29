@@ -12,4 +12,11 @@ void memcpy(int *dest, int *src, unsigned int n);
 void clear(int *ptr, unsigned int n);
 
 int strlen(char* str); 
+
+int strncmp(char* a, char*b, int length);
+
+int strcmp(char* a, char* b);
+
+int oct2bin(unsigned char* str, int size);
+
 #endif
