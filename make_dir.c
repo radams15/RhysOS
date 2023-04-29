@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "fs_structs.h"
+
 int main(int argc, char* argv[]) {
 	int i;
 
@@ -13,17 +15,27 @@ int main(int argc, char* argv[]) {
 	}
 
 	//load the disk map
-	char map[512] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00};
+	char map[512] = {0};
+	
+	for(i=0 ; i<KERNEL_SECTORS ; i++)
+		map[i] = 0xFF;
 
-	char dir[512] = "KERNEL\x3\x4\x5\x6\x7\x8\x9\xA\xB\xC";
+	struct DirEnt dir[512] = {
+		{
+			"KERNEL",
+			"IMG",
+			0,
+		}
+	};
 
-        fseek(floppy,512,SEEK_SET);
-        for(i=0; i<512; i++)
+	fseek(floppy,512,SEEK_SET);
+	for(i=0; i<512; i++)
 		fputc(map[i],floppy);
-        
-        fseek(floppy,512*2,SEEK_SET);
-        for (i=0; i<512; i++)
-		fputc(dir[i],floppy);
+
+	fseek(floppy,512*2,SEEK_SET);
+	for (i=0; i<512; i++)
+		fputc(((char*)dir)[i],floppy);
+
 
 	fclose(floppy);
 	

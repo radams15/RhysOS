@@ -95,8 +95,8 @@ int init(){
 	
 	makeInterrupt21();
 	
-	//shell();
-	test();
+	shell();
+	//test();
 	
 	print_string("\n\nDone.");
 

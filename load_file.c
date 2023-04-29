@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
 	if (argc<2)
 	{
 		printf("Specify file name to load\n");
-		return;
+		return 1;
 	}
 
 	//open the source file
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 	if (loadFil==0)
 	{
 		printf("File not found\n");
-		return;
+		return 1;
 	}
 
 	//open the floppy image
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 	if (floppy==0)
 	{
 		printf("floppya.img not found\n");
-		return;
+		return 1;
 	}
 
 	//load the disk map
@@ -47,6 +47,9 @@ int main(int argc, char* argv[]) {
 	for (i=0; i<512; i++)
 		dir[i]=fgetc(floppy);
 
+
+
+
 	//find a free entry in the directory
 	for (i=0; i<512; i=i+0x20)
 		if (dir[i]==0)
@@ -54,7 +57,7 @@ int main(int argc, char* argv[]) {
 	if (i==512)
 	{
 		printf("Not enough room in directory\n");
-		return;
+		return 1;
 	}
 	int dirindex=i;
 	
@@ -80,7 +83,7 @@ int main(int argc, char* argv[]) {
 		if (sectcount==26)
 		{
 			printf("Not enough space in directory entry for file\n");
-			return;
+			return 1;
 		}
 
 		//find a free map entry
@@ -90,7 +93,7 @@ int main(int argc, char* argv[]) {
 		if (i==256)
 		{
 			printf("Not enough room for file\n");
-			return;
+			return 1;
 		}
 
 		//mark the map entry as taken
@@ -105,7 +108,7 @@ int main(int argc, char* argv[]) {
 		//move to the sector and write to it
 		fseek(floppy,i*512,SEEK_SET);
 		
-		printf("Placing file at map[%d] (Sector 0x%x) (Root+0x%x)\n", i, i*512, dirindex);
+		printf("Placing file at map[%d] (Address 0x%x)\n", i, i*512);
 		
 		for (i=0; i<512; i++)
 		{
@@ -121,6 +124,8 @@ int main(int argc, char* argv[]) {
 			}	
 		}
 	}
+
+
 
 	//write the map and directory back to the floppy image
         fseek(floppy,512,SEEK_SET);

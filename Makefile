@@ -11,7 +11,7 @@ bload:
 	nasm -fbin bootloader/boot.nasm -DKERNEL_ADDR=${KERNEL_ADDR} -DKERNEL_SECTORS=${KERNEL_SECTORS} -Ibootloader -o build/boot.bin
 	
 make_dir:
-	gcc make_dir.c -o make_dir
+	gcc make_dir.c -DKERNEL_SECTORS=${KERNEL_SECTORS} -o make_dir
 	
 load_file:
 	gcc load_file.c -o load_file
@@ -47,7 +47,7 @@ progs: stdlb
 	bcc -ansi -c programs/shell.c -Iprograms/ -Istdlib -o build/programs/shell.bin.o
 	ld86 -o build/programs/shell.bin -T${SHELL_ADDR} -d build/programs/shell.bin.o -Lbuild/stdlib -lstdlib
 
-img: bload krnl progs
+img: bload krnl progs make_dir load_file
 	dd if=/dev/zero of=build/system.img bs=512 count=2880 # Empty disk
 	
 	dd if=build/boot.bin of=build/system.img bs=512 count=1 conv=notrunc
@@ -57,7 +57,6 @@ img: bload krnl progs
 	dd if=map.img of=build/system.img bs=512 count=1 seek=1 conv=notrunc
 	
 	./make_dir
-	./load_file testfl
 	cp build/programs/test.bin . && ./load_file test.bin && rm test.bin
 	cp build/programs/shell.bin . && ./load_file shell.bin && rm shell.bin
 	
@@ -66,3 +65,5 @@ run: img
 	
 clean:
 	rm -rf build
+	rm -f make_dir
+	rm -f load_file
