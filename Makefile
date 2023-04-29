@@ -51,14 +51,15 @@ img: bload krnl progs make_dir load_file
 	dd if=/dev/zero of=build/system.img bs=512 count=2880 # Empty disk
 	
 	dd if=build/boot.bin of=build/system.img bs=512 count=1 conv=notrunc
+	#dd if=build/kernel.bin of=build/system.img bs=512 seek=3 conv=notrunc
+	#dd if=map.img of=build/system.img bs=512 count=1 seek=1 conv=notrunc
+
+	#./make_dir
+	#cp build/programs/test.bin . && ./load_file test.bin && rm test.bin
+	#cp build/programs/shell.bin . && ./load_file shell.bin && rm shell.bin
 	
-	dd if=build/kernel.bin of=build/system.img bs=512 seek=3 conv=notrunc
-	
-	dd if=map.img of=build/system.img bs=512 count=1 seek=1 conv=notrunc
-	
-	./make_dir
-	cp build/programs/test.bin . && ./load_file test.bin && rm test.bin
-	cp build/programs/shell.bin . && ./load_file shell.bin && rm shell.bin
+	tar --xform s:^.*/:: -cf build/initrd.tar build/kernel.bin build/programs/test.bin build/programs/shell.bin
+	dd if=build/initrd.tar of=build/system.img bs=512 seek=1 conv=notrunc
 	
 run: img
 	qemu-system-i386 -machine pc -fda build/system.img -boot a -m 1M

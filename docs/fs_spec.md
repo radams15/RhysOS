@@ -28,12 +28,12 @@ Every 32 bytes can store 1 file name.
  
 ```c
 struct DirEnt {
-	char file_name[7];
+	char name[7];
 	char ext[3];
 	int sector;
 };
 
-typedef struct DirEnt DirectoryTable[16]; // 512/32 = 16
+typedef struct DirEnt DirTable[16]; // 512/32 = 16
 ```
 
 # Rest of sectors
