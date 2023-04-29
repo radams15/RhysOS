@@ -164,7 +164,7 @@ int find_file(struct File* out, char* filename) {
 	
 found:
 
-	//memcpy(out->name, file.old.name, sizeof(out->name));
+	memcpy(out->name, file.old.name, sizeof(out->name));
 	out->sector_start = sector+1; // +1 to remove header sector
 	out->size = size;
   
