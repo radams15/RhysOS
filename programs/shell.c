@@ -39,9 +39,6 @@ int check_builtins(char* exe, char* args) {
 		}
 		
 		return 0;
-	} else if(STREQ(exe, "dir")) {
-		dir_listing("/");
-		return 0;
 	}
 	
 	return 1;
