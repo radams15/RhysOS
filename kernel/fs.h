@@ -3,44 +3,55 @@
 
 #include "type.h"
 
-union tar_t {
-        // Pre-POSIX.1-1988 format
-        struct {
-            char name[100];             // file name
-            char mode[8];               // permissions
-            char uid[8];                // user id (octal)
-            char gid[8];                // group id (octal)
-            char size[12];              // size (octal)
-            char mtime[12];             // modification time (octal)
-            char check[8];              // sum of unsigned characters in block, with spaces in the check field while calculation is done (octal)
-            char link;                  // link indicator
-            char link_name[100];        // name of linked file
-        } old;
+#define FILE_NAME_MAX 128
 
-        // UStar format (POSIX IEEE P1003.1)
-        struct {
-            char old[156];              // first 156 octets of Pre-POSIX.1-1988 format
-            char type;                  // file type
-            char also_link_name[100];   // name of linked file
-            char ustar[8];              // ustar\000
-            char owner[32];             // user name (string)
-            char group[32];             // group name (string)
-            char major[8];              // device major number
-            char minor[8];              // device minor number
-            char prefix[155];
-            struct tar_t * next;
-        } new;
-        
-        char raw[512];
-};
+#define FS_FILE        0x01
+#define FS_DIRECTORY   0x02
+#define FS_CHARDEVICE  0x03
+#define FS_BLOCKDEVICE 0x04
+#define FS_PIPE        0x05
+#define FS_SYMLINK     0x06
+#define FS_MOUNTPOINT  0x08
 
-typedef struct File {
-	char name[100];
-	unsigned int sector_start;
-	unsigned int size; // size in bytes.
-} File_t;
+/*
+	http://www.jamesmolloy.co.uk/tutorial_html/8.-The%20VFS%20and%20the%20initrd.html
+*/
 
-int read_file(char* buf, int n, char* filename);
-int list_directory(char* dir_name, struct File* buf);
+void read_sector(int* buffer, int sector);
+
+typedef unsigned int (*ReadFunc)(struct FsNode*, unsigned int, unsigned int, unsigned char*);
+typedef unsigned int (*WriteFunc)(struct FsNode*, unsigned int, unsigned int, unsigned char*);
+typedef unsigned int (*OpenFunc)(struct FsNode*);
+typedef unsigned int (*CloseFunc)(struct FsNode*);
+typedef struct DirEnt* (*ReaddirFunc)(struct FsNode*, unsigned int);
+typedef struct FsNode* (*FinddirFunc)(struct FsNode*, char* name);
+
+typedef struct DirEnt {
+	char name[FILE_NAME_MAX];
+	unsigned int inode;
+} DirEnt_t;
+
+typedef struct FsNode {
+	char name[FILE_NAME_MAX];
+	unsigned int flags; // node type, etc
+	unsigned int inode;
+	unsigned int start_sector;
+	unsigned int length; // size in bytes.
+	ReadFunc read;
+	WriteFunc write;
+	OpenFunc open;
+	CloseFunc close;
+	ReaddirFunc readdir;
+	FinddirFunc finddir;
+	struct FsNode* ref; // Pointer to symlink or mount
+} FsNode_t;
+
+
+unsigned int fs_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer);
+unsigned int fs_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer);
+unsigned int fs_open(FsNode_t* node, unsigned char read, unsigned char write);
+unsigned int fs_close(FsNode_t* node);
+DirEnt_t* fs_readdir(FsNode_t* node, unsigned int index);
+FsNode_t* fs_finddir(FsNode_t* node, char* name);
 
 #endif

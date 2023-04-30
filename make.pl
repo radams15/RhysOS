@@ -21,7 +21,11 @@ sub run {
 	my ($cmd) = @_;
 	
 	print "$cmd\n";
-	system($cmd);
+	my $ret = system($cmd);
+
+	die if $ret;
+
+	$ret;
 }
 
 sub bootloader {
@@ -113,11 +117,11 @@ sub initrd {
 }
 
 sub img {
-	my ($bootloader, $kernel, $programs) = @_;
+	my ($bootloader, $kernel, $programs, $extra_files) = @_;
 	
 	&run("dd if=/dev/zero of=build/system.img bs=512 count=2880");
 	
-	my $initrd = &initrd($kernel, @$programs);
+	my $initrd = &initrd($kernel, @$programs, @$extra_files);
 	
 	&run("dd if=$bootloader of=build/system.img bs=512 count=1 conv=notrunc");
 	&run("dd if=$initrd of=build/system.img bs=512 seek=1 conv=notrunc");
@@ -134,7 +138,7 @@ sub build {
 	my $kernel = &kernel;
 	my $stdlib = &stdlib;
 	my @programs = &programs($stdlib);
-	&img($bootloader, $kernel, \@programs);
+	&img($bootloader, $kernel, \@programs, ['fs_structs.h']);
 }
 
 sub clean {
