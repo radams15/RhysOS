@@ -7,7 +7,7 @@ int div (int a, int b);
 
 int mod (int a, int n);
 
-void memcpy(int *dest, int *src, unsigned int n);
+void memcpy(char *dest, char *src, unsigned int n);
 
 void clear(int *ptr, unsigned int n);
 

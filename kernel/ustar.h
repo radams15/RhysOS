@@ -3,7 +3,7 @@
 
 #include "fs.h"
 
-union tar_t {
+typedef union Tar {
         // Pre-POSIX.1-1988 format
         struct {
             char name[100];             // file name
@@ -32,9 +32,11 @@ union tar_t {
         } new;
         
         char raw[512];
-};
+} Tar_t;
 
 int ustar_read_file(char* buf, int n, char* filename);
 int ustar_list_directory(char* dir_name, struct File* buf);
+
+FsNode_t* ustar_init(int fs_sector_start);
 
 #endif

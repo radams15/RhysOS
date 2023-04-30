@@ -6,19 +6,16 @@ int entry(int argc, char** argv) { return main(argc, argv); }
 
 void dir_listing(char* dir) {
 	int i;
-	File_t dir_buf[20]; // allow for 20 files max.
-	File_t* file;
+	char* dir_buf[20]; // allow for 20 files max.
 
 	printf("Files in directory '%s'\n", dir);
 	dir_list(dir, &dir_buf);
 	
-	for(i=0 ; i<20 ; i++) {
-		file = &dir_buf[i];
-		
-		if(strlen(file->name) == 0)
+	for(i=0 ; i<5 ; i++) {		
+		if(strlen(dir_buf[i]) == NULL)
 			break;
 
-		printf("\t- %s\n", file->name);
+		printf("\t- %s\n", dir_buf[i]);
 	}
 }
 

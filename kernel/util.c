@@ -13,17 +13,18 @@ int div (int a, int b) {
 }
 
 int mod (int a, int n) {
-  return a - div(a,n) * n;
+	return a - div(a,n) * n;
 }
 
-void memcpy(int *dest, int *src, unsigned int n) {
-  while (n-- > 0) {
-    *dest++ = *src++;
-  }
+void memcpy(char* dest, char* src, unsigned int n) {
+	int i;
+	for(i=0; i<n ; i++) {
+		dest[i] = src[i];
+	}
 }
 
 void clear(int *ptr, unsigned int n) {
-  memset(ptr, 0, n);
+	memset(ptr, 0, n);
 }
 
 int strlen(char* str) {

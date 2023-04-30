@@ -1,4 +1,5 @@
 #include "ustar.h"
+#include "malloc.h"
 
 #define ROOT_DIR_SECTOR 1
 #define SECTOR_SIZE 512
@@ -6,40 +7,94 @@
 #define HEADER_SIZE (NAME_SIZE+1) //Number of name and type bytes in directory
 #define ENTRY_SIZE 32
 
-void moveString(char* to, char* from, int length) {
-  strcpy(to, from, length);
-  clear(from, length);
+#define MAX_FILES 32
+
+static int sector_start;
+static union Tar* file_headers;
+static FsNode_t* root_node;
+static FsNode_t* root_nodes;
+static unsigned int num_root_nodes;
+
+static DirEnt_t dirent;
+
+void strcpy(char* a, char* b) {
+	memcpy(a, b, strlen(b));
 }
 
-void read_sector(int* buffer, int sector){	
-	int relativeSector = mod(sector, 18) + 1;
-	int track = sector / 36;
-	int head = mod((sector / 18), 2);
-	int floppyDevice = 0;
+unsigned int ustar_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) { // TODO implement offset
+	int sector;
+	int read;
+	int size_sectors;
+	int end_sector;
+	int to_copy;
+	int to_read;
+	char sect_buf[SECTOR_SIZE];
+	int i;
+	
+	to_read = size;	
+	size_sectors = (node->length/SECTOR_SIZE);
+	end_sector = node->start_sector + size_sectors;
+	read = 0;
+	
+	for(sector=node->start_sector ; sector <= end_sector ; sector++) {	
+		read_sector(&sect_buf, sector);
+		
+		if(read + SECTOR_SIZE > size) {
+			to_copy = size-read;
+		} else {
+			to_copy = SECTOR_SIZE;
+		}
+		
+		if(to_copy+read > to_read) {
+			to_copy = to_read - read;
+		}
+		
+		//print_string(sect_buf);
+		for(i=0 ; i<to_copy ; i++) {
+			buffer[i] = sect_buf[i];
+		}
 
-	interrupt(0x13, (2 * 256 + 1), (int)buffer, (track*256 + relativeSector), (head*256 + floppyDevice));
+		
+		buffer += to_copy;
+		read += to_copy;
+	}
+	
+	return read;
 }
 
-void file_struct_copy(struct File* out, union tar_t* in, int sector, int size) {
-	memcpy(out->name, in->old.name, strlen(in->old.name));
-	out->sector_start = sector+1; // +1 to remove header sector
-	out->size = size;
+unsigned int ustar_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+
 }
 
-int ustar_list_directory(char* dir_name, struct File* buf) {
+DirEnt_t* ustar_readdir(FsNode_t* node, unsigned int index) {
+	if(index >= num_root_nodes+1) {
+		return NULL;
+	}
+	
+	strcpy(dirent.name, root_nodes[index-1].name);
+	dirent.name[strlen(root_nodes[index-1].name)] = 0;
+	dirent.inode = root_nodes[index-1].inode;
+	
+	return &dirent;
+}
+
+FsNode_t* ustar_finddir(FsNode_t* node, char* name) {
+   int i;
+   for (i = 0; i < num_root_nodes; i++)
+       if (strcmp(name, root_nodes[i].name) == 0)
+           return &root_nodes[i];
+           
+   return NULL;
+}
+
+int ustar_load_root() {
 	int sector;
 	int size_sectors;
 	int size;
 	int i;
-	union tar_t file;
-	struct File out_file;
+	union Tar file;
 	
-	if(dir_name[0] == '/' && dir_name[1] == 0) {
-		sector = ROOT_DIR_SECTOR;
-	} else {
-		print_string("Unknown Directory");
-		return;
-	}
+	sector = ROOT_DIR_SECTOR;
 	
 	read_sector(&file, sector);
 	
@@ -49,95 +104,56 @@ int ustar_list_directory(char* dir_name, struct File* buf) {
 		
 		size_sectors = (size / SECTOR_SIZE) + 2;
 		
-		if(buf != NULL) {
-			file_struct_copy(&out_file, &file, sector, size);
-			
-			memcpy(&buf[i], &out_file, sizeof(struct File));
-			i++;
-		} else {
-			print_string(file.old.name);
-			print_char('\n');
-		}
+		strcpy(root_nodes[i].name, file.old.name);
 		
+		root_nodes[i].flags = FS_FILE;
+		root_nodes[i].inode = i;
+		root_nodes[i].start_sector = sector+1; // +1 to ignore header
+		root_nodes[i].length = size;
+		root_nodes[i].read = ustar_read;
+		root_nodes[i].write = 0;
+		root_nodes[i].open = 0;
+		root_nodes[i].close = 0;
+		root_nodes[i].readdir = 0;
+		root_nodes[i].finddir = 0;
+		root_nodes[i].ref = 0;
+		
+		i++;
 		sector += size_sectors;
 		
 		read_sector(&file, sector);
 	}
 	
+	num_root_nodes = i;
+	
 	return 0;
 }
 
-int find_file(struct File* out, char* filename) {
-	int x, index;
-	char entryChar;
-	char directory[SECTOR_SIZE];
-	char topName[NAME_SIZE], subName[NAME_SIZE];
-	int sector;
-	int size_sectors;
-	int size;
-	
-	union tar_t file;
-	
-	sector = ROOT_DIR_SECTOR;
-	
-	read_sector(&file, sector);
-	
-	while(strcmp("ustar", file.new.ustar) == 0) {
-		size = oct2bin(file.old.size, 11);
-		
-		size_sectors = (size / SECTOR_SIZE) + 2;
-		
-		if(strcmp(file.old.name, filename) == 0) { // Correct File
-			goto found;
-		}
-		
-		sector += size_sectors;
-		
-		read_sector(&file, sector);
-	}
-	
-	return 1;
-	
-found:
-	file_struct_copy(out, &file, sector, size);
-  
-	return 0;
-}
 
-int ustar_read_file(char* buf, int n, char* filename) {
-	int sector;
-	int read;
-	int size_sectors;
-	int end_sector;
-	int to_copy;
+FsNode_t* ustar_init(int fs_sector_start) {
+	int i;
 	
-	char sect_buf[SECTOR_SIZE];
+	sector_start = fs_sector_start;
 	
-	struct File file;
+	file_headers = malloc(MAX_FILES * sizeof(union Tar));
+	root_node = malloc(sizeof(FsNode_t));
 	
-	if(find_file(&file, filename)) {
-		print_string("Could not find file\n");
-		return 1;
-	}
+	strcpy(root_node->name, "ustar");
+	root_node->flags = FS_DIRECTORY;
+	root_node->inode = 0;
+	root_node->length = 0;
+	root_node->read = 0;
+	root_node->write = 0;
+	root_node->open = 0;
+	root_node->close = 0;
+	root_node->readdir = ustar_readdir;
+	root_node->finddir = ustar_finddir;
+	root_node->ref = 0;
 	
-	size_sectors = (file.size/SECTOR_SIZE);
-	end_sector = file.sector_start + size_sectors;
-	read = 0;
 	
-	for(sector=file.sector_start ; sector <= end_sector ; sector++) {	
-		read_sector(&sect_buf, sector);
-		
-		if(read + SECTOR_SIZE > n) {
-			to_copy = n-read;
-		} else {
-			to_copy = SECTOR_SIZE;
-		}
-		
-		memcpy(buf, &sect_buf, to_copy);
-		
-		buf += to_copy;
-		read += SECTOR_SIZE;
-	}
+	root_nodes = malloc(sizeof(FsNode_t) * MAX_FILES);
 	
-	return 0;
+	ustar_load_root();
+	
+	return root_node;
 }

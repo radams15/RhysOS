@@ -19,7 +19,7 @@ int print(char* str);
 int readline(char* buffer);
 int exec(char* file, int argc, char** argv);
 int sys_set_graphics_mode(int mode);
-int dir_list(char* dir_name, struct File* buf);
+int dir_list(char* dir_name, char** buf);
 int file_read(char* buf, int n, char* file_name);
 
 #endif
