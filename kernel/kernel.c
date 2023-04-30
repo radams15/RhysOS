@@ -2,6 +2,8 @@
 #include "tty.h"
 #include "proc.h"
 
+#include "ustar.h"
+
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
 
@@ -25,7 +27,7 @@ int shell() {
 	int size;
 	char buf[SHELL_SIZE];
     
-    read_file(&buf, SHELL_SIZE, "/shell");
+    ustar_read_file(&buf, SHELL_SIZE, "shell");
     
     return run_exe(&buf, SHELL_SIZE, LOAD_SHELL, 0, NULL);
 }
@@ -33,7 +35,7 @@ int shell() {
 int exec(char* file_name, int argc, char** argv) {
 	char buf[EXE_SIZE];
     
-    if(! read_file(&buf, EXE_SIZE, file_name)) {
+    if(! ustar_read_file(&buf, EXE_SIZE, file_name)) {
 	    return run_exe(&buf, EXE_SIZE, LOAD_EXE, argc, argv);
     }
     
@@ -62,13 +64,13 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 		set_graphics_mode(bx);
 		break;
 
-    case 5:
+/*    case 5:
 		list_directory(bx, cx);
 		break;
 
     case 6:
 		read_file((char*) bx, (int) cx, (char*) dx);
-		break;
+		break;*/
 
     default:
 		print_string("Unknown interrupt: ");
@@ -88,7 +90,6 @@ int init(){
 	makeInterrupt21();
 	
 	shell();
-	list_directory("/", NULL);
 	//test();
 	
 	print_string("\n\nDone.");
