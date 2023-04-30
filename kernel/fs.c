@@ -63,7 +63,7 @@ FsNode_t* fs_finddir(FsNode_t* node, char* name) {
 	return 0;
 }
 
-int fs_find_file(FsNode_t* node, char* name) {
+/*int fs_find_file(FsNode_t* root, char* name) {
 	int i;
 	int found;
 	struct DirEnt* node = NULL;
@@ -91,4 +91,4 @@ int fs_find_file(FsNode_t* node, char* name) {
 	}
 	
 	return -1;
-}
+}*/

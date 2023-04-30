@@ -21,7 +21,11 @@ sub run {
 	my ($cmd) = @_;
 	
 	print "$cmd\n";
-	system($cmd);
+	my $ret = system($cmd);
+
+	die if $ret;
+
+	$ret;
 }
 
 sub bootloader {

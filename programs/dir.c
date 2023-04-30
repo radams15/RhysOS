@@ -4,18 +4,22 @@
 
 int entry(int argc, char** argv) { return main(argc, argv); }
 
+typedef char FileName_t[256];
 void dir_listing(char* dir) {
 	int i;
-	char* dir_buf[20]; // allow for 20 files max.
+	FsNode_t dir_buf[20]; // allow for 20 files max.
+	FsNode_t* file;
 
 	printf("Files in directory '%s'\n", dir);
 	dir_list(dir, &dir_buf);
 	
-	for(i=0 ; i<5 ; i++) {		
-		if(strlen(dir_buf[i]) == NULL)
+	for(i=0 ; i<20 ; i++) {		
+		file = &dir_buf[i];
+		
+		if(strlen(file->name) == 0)
 			break;
 
-		printf("\t- %s\n", dir_buf[i]);
+		printf("\t- %s\n", file->name);
 	}
 }
 

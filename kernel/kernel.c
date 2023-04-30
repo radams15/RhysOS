@@ -71,18 +71,15 @@ int read_file(char* buf, int n, char* file_name) {
     return size;
 }
 
-int list_directory(char* dir_name, char** buf) {
+int list_directory(char* dir_name, FsNode_t* buf) {
 	int i = 0;
 	DirEnt_t* node = 0;
 	FsNode_t* fsnode;
 	
 	while ( (node = fs_readdir(fs_root, i)) != 0) {
-	  fsnode = fs_finddir(fs_root, node->name);
-	  strcpy(buf[i], node->name);
-	  
-		print_string(buf[i]);
-		
-	  i++;
+		fsnode = fs_finddir(fs_root, node->name);
+		memcpy(&buf[i], fsnode, sizeof(FsNode_t));
+		i++;
 	}
 	
 	return i;
