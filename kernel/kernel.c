@@ -7,9 +7,6 @@
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
 
-void main();
-void entry() {main();}
-
 void main() {
 	int err;
 
