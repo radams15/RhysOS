@@ -8,24 +8,6 @@ int entry() {return main();}
 
 static char* prompt = "> ";
 
-void dir_listing(char* dir) {
-	int i;
-	File_t dir_buf[20]; // allow for 20 files max.
-	File_t* file;
-
-	printf("Files in directory '/'");
-	dir_list(dir, &dir_buf);
-	
-	for(i=0 ; i<20 ; i++) {
-		file = &dir_buf[i];
-		
-		if(strlen(file->name) == 0)
-			break;
-
-		printf("- %s\n", file->name);
-	}
-}
-
 static int run_external(char* exe, char* rest) {
 	int argc;
 	char* argv[MAX_PARAMS];
@@ -39,8 +21,6 @@ static int run_external(char* exe, char* rest) {
 	while(tok != NULL) {		
 		*(tok-1) = 0; // null terminate section (replacing space)		
 		argv[argc++] = tok;
-		
-		printf("'%s' ", tok);
 		
 		tok = strtok(NULL, " ");
 	}
@@ -62,6 +42,8 @@ int run_line(char* line, int length) {
 int loop() {
 	char line[1024];
 	
+	memset(&line, 0, 1024/8);
+	
 	printf(prompt);
 	readline(line);
 	printf("\n");
@@ -77,7 +59,7 @@ int main() {
 	char name[32];
 	int ret = 0;
 	
-	cls();
+	//cls();
 	
 	while(!ret) {
 		ret = loop();

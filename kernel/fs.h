@@ -40,8 +40,6 @@ typedef struct File {
 	unsigned int size; // size in bytes.
 } File_t;
 
-typedef int (*FsCallback)(struct File*);
-
 int read_file(char* buf, int n, char* filename);
 int list_directory(char* dir_name, struct File* buf);
 

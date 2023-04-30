@@ -26,8 +26,6 @@ int run_exe(char* buf, unsigned int size, int type, int argc, char** argv) {
 	
 	memcpy(out_buf, buf, size);
 	
-	print_hex_4(argc);
-	
 	ret = ((proc_func)out_buf)(argc, argv);
 	
 	return ret;
