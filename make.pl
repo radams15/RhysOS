@@ -104,28 +104,32 @@ sub programs {
 		my $folder = "build/$program";
 		make_path($folder) if !(-e $folder);
 		
+		my @objs;
+		
+		my $load_addr = $program =~ 'programs/shell/' ? $SHELL_ADDR : $EXE_ADDR;
+		
 		for my $c_file (&find("$program/*.c")) {
-			my $load_addr = $c_file =~ 'shell.c'? $SHELL_ADDR : $EXE_ADDR;
 			
 			(my $out_obj = $c_file) =~ s:programs/(.*)\.c:build/programs/$1.o:;
 			(my $out = $out_obj) =~ s:\.o$::;
 			&run("$CC -ansi -c $c_file -Iprograms/ -Istdlib -o $out_obj");
-			&run("$LD -o $out -T$load_addr -d $out_obj $stdlib");
 			
-			push @programs, $out;
+			push @objs, $out_obj;
 		}
 		
 		for my $asm_file (&find("$program/*.nasm")) {
-			my $load_addr = $asm_file =~ 'shell.c'? $SHELL_ADDR : $EXE_ADDR;
-			
 			(my $out_obj = $asm_file) =~ s:programs/(.*)\.nasm:build/programs/$1.o:;
-			(my $out = $out_obj) =~ s:\.o$::;
 			
 			&run("$ASM -fas86 $asm_file -Iprograms/ -Istdlib -o $out_obj");
-			&run("$LD -o $out -T$EXE_ADDR -d $out_obj $stdlib");
 			
-			push @programs, $out;
+			push @objs, $out_obj;
 		}
+		
+		my $out = "$folder/".basename($program);
+		
+		print "Program: $out\n";
+		
+		&run("$LD -o $out -T$load_addr -d ".join(' ', @objs)." $stdlib");
 	}
 	
 	@programs;
