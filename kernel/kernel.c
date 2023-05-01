@@ -77,12 +77,14 @@ int get_dir(char* name) {
 	FsNode_t* fsnode = fs_root;
 	char* tok;
 	
-	tok = strtok(name, "/");
+	char buf[256];
+	strcpy(&buf, name);
+	buf[strlen(name)] = 0;
+	
+	tok = strtok(buf, "/");
 	
 	while(tok != NULL) {		
 		fsnode = fs_finddir(fsnode, tok);
-		
-		print_string(fsnode->name); print_char('-');
 		
 		tok = strtok(NULL, "/");
 	}
@@ -94,12 +96,7 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 	int i = 0;
 	DirEnt_t* node = 0;
 	FsNode_t* fsnode;
-	FsNode_t* root;
-	
-	if(strcmp(dir_name, "/") == 0)
-		root = fs_root;
-	else
-		root = fs_finddir(fs_root, dir_name);
+	FsNode_t* root = get_dir(dir_name);
 	
 	if(root == NULL) {
 		print_string("Cannot find file!\n");
