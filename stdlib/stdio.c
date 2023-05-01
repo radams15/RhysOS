@@ -10,14 +10,58 @@ void vprintf(char* text, va_list args);
 
 static int graphics_mode = GRAPHICS_CGA_80x25;
 
+
+
 int set_graphics_mode(int mode) {
 	graphics_mode = mode;
 	cls();
 }
 
+
+int print(char* str) {
+	return file_write(str, strlen(str), "/dev/stdout");
+}
+
+
+int putc(char c) {
+	char buf[2];
+	buf[1] = 0;
+	buf[0] = c;
+	
+	return file_write(buf, 1, "/dev/stdout");
+}
+
+
 int cls() {
 	return sys_set_graphics_mode(graphics_mode);
 }
+
+
+char getch() {
+	char out[1];
+	
+	file_read(&out, 1, "/dev/stdin");
+	
+	return out[0];
+}
+
+
+int readline(char* buffer) {
+	char* buffer_head = buffer;
+	char c;
+	
+	while((c=getch()) != '\r') {
+		if(c == 0x8 && buffer != buffer_head) { // backspace
+			*(buffer--) = ' ';
+		} else {
+			*(buffer++) = c;
+		}
+	}
+	
+	*(buffer++) = 0; // null-terminate
+}
+
+
 
 void print_hex_1(unsigned int n) {
     if (n < 10)

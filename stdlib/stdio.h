@@ -10,6 +10,11 @@ enum {
 
 void printf(char* text, ...);
 
+char getch();
+int print(char* str);
+int putc(char c);
+int readline(char* buffer);
+
 int set_graphics_mode(int mode);
 int cls();
 
