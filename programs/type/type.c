@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define CHUNK_SIZE 4096
+#define CHUNK_SIZE 512
 
 int entry(int argc, char** argv) { return main(argc, argv); }
 

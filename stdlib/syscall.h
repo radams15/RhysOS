@@ -33,6 +33,7 @@ typedef int (*FsCallback)(struct File*);
 
 
 int print(char* str);
+int putc(char c);
 int readline(char* buffer);
 int exec(char* file, int argc, char** argv);
 int sys_set_graphics_mode(int mode);

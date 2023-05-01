@@ -24,7 +24,7 @@ void dir_listing(char* dir) {
 		if(strlen(file->name) == 0)
 			break;
 
-		printf("\t- %s\n", file->name);
+		printf("\t - %s\n", file->name);
 	}
 }
 

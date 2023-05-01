@@ -1,13 +1,13 @@
 #include "malloc.h"
 
-static int* heap = (int*) HEAP_ADDRESS;
+static int heap = HEAP_ADDRESS;
 
 void* malloc(unsigned int size) {
-	void* out = heap;
+	int out = heap;
 
 	heap += size;
 
-	return out;
+	return (int*) out;
 }
 
 void free(void* ptr) {

@@ -23,6 +23,25 @@ void main() {
 	for(;;){}
 }
 
+int get_dir(char* name) {
+	FsNode_t* fsnode = fs_root;
+	char* tok;
+	
+	char buf[256];
+	memcpy(&buf, name, 100);
+	buf[strlen(name)] = 0;
+	
+	tok = strtok(buf, "/");
+	
+	while(tok != NULL) {
+		fsnode = fs_finddir(fsnode, tok);
+		
+		tok = strtok(NULL, "/");
+	}
+	
+	return fsnode;
+}
+
 int shell() {
 	struct FsNode* fs_node;
 	char buf[SHELL_SIZE];
@@ -45,7 +64,7 @@ int exec(char* file_name, int argc, char** argv) {
 	char buf[SHELL_SIZE];
 	int size;
 	
-	fs_node = fs_finddir(fs_root, file_name);
+	fs_node = get_dir(file_name);
 	
 	if(fs_node == NULL) {
 		print_string("Failed to find shell!\n");
@@ -61,7 +80,7 @@ int read_file(char* buf, int n, char* file_name) {
 	struct FsNode* fs_node;
 	int size;
 	
-	fs_node = fs_finddir(fs_root, file_name);
+	fs_node = get_dir(file_name);
 	
 	if(fs_node == NULL) {
 		print_string("Failed to find file!\n");
@@ -73,23 +92,20 @@ int read_file(char* buf, int n, char* file_name) {
     return size;
 }
 
-int get_dir(char* name) {
-	FsNode_t* fsnode = fs_root;
-	char* tok;
+int write_file(char* buf, int n, char* file_name) {
+	struct FsNode* fs_node;
+	int size;
 	
-	char buf[256];
-	strcpy(&buf, name);
-	buf[strlen(name)] = 0;
+	fs_node = get_dir(file_name);
 	
-	tok = strtok(buf, "/");
-	
-	while(tok != NULL) {		
-		fsnode = fs_finddir(fsnode, tok);
-		
-		tok = strtok(NULL, "/");
+	if(fs_node == NULL) {
+		print_string("Failed to find file!\n");
+		return -1;
 	}
 	
-	return fsnode;
+	size = fs_write(fs_node, 0, n, buf);
+    
+    return size;
 }
 
 int list_directory(char* dir_name, FsNode_t* buf) {
@@ -100,11 +116,15 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 	
 	if(root == NULL) {
 		print_string("Cannot find file!\n");
+		return -1;
 	}
 	
 	while ( (node = fs_readdir(root, i)) != NULL) {
 		fsnode = fs_finddir(root, node->name);
-		memcpy(&buf[i], fsnode, sizeof(FsNode_t));
+		if(fsnode != NULL) {
+			memcpy(buf++, fsnode, sizeof(FsNode_t));
+		}
+		
 		i++;
 	}
 	
@@ -116,7 +136,7 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
     case 0:
 		print_string((char *)bx);
 		break;
-
+		
     case 1:
 		print_char((char) bx);
 		break;
@@ -133,15 +153,17 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 		set_graphics_mode(bx);
 		break;
 
-    case 5: {
+    case 5:
 		list_directory(bx, cx);
 		break;
-	}
 
-    case 6: {
+    case 6:
 		read_file((char*) bx, (int) cx, (char*) dx);
 		break;
-	}
+	
+    case 7:
+		write_file((char*) bx, (int) cx, (char*) dx);
+		break;
 
     default:
 		print_string("Unknown interrupt: ");
@@ -151,28 +173,6 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
   }
 }
 
-void test(FsNode_t* root) {
-	int size;
-	int x;
-	struct FsNode* fs_node;
-	char buf[SHELL_SIZE];
-	
-	fs_node = fs_finddir(root, "shell");
-	
-	if(fs_node == NULL) {
-		print_string("Failed to find file!\n");
-		return;
-	}
-	
-	size = fs_read(fs_node, 0, sizeof(buf), &buf);
-	
-	for(x=0 ; x<size ; x++) {
-		print_char(buf[x]);
-	}
-	
-	print_char('\n');
-}
-
 int init(){	
 	makeInterrupt21();
 	
@@ -180,10 +180,7 @@ int init(){
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
 	
-	get_dir("/dev/stdout");
-	
 	shell();
-	//test(root);
 	
 	print_string("\n\nDone.");
 

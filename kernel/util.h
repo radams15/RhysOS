@@ -3,6 +3,8 @@
 
 void memset(int *dest, int val, int len);
 
+void strcpy(char* a, char* b);
+
 int div (int a, int b);
 
 int mod (int a, int n);

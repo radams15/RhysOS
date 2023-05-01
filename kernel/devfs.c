@@ -24,10 +24,12 @@ DirEnt_t* devfs_readdir(FsNode_t* node, unsigned int index) {
 
 FsNode_t* devfs_finddir(FsNode_t* node, char* name) {
    int i;
-   for (i = 0; i < num_root_nodes; i++)
-       if (strcmp(name, root_nodes[i].name) == 0)
+   for (i = 0; i < num_root_nodes; i++) {
+       if (strcmp(name, root_nodes[i].name) == 0) {
            return &root_nodes[i];
-           
+       }
+   }
+   
    return NULL;
 }
 
@@ -104,8 +106,6 @@ void devfs_setup() {
 
 
 FsNode_t* devfs_init() {
-	int i;
-	
 	root_node = malloc(sizeof(FsNode_t));
 	
 	strcpy(root_node->name, "dev");
@@ -121,6 +121,10 @@ FsNode_t* devfs_init() {
 	root_node->ref = 0;
 	
 	root_nodes = malloc(sizeof(FsNode_t) * MAX_FILES);
+	
+	if(root_node >= root_nodes) {
+		print_string("FAILLLLL\n");
+	}
 	
 	devfs_setup();
 	

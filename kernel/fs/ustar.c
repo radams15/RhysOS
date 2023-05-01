@@ -17,10 +17,6 @@ static unsigned int num_root_nodes;
 
 static DirEnt_t dirent;
 
-void strcpy(char* a, char* b) {
-	memcpy(a, b, strlen(b));
-}
-
 unsigned int ustar_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) { // TODO implement offset
 	int sector;
 	int read;
@@ -35,6 +31,8 @@ unsigned int ustar_read(FsNode_t* node, unsigned int offset, unsigned int size, 
 	size_sectors = (node->length/SECTOR_SIZE);
 	end_sector = node->start_sector + size_sectors;
 	read = 0;
+	
+	//read += offset;
 	
 	for(sector=node->start_sector ; sector <= end_sector ; sector++) {	
 		read_sector(&sect_buf, sector);
@@ -52,7 +50,6 @@ unsigned int ustar_read(FsNode_t* node, unsigned int offset, unsigned int size, 
 		for(i=0 ; i<to_copy ; i++) {
 			buffer[i] = sect_buf[i];
 		}
-
 		
 		buffer += to_copy;
 		read += to_copy;
@@ -62,7 +59,7 @@ unsigned int ustar_read(FsNode_t* node, unsigned int offset, unsigned int size, 
 }
 
 unsigned int ustar_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
-
+	return 0;
 }
 
 DirEnt_t* ustar_readdir(FsNode_t* node, unsigned int index) {
@@ -81,14 +78,16 @@ FsNode_t* ustar_finddir(FsNode_t* node, char* name) {
    int i;
    for (i = 0; i < num_root_nodes; i++) {
        if (strcmp(name, root_nodes[i].name) == 0) {
-       		if((root_nodes[i].flags & 0x08)) {
+       		if((root_nodes[i].flags & 0x08)) { // Is a mount
        			return root_nodes[i].ref;
    			} else {
 	           return &root_nodes[i];
            }
+       } else {
+
        }
    }
-           
+   
    return NULL;
 }
 
@@ -137,8 +136,8 @@ int ustar_load_root() {
 
 void ustar_mount(FsNode_t* node, char* name) {
 	int i = num_root_nodes;
+	
 	strcpy(root_nodes[i].name, name);
-
 	root_nodes[i].flags = FS_DIRECTORY | FS_MOUNTPOINT;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
