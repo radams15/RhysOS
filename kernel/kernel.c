@@ -146,8 +146,6 @@ void test(FsNode_t* root) {
 }
 
 int init(){	
-	clear_screen();
-	
 	makeInterrupt21();
 	
 	fs_root = ustar_init(1);

@@ -8,10 +8,10 @@ int graphics_mode = GRAPHICS_CGA_80x25; // CGA 80x24
 
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
-void clear_screen() {
+/*void clear_screen() {
 	interrupt(0x10, 0x0200, 0, 0, 0);
 	interrupt(0x10, 0x0600, 0x0f00, 0, 0x184f);
-}
+}*/
 
 void set_resolution(int mode) {
 	interrupt(0x10, mode, 0, 0, 0);

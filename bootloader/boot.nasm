@@ -1,8 +1,22 @@
-org 0
+org 0x7c00
 
 KSEG	equ	KERNEL_ADDR ; address to place kernel in
 KSIZE	equ	KERNEL_SECTORS ; sectors in kernel
 KSTART	equ	2 ; start sector in initrd
+
+mov si, boot_msg
+
+print_char:
+	mov al, [si]
+	cmp al, 0
+	je print_done
+
+	mov ah, 0x0E
+	int 0x10
+	inc si
+	jmp print_char
+
+print_done:
 
 mov ax,KSEG
 mov ds,ax
@@ -23,6 +37,8 @@ mov     bx,0		;read into 0 (in the segment)
 int     13h	;call BIOS disk read function
 
 jmp KSEG:0
+
+boot_msg: db 'Booting RhysOS...', 0xa, 0xd, 0
 
 times 510-($-$$) db 0
 
