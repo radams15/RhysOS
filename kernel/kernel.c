@@ -1,8 +1,6 @@
-#include "fs.h"
+#include "fs/fs.h"
 #include "tty.h"
 #include "proc.h"
-
-#include "ustar.h"
 
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE

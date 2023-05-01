@@ -3,6 +3,10 @@
 use warnings;
 use strict;
 
+use File::Basename;
+use File::Path qw/make_path/;
+use File::Find::Rule;
+
 my $ASM = 'nasm';
 my $CC = 'bcc';
 my $LD = 'ld86';
@@ -28,8 +32,14 @@ sub run {
 	$ret;
 }
 
+sub find {
+	my ($rule) = @_;
+	
+	File::Find::Rule->name(basename($rule))->in(dirname($rule));
+}
+
 sub bootloader {
-	mkdir "build" if !(-e 'build/');
+	make_path("build") if !(-e 'build/');
 	&run("$ASM -fbin bootloader/boot.nasm -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.bin");
 	
 	"build/boot.bin";
@@ -38,35 +48,41 @@ sub bootloader {
 sub kernel {
 	my @objs;
 	
-	for my $c_file (<kernel/*.c>) {
-		(my $out = $c_file) =~ s:kernel/(.*)\.c:build/$1.o:;
-		&run("$CC -ansi $KERNEL_FLAGS -c $c_file -o $out");
+	for my $c_file (&find('kernel/*.c')) {
+		(my $out = $c_file) =~ s:(kernel/.*)\.c:build/$1.o:;
+		my $folder = dirname($out);
+		make_path($folder) if !(-e $folder);
+
+		&run("$CC -ansi -Ikernel/ $KERNEL_FLAGS -c $c_file -o $out");
 		(push @objs, $out) unless $c_file =~ /kernel.c/;
 	}
 	
-	for my $asm_file (<kernel/*.nasm>) {
-		(my $out = $asm_file) =~ s:kernel/(.*)\.nasm:build/$1_nasm.o:;
+	for my $asm_file (&find('kernel/*.nasm')) {
+		(my $out = $asm_file) =~ s:(kernel/.*)\.nasm:build/$1_nasm.o:;
+		my $folder = dirname($out);
+		make_path($folder) if !(-e $folder);
+		
 		&run("$ASM -fas86 $asm_file -o $out");
 		push @objs, $out;
 	}
 	
-	&run("$LD -o build/kernel.bin -d build/kernel.o ".(join ' ', @objs));
+	&run("$LD -o build/kernel.bin -d build/kernel/kernel.o ".(join ' ', @objs));
 	
 	"build/kernel.bin";
 }
 
 sub stdlib {	
-	mkdir "build/stdlib/" if !(-e 'build/stdlib/');
+	make_path("build/stdlib/") if !(-e 'build/stdlib/');
 	my @objs;
 	
-	for my $c_file (<stdlib/*.c>) {		
+	for my $c_file (&find('stdlib/*.c')) {		
 		(my $out = $c_file) =~ s:stdlib/(.*)\.c:build/stdlib/$1.o:;
 		&run("$CC -ansi -c $c_file -Istdlib/ -o $out");
 		
 		push @objs, $out;
 	}
 	
-	for my $asm_file (<stdlib/*.nasm>) {
+	for my $asm_file (&find('stdlib/*.nasm')) {
 		(my $out = $asm_file) =~ s:stdlib/(.*)\.nasm:build/stdlib/$1_nasm.o:;
 		&run("$ASM -fas86 $asm_file -Istdlib/ -o $out");
 		push @objs, $out;
@@ -80,11 +96,11 @@ sub stdlib {
 sub programs {
 	my ($stdlib) = @_;
 	
-	mkdir "build/programs/" if !(-e 'build/programs/');
+	make_path("build/programs/") if !(-e 'build/programs/');
 	
 	my @programs;
 	
-	for my $c_file (<programs/*.c>) {
+	for my $c_file (&find('programs/*.c')) {
 		my $load_addr = $c_file =~ 'shell.c'? $SHELL_ADDR : $EXE_ADDR;
 		
 		(my $out_obj = $c_file) =~ s:programs/(.*)\.c:build/programs/$1.o:;
@@ -95,7 +111,7 @@ sub programs {
 		push @programs, $out;
 	}
 	
-	for my $asm_file (<programs/*.nasm>) {
+	for my $asm_file (&find('programs/*.nasm')) {
 		my $load_addr = $asm_file =~ 'shell.c'? $SHELL_ADDR : $EXE_ADDR;
 		
 		(my $out_obj = $asm_file) =~ s:programs/(.*)\.nasm:build/programs/$1.o:;
