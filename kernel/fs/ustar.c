@@ -49,7 +49,6 @@ unsigned int ustar_read(FsNode_t* node, unsigned int offset, unsigned int size, 
 			to_copy = to_read - read;
 		}
 		
-		//print_string(sect_buf);
 		for(i=0 ; i<to_copy ; i++) {
 			buffer[i] = sect_buf[i];
 		}
@@ -80,9 +79,15 @@ DirEnt_t* ustar_readdir(FsNode_t* node, unsigned int index) {
 
 FsNode_t* ustar_finddir(FsNode_t* node, char* name) {
    int i;
-   for (i = 0; i < num_root_nodes; i++)
-       if (strcmp(name, root_nodes[i].name) == 0)
-           return &root_nodes[i];
+   for (i = 0; i < num_root_nodes; i++) {
+       if (strcmp(name, root_nodes[i].name) == 0) {
+       		if((root_nodes[i].flags & 0x08)) {
+       			return root_nodes[i].ref;
+   			} else {
+	           return &root_nodes[i];
+           }
+       }
+   }
            
    return NULL;
 }
@@ -130,6 +135,24 @@ int ustar_load_root() {
 }
 
 
+void ustar_mount(FsNode_t* node, char* name) {
+	int i = num_root_nodes;
+	strcpy(root_nodes[i].name, name);
+
+	root_nodes[i].flags = FS_DIRECTORY | FS_MOUNTPOINT;
+	root_nodes[i].inode = i;
+	root_nodes[i].length = 1;
+	root_nodes[i].read = 0;
+	root_nodes[i].write = 0;
+	root_nodes[i].open = 0;
+	root_nodes[i].close = 0;
+	root_nodes[i].readdir = 0;
+	root_nodes[i].finddir = 0;
+	root_nodes[i].ref = node;
+	
+	num_root_nodes++;
+}
+
 FsNode_t* ustar_init(int fs_sector_start) {
 	int i;
 	
@@ -138,7 +161,7 @@ FsNode_t* ustar_init(int fs_sector_start) {
 	file_headers = malloc(MAX_FILES * sizeof(union Tar));
 	root_node = malloc(sizeof(FsNode_t));
 	
-	strcpy(root_node->name, "ustar");
+	strcpy(root_node->name, "/");
 	root_node->flags = FS_DIRECTORY;
 	root_node->inode = 0;
 	root_node->length = 0;

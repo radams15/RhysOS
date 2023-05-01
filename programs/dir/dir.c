@@ -2,18 +2,23 @@
 #include <string.h>
 #include <syscall.h>
 
+#define MAX_FILES 30
+
 int entry(int argc, char** argv) { return main(argc, argv); }
 
-typedef char FileName_t[256];
 void dir_listing(char* dir) {
 	int i;
-	FsNode_t dir_buf[20]; // allow for 20 files max.
+	FsNode_t dir_buf[MAX_FILES];
 	FsNode_t* file;
+
+	for(i=0 ; i<MAX_FILES ; i++) {
+		dir_buf[i].name[0] = 0;
+	}
 
 	printf("Files in directory '%s'\n", dir);
 	dir_list(dir, &dir_buf);
 	
-	for(i=0 ; i<20 ; i++) {		
+	for(i=0 ; i<MAX_FILES ; i++) {		
 		file = &dir_buf[i];
 		
 		if(strlen(file->name) == 0)

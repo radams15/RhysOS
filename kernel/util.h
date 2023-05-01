@@ -19,4 +19,6 @@ int strcmp(char* a, char* b);
 
 int oct2bin(unsigned char* str, int size);
 
+char* strtok(register char* s, register char* delim);
+
 #endif

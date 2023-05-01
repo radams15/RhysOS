@@ -2,10 +2,14 @@
 #include "tty.h"
 #include "proc.h"
 
+#include "fs/ustar.h"
+#include "devfs.h"
+
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
 
 FsNode_t* fs_root;
+FsNode_t* fs_dev;
 
 void main() {
 	int err;
@@ -69,13 +73,40 @@ int read_file(char* buf, int n, char* file_name) {
     return size;
 }
 
+int get_dir(char* name) {
+	FsNode_t* fsnode = fs_root;
+	char* tok;
+	
+	tok = strtok(name, "/");
+	
+	while(tok != NULL) {		
+		fsnode = fs_finddir(fsnode, tok);
+		
+		print_string(fsnode->name); print_char('-');
+		
+		tok = strtok(NULL, "/");
+	}
+	
+	return fsnode;
+}
+
 int list_directory(char* dir_name, FsNode_t* buf) {
 	int i = 0;
 	DirEnt_t* node = 0;
 	FsNode_t* fsnode;
+	FsNode_t* root;
 	
-	while ( (node = fs_readdir(fs_root, i)) != 0) {
-		fsnode = fs_finddir(fs_root, node->name);
+	if(strcmp(dir_name, "/") == 0)
+		root = fs_root;
+	else
+		root = fs_finddir(fs_root, dir_name);
+	
+	if(root == NULL) {
+		print_string("Cannot find file!\n");
+	}
+	
+	while ( (node = fs_readdir(root, i)) != NULL) {
+		fsnode = fs_finddir(root, node->name);
 		memcpy(&buf[i], fsnode, sizeof(FsNode_t));
 		i++;
 	}
@@ -149,6 +180,10 @@ int init(){
 	makeInterrupt21();
 	
 	fs_root = ustar_init(1);
+	fs_dev = devfs_init();
+	ustar_mount(fs_dev, "dev");
+	
+	get_dir("/dev/stdout");
 	
 	shell();
 	//test(root);

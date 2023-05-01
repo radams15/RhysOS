@@ -36,6 +36,7 @@ typedef union Tar {
 
 int ustar_read_file(char* buf, int n, char* filename);
 int ustar_list_directory(char* dir_name, struct File* buf);
+void ustar_mount(FsNode_t* node, char* name);
 
 FsNode_t* ustar_init(int fs_sector_start);
 
