@@ -1,0 +1,3 @@
+name: dir
+main: dir.c
+stdlib: true

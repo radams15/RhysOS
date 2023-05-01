@@ -7,6 +7,10 @@ use File::Basename;
 use File::Path qw/make_path/;
 use File::Find::Rule;
 
+use Data::Dumper;
+
+use Config::Simple;
+
 my $ASM = 'nasm';
 my $CC = 'bcc';
 my $LD = 'ld86';
@@ -104,32 +108,40 @@ sub programs {
 		my $folder = "build/$program";
 		make_path($folder) if !(-e $folder);
 		
+		next if !(-e "$program/config");
+		
+		my $conf = Config::Simple->import_from("$program/config");
+		
+		print "Shell? ", $conf->param('shell'), "\n";
+		
+		my $load_addr = $conf->param('shell') ? $SHELL_ADDR : $EXE_ADDR;
+		
 		my @objs;
-		
-		my $load_addr = $program =~ 'programs/shell/' ? $SHELL_ADDR : $EXE_ADDR;
-		
-		for my $c_file (&find("$program/*.c")) {
+		for my $file ( ($conf->param('main')), $conf->param('files') ) {
+			if ($file =~ /\.c$/) {
+				(my $out_obj = $file) =~ s:(.*)\.c:$folder/$1.o:;
+				&run("$CC -ansi -c $program/$file -I$program/ -Istdlib -o $out_obj");
+				
+				push @objs, $out_obj;
+			}
 			
-			(my $out_obj = $c_file) =~ s:programs/(.*)\.c:build/programs/$1.o:;
-			(my $out = $out_obj) =~ s:\.o$::;
-			&run("$CC -ansi -c $c_file -Iprograms/ -Istdlib -o $out_obj");
+			if ($file =~ /\.nasm$/) {
+				(my $out_obj = $file) =~ s:(.*)\.nasm:$folder/$1.o:;
+				
+				&run("$ASM -fas86 $program/$file -I$program/ -Istdlib -o $out_obj");
+				
+				push @objs, $out_obj;
+			}
 			
-			push @objs, $out_obj;
 		}
 		
-		for my $asm_file (&find("$program/*.nasm")) {
-			(my $out_obj = $asm_file) =~ s:programs/(.*)\.nasm:build/programs/$1.o:;
-			
-			&run("$ASM -fas86 $asm_file -Iprograms/ -Istdlib -o $out_obj");
-			
-			push @objs, $out_obj;
-		}
-		
-		my $out = "$folder/".basename($program);
+		my $out = "$folder/".$conf->param('name');
 		
 		print "Program: $out\n";
 		
-		&run("$LD -o $out -T$load_addr -d ".join(' ', @objs)." $stdlib");
+		&run("$LD -o $out -T$load_addr -d ".join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
+		
+		push @programs, $out;
 	}
 	
 	@programs;
