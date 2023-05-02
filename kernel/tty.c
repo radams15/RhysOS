@@ -35,7 +35,6 @@ void print_char(int c) {
 
 	if(c == '\n')
 		interrupt(0x10, 0x0E00 + '\r', 0, 0, 0);
-	
 	interrupt(0x10, 0x0E00 + c, 0, 0, 0);
 }
 

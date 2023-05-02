@@ -143,10 +143,12 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 		write((int) bx, (char*) cx, (int) dx);
 		break;
 		
-    case 8:
-		open((char*) bx);
+    case 8: {
+		int out = open((char*) bx);
+		*((int*)cx) = out;
 		break;
-		
+	}
+	
     case 9:
 		close((char*) bx);
 		break;

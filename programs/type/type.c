@@ -11,11 +11,20 @@ int type(char* file) {
 	
 	fh = open(file);
 	
-	read(fh, &buffer, CHUNK_SIZE);
+	if(fh == -1) {
+		printf("Error!\n");
+		return 1;
+	}
+	
+	print_hex_2(fh);
+	
+	read(fh, &buffer, 10);
 	
 	close(fh);
 	
 	printf("%s\n", buffer);
+	
+	return 0;
 }
 
 int main(int argc, char** argv) {

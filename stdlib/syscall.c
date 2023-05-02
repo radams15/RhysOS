@@ -1,5 +1,11 @@
 #include "syscall.h"
 
+/*int syscall(int ax, int bx, int cx, int dx) {
+	int out;
+	
+	interrupt(0x21, ax, bx, cx, dx);
+}*/
+
 int exec(char* file, int argc, char** argv) {
 	return SYSCALL(3, file, argc, argv);
 }
@@ -21,7 +27,9 @@ int write(int fh, unsigned char* buffer, unsigned int size) {
 }
 
 int open(char* name) {
-	return SYSCALL(8, name, 0, 0);
+	int out;
+	SYSCALL(8, name, &out, 0);
+	return out;
 }
 
 void close(int fh) {

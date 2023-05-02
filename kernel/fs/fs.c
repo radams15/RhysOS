@@ -35,6 +35,7 @@ int open(char* name) {
 	for(i=0 ; i<MAX_OPEN_FILES ; i++) {
 		if(open_files[i] == NULL) {
 			open_files[i] = handle;
+			print_string("Opened "); print_string(name); print_string(" at ");print_hex_2(i);print_string("\n");
 			return i;
 		}
 	}
