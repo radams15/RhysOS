@@ -47,7 +47,7 @@ int exec(char* file_name, int argc, char** argv) {
 	if(fs_node == NULL) {
 		print_string(file_name);
 		print_string(" is not recognised as an internal or external command.\n");
-		return;
+		return -1;
 	}
 	
 	size = fs_read(fs_node, 0, sizeof(buf), &buf);

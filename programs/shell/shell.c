@@ -12,16 +12,23 @@ static int run_external(char* exe, char* rest) {
 	int argc;
 	char* argv[MAX_PARAMS];
 	char* tok;
+	char* dest;
 	
 	argc = 1;
 	argv[0] = exe;
 	
 	tok = strtok(rest, " ");
 	
-	while(tok != NULL) {		
-		*(tok-1) = 0; // null terminate section (replacing space)		
-		argv[argc++] = tok;
+	while(tok != NULL) {	
+		*(tok-1) = 0; // null terminate section (replacing space)	
+		if(strcmp(tok, ">") == 0) { // redirection?
+			tok = strtok(NULL, ">");
+			dest = tok;
+			*(tok-1) = 0;
+			break;
+		}
 		
+		argv[argc++] = tok;
 		tok = strtok(NULL, " ");
 	}
 	

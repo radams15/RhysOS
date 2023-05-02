@@ -6,7 +6,7 @@ typedef int (*proc_func)(void);
 static char* proc_buf = (char*) EXE_ADDRESS;
 static char* shell_buf = (char*) SHELL_ADDRESS;
 
-int run_exe(char* buf, unsigned int size, int type, int argc, char** argv) {
+int run_exe(char* buf, unsigned int size, int type, int argc, char** argv, int stdout, int stderr, int stdin) {
 	int ret;
 	char* out_buf;
 	int stdout, stdin, stderr;

@@ -57,6 +57,27 @@ void stdin_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned
 	}
 }
 
+void int2chars(unsigned int in, unsigned char* buffer) {
+	buffer[0] = (unsigned char) in & 0xff; // low byte
+	buffer[1] = (in >> 8) & 0xff; // high byte
+}
+
+void lowmem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+	unsigned int mem = lowmem();
+	int2chars(mem, buffer);
+}
+
+
+void highmem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+	int mem = highmem();
+	int2chars(mem, buffer);
+}
+
+void mem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+	int mem = lowmem() + highmem();
+	int2chars(mem, buffer);
+}
+
 void devfs_setup() {
 	int i = 0;
 	
@@ -104,7 +125,54 @@ void devfs_setup() {
 	root_nodes[i].readdir = 0;
 	root_nodes[i].finddir = 0;
 	root_nodes[i].ref = 0;
+	num_root_nodes++;
 	
+	i++;
+	
+	strcpy(root_nodes[i].name, "highmem");
+	root_nodes[i].flags = FS_FILE;
+	root_nodes[i].inode = i;
+	root_nodes[i].length = 2;
+	root_nodes[i].offset = 0;
+	root_nodes[i].read = highmem_read;
+	root_nodes[i].write = 0;
+	root_nodes[i].open = 0;
+	root_nodes[i].close = 0;
+	root_nodes[i].readdir = 0;
+	root_nodes[i].finddir = 0;
+	root_nodes[i].ref = 0;
+	num_root_nodes++;
+	
+	i++;
+	
+	strcpy(root_nodes[i].name, "lowmem");
+	root_nodes[i].flags = FS_FILE;
+	root_nodes[i].inode = i;
+	root_nodes[i].length = 2;
+	root_nodes[i].offset = 0;
+	root_nodes[i].read = lowmem_read;
+	root_nodes[i].write = 0;
+	root_nodes[i].open = 0;
+	root_nodes[i].close = 0;
+	root_nodes[i].readdir = 0;
+	root_nodes[i].finddir = 0;
+	root_nodes[i].ref = 0;
+	num_root_nodes++;
+	
+	i++;
+	
+	strcpy(root_nodes[i].name, "mem");
+	root_nodes[i].flags = FS_FILE;
+	root_nodes[i].inode = i;
+	root_nodes[i].length = 2;
+	root_nodes[i].offset = 0;
+	root_nodes[i].read = mem_read;
+	root_nodes[i].write = 0;
+	root_nodes[i].open = 0;
+	root_nodes[i].close = 0;
+	root_nodes[i].readdir = 0;
+	root_nodes[i].finddir = 0;
+	root_nodes[i].ref = 0;
 	num_root_nodes++;
 }
 
