@@ -9,10 +9,12 @@ extern _cls
 _main:
 	push bp
 
-	mov ax, 04h ; system_set_graphics_mode
+	lea ax, syscall_num
 	mov bx, MODE
 	int 21h
 
 	pop bp
 
 	ret
+
+syscall_num: db 04h ; system_set_graphics_mode
