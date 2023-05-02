@@ -3,7 +3,7 @@
 #include "util.h"
 #include "proc.h"
 
-#define MAX_OPEN_FILES 32
+#define MAX_OPEN_FILES 64
 
 extern int interrupt(int number, int AX, int BX, int CX, int DX);
 

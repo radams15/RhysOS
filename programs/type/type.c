@@ -16,7 +16,7 @@ int type(char* file) {
 		return 1;
 	}
 	
-	seek(fh, 20);
+	seek(fh, 0);
 	
 	read(fh, &buffer, CHUNK_SIZE);
 	
