@@ -6,7 +6,7 @@
 
 static FsNode_t* root_node;
 static FsNode_t* root_nodes;
-static unsigned int num_root_nodes;
+static int num_root_nodes;
 
 static DirEnt_t dirent;
 
@@ -101,6 +101,7 @@ void devfs_setup() {
 	root_nodes[i].readdir = 0;
 	root_nodes[i].finddir = 0;
 	root_nodes[i].ref = 0;
+	
 	num_root_nodes++;
 }
 
@@ -120,6 +121,7 @@ FsNode_t* devfs_init() {
 	root_node->finddir = devfs_finddir;
 	root_node->ref = 0;
 	
+	num_root_nodes = 0;
 	root_nodes = malloc(sizeof(FsNode_t) * MAX_FILES);
 	
 	if(root_node >= root_nodes) {
