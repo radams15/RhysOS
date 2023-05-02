@@ -180,6 +180,11 @@ int init(){
 	row = (char) cursor;
 	col = cursor<<4;
 	
+	printi(lowmem(), 10);
+	print_string("k low memory\n");
+	printi(highmem(), 10);
+	print_string("k high memory\n");
+	
 	//set_cursor(40, 40);
 	
 	shell();
