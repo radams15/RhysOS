@@ -109,8 +109,8 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 	return i;
 }
 
-int handleInterrupt21(int ax, int bx, int cx, int dx) {
-  switch(ax) {
+int handleInterrupt21(int* ax, int bx, int cx, int dx) {
+  switch(*ax) {
     case 0:
 		print_string((char *)bx);
 		break;
@@ -120,11 +120,11 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 		break;
 
     case 2:
-		readline(bx);
+		*ax = readline(bx);
 		break;
 
     case 3:
-		exec(bx, cx, dx);
+		*ax = exec(bx, cx, dx);
 		break;
 
     case 4:
@@ -132,20 +132,19 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 		break;
 
     case 5:
-		list_directory(bx, cx);
+		*ax = list_directory(bx, cx);
 		break;
 
     case 6:
-		read((int) bx, (char*) cx, (int) dx);
+		*ax = read((int) bx, (char*) cx, (int) dx);
 		break;
 	
     case 7:
-		write((int) bx, (char*) cx, (int) dx);
+		*ax = write((int) bx, (char*) cx, (int) dx);
 		break;
 		
     case 8: {
-		int out = open((char*) bx);
-		*((int*)cx) = out;
+		*ax = open((char*) bx);
 		break;
 	}
 	
@@ -155,8 +154,9 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 
     default:
 		print_string("Unknown interrupt: ");
-		print_hex_4(ax);
+		print_hex_4(*ax);
 		print_string("!\r\n");
+		*ax = -1;
 		break;
   }
 }

@@ -12,13 +12,11 @@ int type(char* file) {
 	fh = open(file);
 	
 	if(fh == -1) {
-		printf("Error!\n");
+		printf("Error reading file '%s'!\n", file);
 		return 1;
 	}
 	
-	print_hex_2(fh);
-	
-	read(fh, &buffer, 10);
+	read(fh, &buffer, CHUNK_SIZE);
 	
 	close(fh);
 	
