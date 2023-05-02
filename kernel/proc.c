@@ -6,10 +6,9 @@ typedef int (*proc_func)(void);
 static char* proc_buf = (char*) EXE_ADDRESS;
 static char* shell_buf = (char*) SHELL_ADDRESS;
 
-int run_exe(char* buf, unsigned int size, int type, int argc, char** argv, int stdout, int stderr, int stdin) {
+int run_exe(char* buf, unsigned int size, int type, int argc, char** argv, int proc_stdin, int proc_stdout, int proc_stderr) {
 	int ret;
 	char* out_buf;
-	int stdout, stdin, stderr;
 	
 	switch(type) {
 		case LOAD_EXE:
@@ -26,17 +25,8 @@ int run_exe(char* buf, unsigned int size, int type, int argc, char** argv, int s
 	}
 	
 	memcpy(out_buf, buf, size);
-	
-	stdout = open("/dev/stdout");
-	stdin = open("/dev/stdin");
-	stderr = open("/dev/stderr");
-	
-	ret = ((proc_func)out_buf)(stdin, stdout, stderr, argc, argv);
-	
-	close(stdout);
-	close(stdin);
-	close(stderr);
-	
+
+	ret = ((proc_func)out_buf)(proc_stdin, proc_stdout, proc_stderr, argc, argv);
 	
 	return ret;
 }

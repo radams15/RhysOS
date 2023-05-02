@@ -66,8 +66,6 @@ int main() {
 	char name[32];
 	int ret = 0;
 	
-	//cls();
-	
 	while(!ret) {
 		ret = loop();
 	}

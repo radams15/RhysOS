@@ -24,6 +24,7 @@ int shell() {
 	struct FsNode* fs_node;
 	char buf[SHELL_SIZE];
 	int size;
+	int ret;
 	
 	fs_node = fs_finddir(fs_root, "shell");
 	
@@ -34,7 +35,9 @@ int shell() {
 	
 	size = fs_read(fs_node, 0, sizeof(buf), &buf);
     
-    return run_exe(&buf, size, LOAD_SHELL, 0, NULL);
+    ret = run_exe(&buf, size, LOAD_SHELL, 0, NULL, 0, 1, 2);
+    
+    return ret;
 }
 
 int exec(char* file_name, int argc, char** argv) {
@@ -52,39 +55,7 @@ int exec(char* file_name, int argc, char** argv) {
 	
 	size = fs_read(fs_node, 0, sizeof(buf), &buf);
     
-    return run_exe(&buf, size, LOAD_EXE, argc, argv);
-}
-
-int read_file(char* buf, int n, char* file_name) {
-	struct FsNode* fs_node;
-	int size;
-	
-	fs_node = get_dir(file_name);
-	
-	if(fs_node == NULL) {
-		print_string("Failed to find file!\n");
-		return -1;
-	}
-	
-	size = fs_read(fs_node, 0, n, buf);
-    
-    return size;
-}
-
-int write_file(char* buf, int n, char* file_name) {
-	struct FsNode* fs_node;
-	int size;
-	
-	fs_node = get_dir(file_name);
-	
-	if(fs_node == NULL) {
-		print_string("Failed to find file!\n");
-		return -1;
-	}
-	
-	size = fs_write(fs_node, 0, n, buf);
-    
-    return size;
+    return run_exe(&buf, size, LOAD_EXE, argc, argv, stdin, stdout, stderr);
 }
 
 int list_directory(char* dir_name, FsNode_t* buf) {
@@ -176,12 +147,12 @@ int init(){
 	fs_root = ustar_init(1);
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
+
+	//cls();
 	
-	cursor = get_cursor();
-	row = (char) cursor;
-	col = cursor<<4;
-	
-	cls();
+	stdin = open("/dev/stdin");
+	stdout = open("/dev/stdout");
+	stderr = open("/dev/stderr");
 	
 	print_string("Welcome to RhysOS!\n\n\t");
 	printi(lowmem(), 10);

@@ -8,6 +8,7 @@ int graphics_mode = GRAPHICS_CGA_80x25; // CGA 80x24
 
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
+int stdout, stderr, stdin; // kernel-level i/o handles.
 
 int get_cursor() {
 	#asm
@@ -33,8 +34,9 @@ void print_char(int c) {
 		return;
 	}
 
-	if(c == '\n')
+	if(c == '\n') // convert to \r\n
 		interrupt(0x10, 0x0E00 + '\r', 0, 0, 0);
+		
 	interrupt(0x10, 0x0E00 + c, 0, 0, 0);
 }
 

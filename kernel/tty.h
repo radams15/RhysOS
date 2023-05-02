@@ -6,6 +6,8 @@ enum {
 	GRAPHICS_CGA_40x25 = 1,
 } GraphicsMode;
 
+extern int stdout, stderr, stdin;
+
 void clear_screen();
 
 void set_resolution(int mode);
