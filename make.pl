@@ -178,7 +178,7 @@ sub build {
 	my $runtime = &runtime;
 	my $stdlib = &stdlib;
 	my @programs = &programs($runtime, $stdlib);
-	&img($bootloader, $kernel, \@programs, ['fs_structs.h']);
+	&img($bootloader, $kernel, \@programs, ['docs/syscalls.md', 'docs/fs_spec.md']);
 }
 
 sub clean {
