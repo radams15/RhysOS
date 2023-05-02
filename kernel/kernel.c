@@ -3,13 +3,10 @@
 #include "proc.h"
 
 #include "fs/ustar.h"
-#include "devfs.h"
+#include "fs/devfs.h"
 
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
-
-FsNode_t* fs_root;
-FsNode_t* fs_dev;
 
 void main() {
 	int err;
@@ -21,25 +18,6 @@ void main() {
 	}
 
 	for(;;){}
-}
-
-int get_dir(char* name) {
-	FsNode_t* fsnode = fs_root;
-	char* tok;
-	
-	char buf[256];
-	memcpy(&buf, name, 100);
-	buf[strlen(name)] = 0;
-	
-	tok = strtok(buf, "/");
-	
-	while(tok != NULL) {
-		fsnode = fs_finddir(fsnode, tok);
-		
-		tok = strtok(NULL, "/");
-	}
-	
-	return fsnode;
 }
 
 int shell() {
@@ -158,11 +136,19 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 		break;
 
     case 6:
-		read_file((char*) bx, (int) cx, (char*) dx);
+		read((int) bx, (char*) cx, (int) dx);
 		break;
 	
     case 7:
-		write_file((char*) bx, (int) cx, (char*) dx);
+		write((int) bx, (char*) cx, (int) dx);
+		break;
+		
+    case 8:
+		open((char*) bx);
+		break;
+		
+    case 9:
+		close((char*) bx);
 		break;
 
     default:
@@ -174,11 +160,21 @@ int handleInterrupt21(int ax, int bx, int cx, int dx) {
 }
 
 int init(){	
+	FsNode_t* fs_dev;
+	int cursor;
+	char row, col;
+	
 	makeInterrupt21();
 	
 	fs_root = ustar_init(1);
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
+	
+	cursor = get_cursor();
+	row = (char) cursor;
+	col = cursor<<4;
+	
+	//set_cursor(40, 40);
 	
 	shell();
 	

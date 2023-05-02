@@ -12,10 +12,18 @@ int dir_list(char* dir_name, struct File* buf) {
 	return SYSCALL(5, dir_name, buf, 0);
 }
 
-int file_read(char* buf, int n, char* file_name) {
-	return SYSCALL(6, buf, n, file_name);
+int read(int fh, unsigned char* buffer, unsigned int size) {
+	return SYSCALL(6, fh, buffer, size);
 }
 
-int file_write(char* buf, int n, char* file_name) {
-	return SYSCALL(7, buf, n, file_name);
+int write(int fh, unsigned char* buffer, unsigned int size) {
+	return SYSCALL(7, fh, buffer, size);
+}
+
+int open(char* name) {
+	return SYSCALL(8, name, 0, 0);
+}
+
+void close(int fh) {
+	return SYSCALL(9, fh, 0, 0);
 }

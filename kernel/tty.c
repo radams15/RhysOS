@@ -8,10 +8,20 @@ int graphics_mode = GRAPHICS_CGA_80x25; // CGA 80x24
 
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
-/*void clear_screen() {
-	interrupt(0x10, 0x0200, 0, 0, 0);
-	interrupt(0x10, 0x0600, 0x0f00, 0, 0x184f);
-}*/
+
+int get_cursor() {
+	#asm
+		xor ax, ax
+		mov ah, 0x02
+		xor bh, bh ; display page = 0
+		int 0x10
+		mov ax, dx
+	#endasm
+}
+
+void set_cursor(char row, char col) {
+	interrupt(0x10, 0x0200, 0 /*Display page 0*/, 0, 0x0C23);
+}
 
 void set_resolution(int mode) {
 	interrupt(0x10, mode, 0, 0, 0);

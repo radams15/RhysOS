@@ -10,7 +10,7 @@ void vprintf(char* text, va_list args);
 
 static int graphics_mode = GRAPHICS_CGA_80x25;
 
-
+int stdout, stdin, stderr;
 
 int set_graphics_mode(int mode) {
 	graphics_mode = mode;
@@ -19,7 +19,7 @@ int set_graphics_mode(int mode) {
 
 
 int print(char* str) {
-	return file_write(str, strlen(str), "/dev/stdout");
+	return write(stdout, str, strlen(str));
 }
 
 
@@ -28,7 +28,7 @@ int putc(char c) {
 	buf[1] = 0;
 	buf[0] = c;
 	
-	return file_write(buf, 1, "/dev/stdout");
+	return write(stdout, buf, 1);
 }
 
 
@@ -40,7 +40,7 @@ int cls() {
 char getch() {
 	char out[1];
 	
-	file_read(&out, 1, "/dev/stdin");
+	read(stdin, &out, 1);
 	
 	return out[0];
 }

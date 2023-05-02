@@ -9,6 +9,7 @@ static char* shell_buf = (char*) SHELL_ADDRESS;
 int run_exe(char* buf, unsigned int size, int type, int argc, char** argv) {
 	int ret;
 	char* out_buf;
+	int stdout, stdin, stderr;
 	
 	switch(type) {
 		case LOAD_EXE:
@@ -26,7 +27,16 @@ int run_exe(char* buf, unsigned int size, int type, int argc, char** argv) {
 	
 	memcpy(out_buf, buf, size);
 	
-	ret = ((proc_func)out_buf)(argc, argv);
+	stdout = open("/dev/stdout");
+	stdin = open("/dev/stdin");
+	stderr = open("/dev/stderr");
+	
+	ret = ((proc_func)out_buf)(stdin, stdout, stderr, argc, argv);
+	
+	close(stdout);
+	close(stdin);
+	close(stderr);
+	
 	
 	return ret;
 }

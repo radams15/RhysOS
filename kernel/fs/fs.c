@@ -3,8 +3,67 @@
 #include "util.h"
 #include "proc.h"
 
+#define MAX_OPEN_FILES 32
+
 extern int interrupt(int number, int AX, int BX, int CX, int DX);
 
+FsNode_t* open_files[MAX_OPEN_FILES];
+FsNode_t* fs_root;
+
+int fh_get_node(int fh) {
+	return open_files[fh];
+}
+
+int write(int fh, unsigned char* buffer, unsigned int size) {
+	return fs_write(fh_get_node(fh), 0, size, buffer);
+}
+
+int read(int fh, unsigned char* buffer, unsigned int size) {
+	return fs_read(fh_get_node(fh), 0, size, buffer);
+}
+
+int open(char* name) {
+	int i;
+	FsNode_t* handle;
+	
+	handle = get_dir(name);
+	
+	if(handle == NULL) {
+		return -1;
+	}
+	
+	for(i=0 ; i<MAX_OPEN_FILES ; i++) {
+		if(open_files[i] == NULL) {
+			open_files[i] = handle;
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void close(int fh) {
+	open_files[fh] = NULL;
+}
+
+FsNode_t* get_dir(char* name) {
+	FsNode_t* fsnode = fs_root;
+	char* tok;
+	
+	char buf[256];
+	memcpy(&buf, name, 100);
+	buf[strlen(name)] = 0;
+	
+	tok = strtok(buf, "/");
+	
+	while(tok != NULL && fsnode != NULL) {
+		fsnode = fs_finddir(fsnode, tok);
+		
+		tok = strtok(NULL, "/");
+	}
+	
+	return fsnode;
+}
 
 void read_sector(int* buffer, int sector){	
 	int relativeSector = mod(sector, 18) + 1;

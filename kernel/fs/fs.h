@@ -54,4 +54,10 @@ unsigned int fs_close(FsNode_t* node);
 DirEnt_t* fs_readdir(FsNode_t* node, unsigned int index);
 FsNode_t* fs_finddir(FsNode_t* node, char* name);
 
+FsNode_t* get_dir(char* name);
+int open(char* name);
+void close(int fh);
+
+extern FsNode_t* fs_root;
+
 #endif

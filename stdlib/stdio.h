@@ -8,6 +8,8 @@ enum {
 	GRAPHICS_CGA_40x25 = 1,
 } GraphicsMode;
 
+extern int stdout, stdin, stderr;
+
 void printf(char* text, ...);
 
 char getch();

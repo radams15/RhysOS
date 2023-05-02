@@ -97,8 +97,14 @@ sub stdlib {
 	"-Lbuild/stdlib -lstdlib";
 }
 
+sub runtime {
+	&run("$CC -ansi -c runtime/crt0.c -Istdlib -o build/crt0.o");
+	
+	"build/crt0.o";
+}
+
 sub programs {
-	my ($stdlib) = @_;
+	my ($runtime, $stdlib) = @_;
 	
 	make_path("build/programs/") if !(-e 'build/programs/');
 	
@@ -111,8 +117,6 @@ sub programs {
 		next if !(-e "$program/config");
 		
 		my $conf = Config::Simple->import_from("$program/config");
-		
-		print "Shell? ", $conf->param('shell'), "\n";
 		
 		my $load_addr = $conf->param('shell') ? $SHELL_ADDR : $EXE_ADDR;
 		
@@ -137,9 +141,7 @@ sub programs {
 		
 		my $out = "$folder/".$conf->param('name');
 		
-		print "Program: $out\n";
-		
-		&run("$LD -o $out -T$load_addr -d ".join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
+		&run("$LD -o $out -T$load_addr -d $runtime ".join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
 		
 		push @programs, $out;
 	}
@@ -173,8 +175,9 @@ sub qemu {
 sub build {
 	my $bootloader = &bootloader;
 	my $kernel = &kernel;
+	my $runtime = &runtime;
 	my $stdlib = &stdlib;
-	my @programs = &programs($stdlib);
+	my @programs = &programs($runtime, $stdlib);
 	&img($bootloader, $kernel, \@programs, ['fs_structs.h']);
 }
 

@@ -7,8 +7,13 @@ int entry(int argc, char** argv) { return main(argc, argv); }
 int type(char* file) {
 	int n;
 	char buffer[CHUNK_SIZE+1];
+	int fh;
 	
-	file_read(&buffer, CHUNK_SIZE, file);
+	fh = open(file);
+	
+	read(fh, &buffer, CHUNK_SIZE);
+	
+	close(fh);
 	
 	printf("%s\n", buffer);
 }
