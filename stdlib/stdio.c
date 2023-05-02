@@ -18,6 +18,39 @@ int set_graphics_mode(int mode) {
 }
 
 
+void printi(int num, int base) {
+    char buffer[64];
+    char* ptr = &buffer[sizeof(buffer)-1];
+    int remainder;
+    
+    if(base == 0) {
+    	printf("Cannot have a base of 0!\n");
+    	return;
+    }
+    
+    *ptr = '\0';
+
+    if (num == 0) {
+        putc('0');
+        return;
+    }
+
+    while (num != 0) {
+        remainder = imod(num, base);
+        
+        if (remainder < 10)
+            *--ptr = '0' + remainder;
+        else
+            *--ptr = 'A' + remainder - 10;
+        
+        num /= base;
+    }
+
+    while (*ptr != '\0') {
+        putc(*ptr++);
+    }
+}
+
 int print(char* str) {
 	return write(stdout, str, strlen(str));
 }
@@ -96,8 +129,7 @@ void vprintf(register char* text, register va_list args) {
 
             switch(formatter){
                 case 'd': // int
-                	print("%d undefined!\n");
-                    //printi(va_arg(args, int), 10);
+                    printi(va_arg(args, int), 10);
                     break;
 
                 case 'c': // char
@@ -109,7 +141,7 @@ void vprintf(register char* text, register va_list args) {
                     break;
 
                 case 'x': // hex int
-                    print_hex_4(va_arg(args, int));
+                    printi(va_arg(args, int), 16);
                     break;
 
                 case FORMAT_MARK:

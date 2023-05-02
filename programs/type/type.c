@@ -19,7 +19,6 @@ int type(char* file) {
 		return 1;
 	}
 	
-	
 	do {
 		seek(fh, total_read);
 		

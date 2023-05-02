@@ -61,13 +61,8 @@ void print_hex_4(unsigned int n) {
     print_hex_2(n & 255);
 }
 
-void print_hex_8(unsigned int n) { // TODO Broken
-    print_hex_4(n >> 12);
-    print_hex_4(n & 4095);
-}
-
 void printi(int num, int base) {
-    char buffer[33];
+    char buffer[64];
     char* ptr = &buffer[sizeof(buffer)-1];
     int remainder;
     
@@ -79,11 +74,13 @@ void printi(int num, int base) {
     }
 
     while (num != 0) {
-        remainder = mod(num, base);
+        remainder = imod(num, base);
+        
         if (remainder < 10)
             *--ptr = '0' + remainder;
         else
             *--ptr = 'A' + remainder - 10;
+        
         num /= base;
     }
 
