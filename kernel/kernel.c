@@ -45,7 +45,8 @@ int exec(char* file_name, int argc, char** argv) {
 	fs_node = get_dir(file_name);
 	
 	if(fs_node == NULL) {
-		print_string("Failed to find shell!\n");
+		print_string(file_name);
+		print_string(" is not recognised as an internal or external command.\n");
 		return;
 	}
 	
@@ -180,10 +181,13 @@ int init(){
 	row = (char) cursor;
 	col = cursor<<4;
 	
+	cls();
+	
+	print_string("Welcome to RhysOS!\n\n\t");
 	printi(lowmem(), 10);
-	print_string("k low memory\n");
+	print_string("k low memory\n\t");
 	printi(highmem(), 10);
-	print_string("k high memory\n");
+	print_string("k high memory\n\n");
 	
 	//set_cursor(40, 40);
 	
