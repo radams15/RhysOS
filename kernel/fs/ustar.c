@@ -98,15 +98,13 @@ unsigned int ustar_read(node, byte_offset, byte_size, out_buffer)
         sector_bytes = MIN(SECTOR_SIZE - sector_offset, byte_size - bytes_read);
 
         memcpy(out_buffer + bytes_read, temp_buffer + sector_offset, sector_bytes);
-        
-		/*for(i=0 ; i<sector_bytes ; i++) {
-			out_buffer[bytes_read+i] = temp_buffer[sector_offset+i];
-		}*/
 
         bytes_read += sector_bytes;
         start_sector++;
         sector_offset = 0;
     }
+    
+    out_buffer[bytes_read] = 0; // Null terminate, just in case it's a string.
 
     return bytes_read;
 }

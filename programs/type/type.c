@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define CHUNK_SIZE 512
+#define CHUNK_SIZE 0x64
 
 int entry(int argc, char** argv) { return main(argc, argv); }
 
@@ -8,6 +8,9 @@ int type(char* file) {
 	int n;
 	char buffer[CHUNK_SIZE+1];
 	int fh;
+	int bytes_read = 1;
+	int total_read = 0;
+	int i;
 	
 	fh = open(file);
 	
@@ -16,13 +19,20 @@ int type(char* file) {
 		return 1;
 	}
 	
-	seek(fh, 0);
 	
-	read(fh, &buffer, CHUNK_SIZE);
+	do {
+		seek(fh, total_read);
+		
+		bytes_read = read(fh, &buffer, CHUNK_SIZE);
+		
+		if(bytes_read == 0)
+			break;
+		
+		write(stdout, buffer, bytes_read);
+		total_read += bytes_read;
+	} while(bytes_read > 0);
 	
 	close(fh);
-	
-	printf("%s\n", buffer);
 	
 	return 0;
 }
