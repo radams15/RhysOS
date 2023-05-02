@@ -9,6 +9,8 @@
 
 #define MAX_FILES 32
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 static int sector_start;
 static union Tar* file_headers;
 static FsNode_t* root_node;
@@ -17,24 +19,28 @@ static unsigned int num_root_nodes;
 
 static DirEnt_t dirent;
 
-unsigned int ustar_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) { // TODO implement offset
+
+/*unsigned int ustar_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	int sector;
 	int read;
 	int size_sectors;
+	int start_sector;
 	int end_sector;
 	int to_copy;
 	int to_read;
 	char sect_buf[SECTOR_SIZE];
 	int i;
+	int copy_start = 0;
 	
 	to_read = size;	
 	size_sectors = (node->length/SECTOR_SIZE);
 	end_sector = node->start_sector + size_sectors;
 	read = 0;
+	start_sector = node->start_sector; + (offset / SECTOR_SIZE);
+	copy_start = 0;
 	
-	//read += offset;
-	
-	for(sector=node->start_sector ; sector <= end_sector ; sector++) {	
+	for(sector=start_sector ; sector <= end_sector ; sector++) {	
+    	print_string("READ: "); print_hex_4(sector);
 		read_sector(&sect_buf, sector);
 		
 		if(read + SECTOR_SIZE > size) {
@@ -42,20 +48,67 @@ unsigned int ustar_read(FsNode_t* node, unsigned int offset, unsigned int size, 
 		} else {
 			to_copy = SECTOR_SIZE;
 		}
-		
 		if(to_copy+read > to_read) {
 			to_copy = to_read - read;
 		}
 		
-		for(i=0 ; i<to_copy ; i++) {
-			buffer[i] = sect_buf[i];
+		for(i=copy_start ; i<to_copy ; i++) {
+			buffer[i-copy_start] = sect_buf[i];
 		}
 		
 		buffer += to_copy;
 		read += to_copy;
+		copy_start = 0;
 	}
 	
 	return read;
+}*/
+
+
+unsigned int ustar_read(node, byte_offset, byte_size, out_buffer)
+	FsNode_t* node;
+	unsigned int byte_offset;
+	unsigned int byte_size;
+	unsigned char* out_buffer;
+{
+    signed int start_sector;
+    unsigned int sector_offset;
+    unsigned int sector_bytes;
+    unsigned int bytes_read = 0;
+    unsigned int end_byte_offset;
+    unsigned char temp_buffer[SECTOR_SIZE];
+    int i;
+
+    end_byte_offset = byte_offset + byte_size;
+
+    if (end_byte_offset > node->length) {
+        byte_size = node->length - byte_offset;
+    }
+
+    if (byte_size <= 0) {
+        return 0;
+    }
+
+    start_sector = node->start_sector + (byte_offset / SECTOR_SIZE);
+    sector_offset = byte_offset % SECTOR_SIZE;
+
+    while (bytes_read < byte_size) {
+        read_sector(&temp_buffer, start_sector);
+
+        sector_bytes = MIN(SECTOR_SIZE - sector_offset, byte_size - bytes_read);
+
+        memcpy(out_buffer + bytes_read, temp_buffer + sector_offset, sector_bytes);
+        
+		/*for(i=0 ; i<sector_bytes ; i++) {
+			out_buffer[bytes_read+i] = temp_buffer[sector_offset+i];
+		}*/
+
+        bytes_read += sector_bytes;
+        start_sector++;
+        sector_offset = 0;
+    }
+
+    return bytes_read;
 }
 
 unsigned int ustar_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
@@ -114,6 +167,7 @@ int ustar_load_root() {
 		root_nodes[i].inode = i;
 		root_nodes[i].start_sector = sector+1; // +1 to ignore header
 		root_nodes[i].length = size;
+		root_nodes[i].offset = 0;
 		root_nodes[i].read = ustar_read;
 		root_nodes[i].write = 0;
 		root_nodes[i].open = 0;
@@ -141,6 +195,7 @@ void ustar_mount(FsNode_t* node, char* name) {
 	root_nodes[i].flags = FS_DIRECTORY | FS_MOUNTPOINT;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
+	root_nodes[i].offset = 0;
 	root_nodes[i].read = 0;
 	root_nodes[i].write = 0;
 	root_nodes[i].open = 0;
@@ -164,6 +219,7 @@ FsNode_t* ustar_init(int fs_sector_start) {
 	root_node->flags = FS_DIRECTORY;
 	root_node->inode = 0;
 	root_node->length = 0;
+	root_nodes[i].offset = 0;
 	root_node->read = 0;
 	root_node->write = 0;
 	root_node->open = 0;

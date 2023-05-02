@@ -5,11 +5,11 @@ void memset(int *dest, int val, int len);
 
 void strcpy(char* a, char* b);
 
-int div (int a, int b);
-
-int mod (int a, int n);
-
 void memcpy(char *dest, char *src, unsigned int n);
+
+int div(int dividend, int divisor);
+
+int mod(int dividend, int divisor);
 
 void clear(int *ptr, unsigned int n);
 

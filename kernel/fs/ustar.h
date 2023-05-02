@@ -31,7 +31,7 @@ typedef union Tar {
             struct tar_t * next;
         } new;
         
-        char raw[512];
+        char buffer[512];
 } Tar_t;
 
 int ustar_read_file(char* buf, int n, char* filename);

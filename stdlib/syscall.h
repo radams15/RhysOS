@@ -19,6 +19,7 @@ typedef struct FsNode {
 	unsigned int inode;
 	unsigned int start_sector;
 	unsigned int length; // size in bytes.
+	unsigned int offset; // used by seek
 	void* read;
 	void* write;
 	void* open;
@@ -33,7 +34,10 @@ typedef int (*FsCallback)(struct File*);
 
 int exec(char* file, int argc, char** argv);
 int sys_set_graphics_mode(int mode);
-int dir_list(char* dir_name, char** buf);
-int file_read(char* buf, int n, char* file_name);
+int read(int fh, unsigned char* buffer, unsigned int size);
+int write(int fh, unsigned char* buffer, unsigned int size);
+int open(char* name);
+void close(int fh);
+void seek(int fh, unsigned int location);
 
 #endif

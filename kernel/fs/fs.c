@@ -10,16 +10,20 @@ extern int interrupt(int number, int AX, int BX, int CX, int DX);
 FsNode_t* open_files[MAX_OPEN_FILES];
 FsNode_t* fs_root;
 
-int fh_get_node(int fh) {
+FsNode_t* fh_get_node(int fh) {
 	return open_files[fh];
 }
 
 int write(int fh, unsigned char* buffer, unsigned int size) {
-	return fs_write(fh_get_node(fh), 0, size, buffer);
+	return fs_write(fh_get_node(fh), fh_get_node(fh)->offset, size, buffer);
 }
 
 int read(int fh, unsigned char* buffer, unsigned int size) {
-	return fs_read(fh_get_node(fh), 0, size, buffer);
+	return fs_read(fh_get_node(fh), fh_get_node(fh)->offset, size, buffer);
+}
+
+void seek(int fh, unsigned int location) {
+	fh_get_node(fh)->offset = location;
 }
 
 int open(char* name) {

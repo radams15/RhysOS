@@ -151,6 +151,10 @@ int handleInterrupt21(int* ax, int bx, int cx, int dx) {
     case 9:
 		close((char*) bx);
 		break;
+		
+    case 10:
+		seek((char*) bx, (int) cx);
+		break;
 
     default:
 		print_string("Unknown interrupt: ");

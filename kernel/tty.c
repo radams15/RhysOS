@@ -66,6 +66,31 @@ void print_hex_8(unsigned int n) { // TODO Broken
     print_hex_4(n & 4095);
 }
 
+void printi(int num, int base) {
+    char buffer[33];
+    char* ptr = &buffer[sizeof(buffer)-1];
+    int remainder;
+    
+    *ptr = '\0';
+
+    if (num == 0) {
+        print_char('0');
+        return;
+    }
+
+    while (num != 0) {
+        remainder = mod(num, base);
+        if (remainder < 10)
+            *--ptr = '0' + remainder;
+        else
+            *--ptr = 'A' + remainder - 10;
+        num /= base;
+    }
+
+    while (*ptr != '\0') {
+        print_char(*ptr++);
+    }
+}
 
 int readline(char* buffer) {
 	char c;

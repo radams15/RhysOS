@@ -14,6 +14,7 @@ void print_char(c);
 
 void print_stringn(char* str, int n);
 void print_string(char* str);
+void printi(int num, int base);
 void print_hex_1(unsigned int n);
 void print_hex_2(unsigned int n);
 void print_hex_4(unsigned int n);

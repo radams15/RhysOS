@@ -37,3 +37,7 @@ int open(char* name) {
 void close(int fh) {
 	return syscall(9, fh, 0, 0);
 }
+
+void seek(int fh, unsigned int location) {
+	return syscall(10, fh, location, 0);
+}

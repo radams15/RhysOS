@@ -37,6 +37,7 @@ typedef struct FsNode {
 	unsigned int inode;
 	unsigned int start_sector;
 	unsigned int length; // size in bytes.
+	unsigned int offset; // used by seek
 	ReadFunc read;
 	WriteFunc write;
 	OpenFunc open;
@@ -57,6 +58,7 @@ FsNode_t* fs_finddir(FsNode_t* node, char* name);
 FsNode_t* get_dir(char* name);
 int open(char* name);
 void close(int fh);
+void seek(int fh, unsigned int location);
 
 extern FsNode_t* fs_root;
 

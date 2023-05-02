@@ -64,6 +64,7 @@ void devfs_setup() {
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
+	root_nodes[i].offset = 0;
 	root_nodes[i].read = 0;
 	root_nodes[i].write = stdout_write;
 	root_nodes[i].open = 0;
@@ -79,6 +80,7 @@ void devfs_setup() {
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
+	root_nodes[i].offset = 0;
 	root_nodes[i].read = stdin_read;
 	root_nodes[i].write = 0;
 	root_nodes[i].open = 0;
@@ -94,6 +96,7 @@ void devfs_setup() {
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
+	root_nodes[i].offset = 0;
 	root_nodes[i].read = 0;
 	root_nodes[i].write = stderr_write;
 	root_nodes[i].open = 0;
@@ -113,6 +116,7 @@ FsNode_t* devfs_init() {
 	root_node->flags = FS_DIRECTORY;
 	root_node->inode = 0;
 	root_node->length = 0;
+	root_node->offset = 0;
 	root_node->read = 0;
 	root_node->write = 0;
 	root_node->open = 0;

@@ -10,24 +10,10 @@ void strcpy(char* a, char* b) {
 	memcpy(a, b, strlen(b));
 }
 
-int div (int a, int b) {
-  int res = 0;
-  while (a>=b) {
-    a -= b;
-    res++;
-  }
-  return res;
-}
-
-int mod (int a, int n) {
-	return a - div(a,n) * n;
-}
-
 void memcpy(char* dest, char* src, unsigned int n) {
-	int i;
-	for(i=0; i<n ; i++) {
-		dest[i] = src[i];
-	}
+	while (n--) {
+        *(dest++) = *(src++);
+    }
 }
 
 void clear(int *ptr, unsigned int n) {
