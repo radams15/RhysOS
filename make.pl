@@ -81,14 +81,14 @@ sub stdlib {
 	
 	for my $c_file (&find('stdlib/*.c')) {		
 		(my $out = $c_file) =~ s:stdlib/(.*)\.c:build/stdlib/$1.o:;
-		&run("$CC -ansi -c $c_file -Istdlib/ -o $out");
+		&run("ia16-elf-gcc -ffreestanding -fno-inline -melks -mcmodel=small -msegment-relocation-stuff -march=i8086 -mtune=i8086 -c $c_file -Istdlib/ -o $out");
 		
 		push @objs, $out;
 	}
 	
 	for my $asm_file (&find('stdlib/*.nasm')) {
 		(my $out = $asm_file) =~ s:stdlib/(.*)\.nasm:build/stdlib/$1_nasm.o:;
-		&run("$ASM -fas86 $asm_file -Istdlib/ -o $out");
+		&run("$ASM -felf $asm_file -Istdlib/ -o $out");
 		push @objs, $out;
 	}
 	
@@ -98,7 +98,7 @@ sub stdlib {
 }
 
 sub runtime {
-	&run("$CC -ansi -c runtime/crt0.c -Istdlib -o build/crt0.o");
+	&run("ia16-elf-gcc -ffreestanding -fno-inline -melks -mcmodel=small -msegment-relocation-stuff -march=i8086 -mtune=i8086 -c runtime/crt0.c -Istdlib -o build/crt0.o");
 	
 	"build/crt0.o";
 }
@@ -118,13 +118,13 @@ sub programs {
 		
 		my $conf = Config::Simple->import_from("$program/config");
 		
-		my $load_addr = $conf->param('shell') ? $SHELL_ADDR : $EXE_ADDR;
+		my $load_script = $conf->param('shell') ? "programs/link.shell.ld" : "programs/link.ld";
 		
 		my @objs;
 		for my $file ( ($conf->param('main')), $conf->param('files') ) {
 			if ($file =~ /\.c$/) {
 				(my $out_obj = $file) =~ s:(.*)\.c:$folder/$1.o:;
-				&run("$CC -ansi -c $program/$file -I$program/ -Istdlib -o $out_obj");
+				&run("ia16-elf-gcc -ffreestanding -fno-inline -melks -mcmodel=small -msegment-relocation-stuff -march=i8086 -mtune=i8086 -c $program/$file -I$program/ -Istdlib -o $out_obj");
 				
 				push @objs, $out_obj;
 			}
@@ -132,7 +132,7 @@ sub programs {
 			if ($file =~ /\.nasm$/) {
 				(my $out_obj = $file) =~ s:(.*)\.nasm:$folder/$1.o:;
 				
-				&run("$ASM -fas86 $program/$file -I$program/ -Istdlib -o $out_obj");
+				&run("$ASM -felf $program/$file -I$program/ -Istdlib -o $out_obj");
 				
 				push @objs, $out_obj;
 			}
@@ -141,7 +141,7 @@ sub programs {
 		
 		my $out = "$folder/".$conf->param('name');
 		
-		&run("$LD -o $out -T$load_addr -d $runtime ".join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
+		&run("ia16-elf-ld -o $out -T$load_script -d ".($conf->param('standalone')? ' ':" $runtime ").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":' ') );
 		
 		push @programs, $out;
 	}
