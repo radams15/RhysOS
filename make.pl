@@ -17,10 +17,10 @@ my $LD = 'ld86';
 
 # Must be strings for some reason
 my $KERNEL_ADDR = '0x1000';
-my $SHELL_ADDR = '0x2000';
+my $SHELL_ADDR = '0x3000';
 my $EXE_ADDR = '0x6000';
 my $HEAP_ADDR = '0x20000';
-my $KERNEL_SECTORS = '15';
+my $KERNEL_SECTORS = '20';
 
 
 my $KERNEL_FLAGS = "-DHEAP_ADDRESS=$HEAP_ADDR -DEXE_ADDRESS=$EXE_ADDR -DSHELL_ADDRESS=$SHELL_ADDR";

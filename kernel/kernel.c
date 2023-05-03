@@ -45,8 +45,10 @@ int exec(char* file_name, int argc, char** argv) {
 	fs_node = get_dir(file_name);
 	
 	if(fs_node == NULL) {
-		print_string(file_name);
-		print_string(" is not recognised as an internal or external command.\n");
+		if(file_name != NULL) {
+			print_string(file_name);
+			print_string(" is not recognised as an internal or external command.\n");
+		}
 		return -1;
 	}
 	

@@ -2,7 +2,9 @@
 
 #include "util.h"
 
-#define MAX_FILES 8
+#define MAX_FILES 16
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define SECTOR_SIZE 512
 
 static FsNode_t* root_node;
 static FsNode_t* root_nodes;
@@ -67,7 +69,6 @@ void lowmem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigne
 	int2chars(mem, buffer);
 }
 
-
 void highmem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	int mem = highmem();
 	int2chars(mem, buffer);
@@ -76,6 +77,42 @@ void highmem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsign
 void mem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	int mem = lowmem() + highmem();
 	int2chars(mem, buffer);
+}
+
+void fda_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, unsigned char* out_buffer) {
+	int mem = lowmem() + highmem();
+	
+	signed int start_sector;
+    unsigned int sector_offset;
+    unsigned int sector_bytes;
+    unsigned int bytes_read = 0;
+    unsigned int end_byte_offset;
+    unsigned char temp_buffer[SECTOR_SIZE];
+    int i;
+
+    end_byte_offset = byte_offset + byte_size;
+
+    if (byte_size <= 0) {
+        return;
+    }
+
+    start_sector = byte_offset / SECTOR_SIZE;
+    sector_offset = byte_offset % SECTOR_SIZE;
+
+    while (bytes_read < byte_size) {
+        read_sector(&temp_buffer, start_sector);
+
+        sector_bytes = MIN(SECTOR_SIZE - sector_offset, byte_size - bytes_read);
+
+        memcpy(out_buffer + bytes_read, temp_buffer + sector_offset, sector_bytes);
+
+        bytes_read += sector_bytes;
+        start_sector++;
+        sector_offset = 0;
+    }
+    
+    out_buffer[bytes_read] = 0; // Null terminate, just in case it's a string.
+
 }
 
 void devfs_setup() {
@@ -167,6 +204,22 @@ void devfs_setup() {
 	root_nodes[i].length = 2;
 	root_nodes[i].offset = 0;
 	root_nodes[i].read = mem_read;
+	root_nodes[i].write = 0;
+	root_nodes[i].open = 0;
+	root_nodes[i].close = 0;
+	root_nodes[i].readdir = 0;
+	root_nodes[i].finddir = 0;
+	root_nodes[i].ref = 0;
+	num_root_nodes++;
+	
+	i++;
+	
+	strcpy(root_nodes[i].name, "fda");
+	root_nodes[i].flags = FS_FILE;
+	root_nodes[i].inode = i;
+	root_nodes[i].length = 1;
+	root_nodes[i].offset = 0;
+	root_nodes[i].read = fda_read;
 	root_nodes[i].write = 0;
 	root_nodes[i].open = 0;
 	root_nodes[i].close = 0;
