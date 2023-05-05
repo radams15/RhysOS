@@ -118,7 +118,18 @@ sub programs {
 		
 		my $conf = Config::Simple->import_from("$program/config");
 		
-		my $load_script = $conf->param('shell') ? "programs/link.shell.ld" : "programs/link.ld";
+		my $load_address = $conf->param('shell') ? $SHELL_ADDR : $EXE_ADDR;
+		my $load_script = "$folder/link.ld";
+		
+		# Make new linker script with desired address.
+		open FH, '<', "programs/link.ld";
+		my $load_script_content = join '', <FH>;
+		close FH;
+		$load_script_content =~ s/ADDRESS/$load_address/g;
+		
+		open FH, '>', $load_script;
+		print FH $load_script_content;
+		close FH;
 		
 		my @objs;
 		for my $file ( ($conf->param('main')), $conf->param('files') ) {

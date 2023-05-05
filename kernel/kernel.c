@@ -166,6 +166,15 @@ int handleInterrupt21(int* ax, int bx, int cx, int dx) {
   }
 }
 
+void test() {
+	char* buf[20];
+	int i;
+	
+	list_directory("/", &buf);
+	for(i=0 ; i<10 ; i++)
+		print_string(buf[i]);
+}
+
 int init(){	
 	FsNode_t* fs_dev;
 	int cursor;
@@ -188,6 +197,9 @@ int init(){
 	print_string("k low memory\n\t");
 	printi(highmem(), 10);
 	print_string("k high memory\n\n");
+	
+	
+	test();
 	
 	//set_cursor(40, 40);
 	
