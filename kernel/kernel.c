@@ -114,24 +114,8 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 
 int handleInterrupt21(int* ax, int bx, int cx, int dx) {
   switch(*ax) {
-    case 0:
-		print_string((char *)bx);
-		break;
-		
-    case 1:
-		print_char((char) bx);
-		break;
-
-    case 2:
-		*ax = readline(bx);
-		break;
-
     case 3:
 		*ax = exec(bx, cx, dx);
-		break;
-
-    case 4:
-		set_graphics_mode(bx);
 		break;
 
     case 5:
@@ -146,11 +130,10 @@ int handleInterrupt21(int* ax, int bx, int cx, int dx) {
 		*ax = write((int) bx, (char*) cx, (int) dx);
 		break;
 		
-    case 8: {
+    case 8:
 		*ax = open((char*) bx);
 		break;
-	}
-	
+
     case 9:
 		close((char*) bx);
 		break;
@@ -179,9 +162,9 @@ int init(){
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
 	
-	cursor = get_cursor();
+	/*cursor = get_cursor();
 	row = (char) cursor;
-	col = cursor<<4;
+	col = cursor<<4;*/
 	
 	cls();
 	
@@ -191,7 +174,7 @@ int init(){
 	printi(highmem(), 10);
 	print_string("k high memory\n\n");
 	
-	//set_cursor(40, 40);
+	//set_cursor(0, 0);
 	
 	shell();
 	

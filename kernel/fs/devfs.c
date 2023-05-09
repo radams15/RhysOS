@@ -1,6 +1,7 @@
 #include "devfs.h"
 
 #include "util.h"
+#include "tty.h"
 
 #define MAX_FILES 16
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -64,6 +65,10 @@ void int2chars(unsigned int in, unsigned char* buffer) {
 	buffer[1] = (in >> 8) & 0xff; // high byte
 }
 
+int chars2int(unsigned char* buffer) {
+	return (buffer[1] << 8) | buffer[0];
+}
+
 void lowmem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	unsigned int mem = lowmem();
 	int2chars(mem, buffer);
@@ -112,7 +117,16 @@ void fda_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, 
     }
     
     out_buffer[bytes_read] = 0; // Null terminate, just in case it's a string.
+}
 
+void graphics_mode_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, unsigned char* out_buffer) {
+	int mode = get_graphics_mode();
+	int2chars(mode, out_buffer);
+}
+
+void graphics_mode_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+	int mode = chars2int(buffer);
+	set_graphics_mode(mode);
 }
 
 void devfs_setup() {
@@ -221,6 +235,22 @@ void devfs_setup() {
 	root_nodes[i].offset = 0;
 	root_nodes[i].read = fda_read;
 	root_nodes[i].write = 0;
+	root_nodes[i].open = 0;
+	root_nodes[i].close = 0;
+	root_nodes[i].readdir = 0;
+	root_nodes[i].finddir = 0;
+	root_nodes[i].ref = 0;
+	num_root_nodes++;
+	
+	i++;
+	
+	strcpy(root_nodes[i].name, "graphmode");
+	root_nodes[i].flags = FS_FILE;
+	root_nodes[i].inode = i;
+	root_nodes[i].length = 1;
+	root_nodes[i].offset = 0;
+	root_nodes[i].read = graphics_mode_read;
+	root_nodes[i].write = graphics_mode_write;
 	root_nodes[i].open = 0;
 	root_nodes[i].close = 0;
 	root_nodes[i].readdir = 0;

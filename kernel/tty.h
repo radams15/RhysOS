@@ -29,6 +29,7 @@ int readline(char* buffer);
 char getch();
 
 void set_graphics_mode(int mode);
+int get_graphics_mode();
 void cls();
 
 #endif

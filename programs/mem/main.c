@@ -9,7 +9,7 @@ int lowmem() {
 	read(fh, &buf, sizeof(&buf));
 	close(fh);
 
-	mem = (buf[1] << 8) | buf[0];
+	mem = chars2int(buf);
 
 	return mem;
 }
@@ -23,7 +23,7 @@ int highmem() {
 	read(fh, &buf, sizeof(&buf));
 	close(fh);
 
-	mem = (buf[1] << 8) | buf[0];
+	mem = chars2int(buf);
 
 	return mem;
 }

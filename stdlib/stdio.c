@@ -8,15 +8,7 @@
 
 void vprintf(char* text, va_list args);
 
-static int graphics_mode = GRAPHICS_CGA_80x25;
-
 int stdout, stdin, stderr;
-
-int set_graphics_mode(int mode) {
-	graphics_mode = mode;
-	cls();
-}
-
 
 void printi(int num, int base) {
     char buffer[64];
@@ -66,7 +58,7 @@ int putc(char c) {
 
 
 int cls() {
-	return sys_set_graphics_mode(graphics_mode);
+	putc('\xC');
 }
 
 
@@ -151,10 +143,9 @@ void vprintf(register char* text, register va_list args) {
                 default:
                     break;
             }
-
+            
             skip_next = TRUE;
-
-        }else{
+        } else {
             putc(text[i]);
         }
     }

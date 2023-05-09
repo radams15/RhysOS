@@ -1,26 +1,11 @@
 #include "tty.h"
 
-int print_code = 0x0E;
-int set_cursor_code = 0x0200;
-int zero = 0x00;
-
 int graphics_mode = GRAPHICS_CGA_80x25; // CGA 80x24
 
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
-
-int get_cursor() {
-	#asm
-		xor ax, ax
-		mov ah, 0x02
-		xor bh, bh ; display page = 0
-		int 0x10
-		mov ax, dx
-	#endasm
-}
-
 void set_cursor(char row, char col) {
-	interrupt(0x10, 0x0200, 0 /*Display page 0*/, 0, 0x0C23);
+	interrupt(0x10, 0x0200, 0, 0, 0x0C23);
 }
 
 void set_resolution(int mode) {
@@ -32,9 +17,15 @@ void print_char(int c) {
 		print_string("    ");
 		return;
 	}
+	
+	if(c == '\xC') {
+		cls();
+		return;
+	}
 
 	if(c == '\n')
 		interrupt(0x10, 0x0E00 + '\r', 0, 0, 0);
+
 	interrupt(0x10, 0x0E00 + c, 0, 0, 0);
 }
 
@@ -129,6 +120,10 @@ void set_graphics_mode(int mode) {
 	graphics_mode = mode;
 	
 	cls();
+}
+
+int get_graphics_mode() {
+	return graphics_mode;
 }
 
 void cls() {

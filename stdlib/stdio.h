@@ -17,7 +17,6 @@ int print(char* str);
 int putc(char c);
 int readline(char* buffer);
 
-int set_graphics_mode(int mode);
 int cls();
 
 #endif

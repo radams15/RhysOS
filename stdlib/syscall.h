@@ -33,11 +33,14 @@ typedef struct FsNode {
 typedef int (*FsCallback)(struct File*);
 
 int exec(char* file, int argc, char** argv);
-int sys_set_graphics_mode(int mode);
 int read(int fh, unsigned char* buffer, unsigned int size);
 int write(int fh, unsigned char* buffer, unsigned int size);
 int open(char* name);
 void close(int fh);
 void seek(int fh, unsigned int location);
+
+
+void int2chars(unsigned int in, unsigned char* buffer);
+int chars2int(unsigned char* buffer);
 
 #endif
