@@ -8,8 +8,10 @@
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
 
-void main() {
+void _start() {
 	int err;
+	
+	print_char('A');
 
 	err = init();
 

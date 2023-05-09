@@ -23,8 +23,6 @@ void print_hex_8(unsigned int n);
 int get_cursor();
 void set_cursor(char row, char col);
 
-void set_cursor(int col, int row);
-
 int readline(char* buffer);
 char getch();
 

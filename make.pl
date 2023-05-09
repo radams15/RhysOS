@@ -12,8 +12,8 @@ use Data::Dumper;
 use Config::Simple;
 
 my $ASM = 'nasm';
-my $CC = 'bcc';
-my $LD = 'ld86';
+my $CC = 'ia16-elf-gcc -ffreestanding -fno-inline -melks -mcmodel=small -msegment-relocation-stuff -march=i8086 -mtune=i8086';
+my $LD = 'ia16-elf-ld';
 
 # Must be strings for some reason
 my $KERNEL_ADDR = '0x1000';
@@ -57,7 +57,7 @@ sub kernel {
 		my $folder = dirname($out);
 		make_path($folder) if !(-e $folder);
 
-		&run("$CC -ansi -Ikernel/ $KERNEL_FLAGS -c $c_file -o $out");
+		&run("$CC -Ikernel/ $KERNEL_FLAGS -c $c_file -o $out");
 		(push @objs, $out) unless $c_file =~ /kernel.c/;
 	}
 	
@@ -66,11 +66,11 @@ sub kernel {
 		my $folder = dirname($out);
 		make_path($folder) if !(-e $folder);
 		
-		&run("$ASM -fas86 $asm_file -o $out");
+		&run("$ASM -felf $asm_file -o $out");
 		push @objs, $out;
 	}
 	
-	&run("$LD -o build/kernel.bin -d build/kernel/kernel.o ".(join ' ', @objs));
+	&run("$LD -Ttext $KERNEL_ADDR --oformat binary -o build/kernel.bin -d build/kernel/kernel.o ".(join ' ', @objs));
 	
 	"build/kernel.bin";
 }
@@ -81,7 +81,7 @@ sub stdlib {
 	
 	for my $c_file (&find('stdlib/*.c')) {		
 		(my $out = $c_file) =~ s:stdlib/(.*)\.c:build/stdlib/$1.o:;
-		&run("ia16-elf-gcc -ffreestanding -fno-inline -melks -mcmodel=small -msegment-relocation-stuff -march=i8086 -mtune=i8086 -c $c_file -Istdlib/ -o $out");
+		&run("$CC -c $c_file -Istdlib/ -o $out");
 		
 		push @objs, $out;
 	}
@@ -119,6 +119,7 @@ sub programs {
 		my $conf = Config::Simple->import_from("$program/config");
 		
 		my $load_address = $conf->param('shell') ? $SHELL_ADDR : $EXE_ADDR;
+=pod
 		my $load_script = "$folder/link.ld";
 		
 		# Make new linker script with desired address.
@@ -130,6 +131,7 @@ sub programs {
 		open FH, '>', $load_script;
 		print FH $load_script_content;
 		close FH;
+=cut
 		
 		my @objs;
 		for my $file ( ($conf->param('main')), $conf->param('files') ) {
@@ -152,7 +154,7 @@ sub programs {
 		
 		my $out = "$folder/".$conf->param('name');
 		
-		&run("ia16-elf-ld -o $out -T$load_script -d ".($conf->param('standalone')? ' ':" $runtime ").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":' ') );
+		&run("$LD -o $out -Ttext $load_address --oformat binary -d ".($conf->param('standalone')? ' ':" $runtime ").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":' ') );
 		
 		push @programs, $out;
 	}

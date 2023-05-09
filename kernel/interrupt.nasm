@@ -1,8 +1,10 @@
-global _interrupt
-global _enableInterrupts
+bits 16
+
+global interrupt
+global enableInterrupts
 
 ;int interrupt (int number, int AX, int BX, int CX, int DX)
-_interrupt:
+interrupt:
 	push bp
 	mov bp,sp
 	mov ax,[bp+4]	;get the interrupt number in AL
@@ -24,6 +26,6 @@ intr:
 	pop bp
 	ret
 
-_enableInterrupts:
+enableInterrupts:
 	sti
 	ret

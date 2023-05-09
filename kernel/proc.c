@@ -1,12 +1,12 @@
 #include "proc.h"
 #include "util.h"
 
-typedef int (*proc_func)(void);
+typedef int (*proc_func)(int, int, int, int, char**);
 
 static char* proc_buf = (char*) EXE_ADDRESS;
 static char* shell_buf = (char*) SHELL_ADDRESS;
 
-int run_exe(char* buf, unsigned int size, int type, int argc, char** argv, int stdout, int stderr, int stdin) {
+int run_exe(char* buf, unsigned int size, enum LoadType type, int argc, char** argv) {
 	int ret;
 	char* out_buf;
 	int stdout, stdin, stderr;
