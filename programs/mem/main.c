@@ -9,7 +9,7 @@ int lowmem() {
 	read(fh, &buf, sizeof(&buf));
 	close(fh);
 
-	mem = chars2int(buf);
+	mem = (buf[1] << 8) | buf[0];
 
 	return mem;
 }
@@ -23,7 +23,7 @@ int highmem() {
 	read(fh, &buf, sizeof(&buf));
 	close(fh);
 
-	mem = chars2int(buf);
+	mem = (buf[1] << 8) | buf[0];
 
 	return mem;
 }
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 
 	int mem_total = mem_high + mem_low;
 	
-	printf("Memory:\n\tLow (under 640k): %dk\n\tHigh (above 1M): %dk\n\tTotal: %dk\n\n", mem_low, mem_high, mem_total);
+	printf("Low (under 640k): %dk\nHigh (above 1M): %dk\nTotal: %dk\n", mem_low, mem_high, mem_total);
 
 	return 0;
 }

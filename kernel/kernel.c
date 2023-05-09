@@ -168,11 +168,9 @@ int init(){
 	
 	cls();
 	
-	print_string("Welcome to RhysOS!\n\n\t");
-	printi(lowmem(), 10);
-	print_string("k low memory\n\t");
-	printi(highmem(), 10);
-	print_string("k high memory\n\n");
+	print_string("Welcome to RhysOS!\n\n");
+	exec("/mem", 0, NULL);
+	print_string("\n");
 	
 	//set_cursor(0, 0);
 	
