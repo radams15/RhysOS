@@ -2,7 +2,7 @@
 
 #include "sysinfo.h"
 
-static int heap = 600000;
+static int heap = 300000;
 
 void memmgr_init() {
 	/*int mem_low = lowmem();
@@ -14,23 +14,22 @@ void memmgr_init() {
 		heap = mem_low * 1000;
 	}*/
 	
-	heap = HEAP_ADDRESS;
+	//heap = HEAP_ADDRESS;
 }
 
-/*
 void* malloc(unsigned int size) {
 	heap -= size;
 
 	return heap;
-}*/
+}
 
-void* malloc(unsigned int size) {
+/*void* malloc(unsigned int size) {
 	int out = heap;
 	
 	heap += size;
 
 	return (int*) out;
-}
+}*/
 
 void free(void* ptr) {
 	// TODO implement memory management.

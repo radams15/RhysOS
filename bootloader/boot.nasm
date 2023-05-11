@@ -5,7 +5,6 @@ KSIZE	equ	KERNEL_SECTORS ; sectors in kernel
 KSTART	equ	2 ; start sector in initrd
 
 mov si, boot_msg
-
 print_char:
 	mov al, [si]
 	cmp al, 0
@@ -15,7 +14,6 @@ print_char:
 	int 0x10
 	inc si
 	jmp print_char
-
 print_done:
 
 mov ax,KSEG

@@ -16,12 +16,13 @@ my $CC = 'bcc';
 my $LD = 'ld86';
 
 # Must be strings for some reason
-my $KERNEL_ADDR = '0x1000';
+my $KERNEL_ADDR = '0x0100';
 my $SHELL_ADDR = '0x3000';
 my $EXE_ADDR = '0x6000';
 my $HEAP_ADDR = '0x20000';
 my $KERNEL_SECTORS = '20';
 
+my $FLOPPY_SECTORS = 2880; # 1.44M floppy
 
 my $KERNEL_FLAGS = "-DHEAP_ADDRESS=$HEAP_ADDR -DEXE_ADDRESS=$EXE_ADDR -DSHELL_ADDRESS=$SHELL_ADDR";
 
@@ -158,7 +159,7 @@ sub initrd {
 sub img {
 	my ($bootloader, $kernel, $programs, $extra_files) = @_;
 	
-	&run("dd if=/dev/zero of=build/system.img bs=512 count=2880");
+	&run("dd if=/dev/zero of=build/system.img bs=512 count=$FLOPPY_SECTORS");
 	
 	my $initrd = &initrd($kernel, @$programs, @$extra_files);
 	

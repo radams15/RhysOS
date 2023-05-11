@@ -12,7 +12,6 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 static int sector_start;
-static union Tar* file_headers;
 static FsNode_t* root_node;
 static FsNode_t* root_nodes;
 static unsigned int num_root_nodes;
@@ -210,7 +209,6 @@ FsNode_t* ustar_init(int fs_sector_start) {
 	
 	sector_start = fs_sector_start;
 	
-	file_headers = malloc(MAX_FILES * sizeof(union Tar));
 	root_node = malloc(sizeof(FsNode_t));
 	
 	strcpy(root_node->name, "/");
