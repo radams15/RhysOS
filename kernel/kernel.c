@@ -1,6 +1,7 @@
 #include "fs/fs.h"
 #include "tty.h"
 #include "proc.h"
+#include "malloc.h"
 
 #include "fs/ustar.h"
 #include "fs/devfs.h"
@@ -151,12 +152,22 @@ int handleInterrupt21(int* ax, int bx, int cx, int dx) {
   }
 }
 
+void test() {
+	int addr;
+	int i;
+	
+	/*for(i=0 ; i<10 ; i++) {
+		addr = malloc(100);
+	}*/
+}
+
 int init(){	
 	FsNode_t* fs_dev;
 	int cursor;
 	char row, col;
 	
 	makeInterrupt21();
+	memmgr_init();
 	
 	fs_root = ustar_init(1);
 	fs_dev = devfs_init();
@@ -173,6 +184,8 @@ int init(){
 	print_string("\n");
 	
 	//set_cursor(0, 0);
+	
+	//test();
 	
 	shell();
 	
