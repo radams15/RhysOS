@@ -6,6 +6,8 @@
 #include "fs/ustar.h"
 #include "fs/devfs.h"
 
+#include "serial.h"
+
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
 
@@ -161,13 +163,15 @@ void test() {
 	}*/
 }
 
-int init(){	
+int init(char* cmdline){	
 	FsNode_t* fs_dev;
 	int cursor;
 	char row, col;
 	
 	makeInterrupt21();
 	memmgr_init();
+	
+	serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 	
 	fs_root = ustar_init(1);
 	fs_dev = devfs_init();

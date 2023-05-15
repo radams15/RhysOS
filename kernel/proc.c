@@ -31,6 +31,10 @@ int run_exe(char* buf, unsigned int size, int type, int argc, char** argv, int s
 	stdin = open("/dev/stdin");
 	stderr = open("/dev/stderr");
 	
+	/*stdout = open("/dev/com1");
+	stdin = open("/dev/com1");
+	stderr = open("/dev/com1");*/
+	
 	ret = ((proc_func)out_buf)(stdin, stdout, stderr, argc, argv);
 	
 	close(stdout);
