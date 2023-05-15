@@ -1,17 +1,19 @@
-org 0x7c00
+bits 16
+
+section .text
 
 KSEG	equ	KERNEL_ADDR ; address to place kernel in
 KSIZE	equ	KERNEL_SECTORS ; sectors in kernel
 KSTART	equ	2 ; start sector in initrd
 
 mov si, boot_msg
-
+mov ah, 0x0E
+	
 print_char:
 	mov al, [si]
 	cmp al, 0
 	je print_done
 
-	mov ah, 0x0E
 	int 0x10
 	inc si
 	jmp print_char
@@ -22,7 +24,7 @@ mov ax,KSEG
 mov ds,ax
 mov ss,ax
 mov es,ax
-mov ax,0xfff0 ; stack offset
+mov ax,STACK_ADDR ; stack offset
 mov sp,ax
 mov bp,ax
 

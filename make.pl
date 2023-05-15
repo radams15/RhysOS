@@ -12,16 +12,18 @@ use Data::Dumper;
 use Config::Simple;
 
 my $ASM = 'nasm';
-my $CC = 'ia16-elf-gcc -ffreestanding -fno-inline -melks -mcmodel=small -msegment-relocation-stuff -march=i8086 -mtune=i8086';
+my $CC = 'ia16-elf-gcc -ffreestanding '; #-march=i8086 -mtune=i8086
 my $LD = 'ia16-elf-ld';
 
-# Must be strings for some reason
-my $KERNEL_ADDR = '0x1000';
-my $SHELL_ADDR = '0x2000';
-my $EXE_ADDR = '0x6000';
-my $HEAP_ADDR = '0x20000';
 my $KERNEL_SECTORS = '15';
 
+
+# Must be strings for some reason
+my $KERNEL_ADDR = '0x0000';
+my $SHELL_ADDR = '0x2000';
+my $EXE_ADDR = '0x6000';
+my $STACK_ADDR = '0xfff0';
+my $HEAP_ADDR = '0x20000';
 
 my $KERNEL_FLAGS = "-DHEAP_ADDRESS=$HEAP_ADDR -DEXE_ADDRESS=$EXE_ADDR -DSHELL_ADDRESS=$SHELL_ADDR";
 
@@ -44,7 +46,8 @@ sub find {
 
 sub bootloader {
 	make_path("build") if !(-e 'build/');
-	&run("$ASM -fbin bootloader/boot.nasm -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.bin");
+	&run("$ASM -felf bootloader/boot.nasm -DSTACK_ADDR=$STACK_ADDR -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.o");
+	&run("$LD -Tbootloader/link.ld build/boot.o --oformat binary -o build/boot.bin");
 	
 	"build/boot.bin";
 }
@@ -70,7 +73,7 @@ sub kernel {
 		push @objs, $out;
 	}
 	
-	&run("$LD -Ttext $KERNEL_ADDR --oformat binary -o build/kernel.bin -d build/kernel/kernel.o ".(join ' ', @objs));
+	&run("$LD -Tkernel/link.ld --oformat binary -o build/kernel.bin -d build/kernel/kernel.o ".(join ' ', @objs));
 	
 	"build/kernel.bin";
 }
@@ -188,9 +191,9 @@ sub qemu {
 sub build {
 	my $bootloader = &bootloader;
 	my $kernel = &kernel;
-	my $runtime = &runtime;
-	my $stdlib = &stdlib;
-	my @programs = &programs($runtime, $stdlib);
+	#my $runtime = &runtime;
+	#my $stdlib = &stdlib;
+	my @programs;# = &programs($runtime, $stdlib);
 	&img($bootloader, $kernel, \@programs, ['docs/syscalls.md', 'docs/fs_spec.md']);
 }
 

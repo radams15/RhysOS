@@ -11,15 +11,17 @@
 void _start() {
 	int err;
 	
-	print_char('A');
+	print_string("RhysOS Initialising!\n");
 
-	err = init();
+	/*err = init();
 
 	if(err){
 		print_string("\r\nError in kernel, halting!\r\n");
-	}
+	}*/
 
-	for(;;){}
+	for(;;){
+		print_string("RhysOS Initialising!\n");
+	}
 }
 
 int shell() {
@@ -201,7 +203,7 @@ int init(){
 	print_string("k high memory\n\n");
 	
 	
-	test();
+	//test();
 	
 	//set_cursor(40, 40);
 	
