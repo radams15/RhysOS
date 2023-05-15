@@ -82,6 +82,9 @@ int readline(char* buffer) {
 	while((c=getch()) != '\r') {
 		if(c == 0x8 && buffer != buffer_head) { // backspace
 			*(buffer--) = ' ';
+			
+			putc(' '); // Overwrite with space
+			putc('\x2'); // Move cursor back
 		} else {
 			*(buffer++) = c;
 		}

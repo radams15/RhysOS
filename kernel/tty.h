@@ -21,9 +21,10 @@ void print_hex_4(unsigned int n);
 void print_hex_8(unsigned int n);
 
 int get_cursor();
+char get_cursor_col();
+char get_cursor_row();
 void set_cursor(char row, char col);
 
-void set_cursor(int col, int row);
 
 int readline(char* buffer);
 char getch();

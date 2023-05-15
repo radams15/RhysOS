@@ -5,7 +5,7 @@ int graphics_mode = GRAPHICS_CGA_80x25; // CGA 80x24
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
 void set_cursor(char row, char col) {
-	interrupt(0x10, 0x0200, 0, 0, 0x0C23);
+	interrupt(0x10, 0x02<<8, 0, 0, (row<<8) | col);
 }
 
 void set_resolution(int mode) {
@@ -22,6 +22,18 @@ void print_char(int c) {
 		cls();
 		return;
 	}
+
+	if(c == '\x1') { // Cursor down
+		set_cursor(get_cursor_row()-1, get_cursor_col());
+		return;
+	}
+	
+	if(c == '\x2') { // Cursor back
+		char col = get_cursor_col();
+		set_cursor(get_cursor_row(), col>0? col-1 : col);
+		return;
+	}
+
 
 	if(c == '\n')
 		interrupt(0x10, 0x0E00 + '\r', 0, 0, 0);

@@ -177,17 +177,11 @@ int init(char* cmdline){
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
 	
-	/*cursor = get_cursor();
-	row = (char) cursor;
-	col = cursor<<4;*/
-	
 	cls();
 	
 	print_string("Welcome to RhysOS!\n\n");
 	exec("/mem", 0, NULL);
 	print_string("\n");
-	
-	//set_cursor(0, 0);
 	
 	//test();
 	
