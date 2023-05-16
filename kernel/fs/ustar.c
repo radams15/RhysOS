@@ -19,51 +19,6 @@ static unsigned int num_root_nodes;
 static DirEnt_t dirent;
 
 
-/*unsigned int ustar_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
-	int sector;
-	int read;
-	int size_sectors;
-	int start_sector;
-	int end_sector;
-	int to_copy;
-	int to_read;
-	char sect_buf[SECTOR_SIZE];
-	int i;
-	int copy_start = 0;
-	
-	to_read = size;	
-	size_sectors = (node->length/SECTOR_SIZE);
-	end_sector = node->start_sector + size_sectors;
-	read = 0;
-	start_sector = node->start_sector; + (offset / SECTOR_SIZE);
-	copy_start = 0;
-	
-	for(sector=start_sector ; sector <= end_sector ; sector++) {	
-    	print_string("READ: "); print_hex_4(sector);
-		read_sector(&sect_buf, sector);
-		
-		if(read + SECTOR_SIZE > size) {
-			to_copy = size-read;
-		} else {
-			to_copy = SECTOR_SIZE;
-		}
-		if(to_copy+read > to_read) {
-			to_copy = to_read - read;
-		}
-		
-		for(i=copy_start ; i<to_copy ; i++) {
-			buffer[i-copy_start] = sect_buf[i];
-		}
-		
-		buffer += to_copy;
-		read += to_copy;
-		copy_start = 0;
-	}
-	
-	return read;
-}*/
-
-
 unsigned int ustar_read(node, byte_offset, byte_size, out_buffer)
 	FsNode_t* node;
 	unsigned int byte_offset;
@@ -133,8 +88,6 @@ FsNode_t* ustar_finddir(FsNode_t* node, char* name) {
    			} else {
 	           return &root_nodes[i];
            }
-       } else {
-
        }
    }
    

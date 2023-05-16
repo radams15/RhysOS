@@ -44,6 +44,8 @@ int exec(char* file_name, int argc, char** argv) {
 	struct FsNode* fs_node;
 	char buf[SHELL_SIZE];
 	int size;
+	int in, out, err;
+	int ret;
 	
 	fs_node = get_dir(file_name);
 	
@@ -57,7 +59,21 @@ int exec(char* file_name, int argc, char** argv) {
 	
 	size = fs_read(fs_node, 0, sizeof(buf), &buf);
     
-    return run_exe(&buf, size, LOAD_EXE, argc, argv);
+    /*in = open("/dev/stdin");
+    out = open("/dev/stdout");
+    err = open("/dev/stderr");
+    
+    print_hex_4(in);*/
+    
+    ret = run_exe(&buf, size, LOAD_EXE, argc, argv, in, out, err);
+    
+    /*print_string("Exec complete\n");
+    
+    close(in);
+    close(out);
+    close(err);*/
+    
+    return ret;
 }
 
 int read_file(char* buf, int n, char* file_name) {

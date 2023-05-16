@@ -42,6 +42,8 @@ int open(char* name) {
 			return i;
 		}
 	}
+	
+    print_string("Error\n");
 
 	return -1;
 }
