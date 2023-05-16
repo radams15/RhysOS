@@ -6,6 +6,8 @@ enum {
 	LOAD_SHELL
 } LoadType;
 
-int run_exe(char* buf, unsigned int size, LoadType type, int argc, char** argv);
+typedef int (*ProcFunc_t)(int stdin, int stdout, int stderr, int argc, char** argv);
+
+ProcFunc_t run_exe(char* buf, unsigned int size, LoadType type);
 
 #endif

@@ -11,6 +11,8 @@
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
 
+int stdin, stdout, stderr;
+
 void main() {
 	int err;
 
@@ -27,6 +29,7 @@ int shell() {
 	struct FsNode* fs_node;
 	char buf[SHELL_SIZE];
 	int size;
+	ProcFunc_t entry;
 	
 	fs_node = fs_finddir(fs_root, "shell");
 	
@@ -37,7 +40,8 @@ int shell() {
 	
 	size = fs_read(fs_node, 0, sizeof(buf), &buf);
     
-    return run_exe(&buf, size, LOAD_SHELL, 0, NULL);
+    entry = run_exe(&buf, size, LOAD_SHELL);
+    return entry(stdin, stdout, stderr, 0, NULL);
 }
 
 int exec(char* file_name, int argc, char** argv) {
@@ -46,6 +50,7 @@ int exec(char* file_name, int argc, char** argv) {
 	int size;
 	int in, out, err;
 	int ret;
+	ProcFunc_t entry;
 	
 	fs_node = get_dir(file_name);
 	
@@ -58,22 +63,10 @@ int exec(char* file_name, int argc, char** argv) {
 	}
 	
 	size = fs_read(fs_node, 0, sizeof(buf), &buf);
+
+    entry = run_exe(&buf, size, LOAD_EXE);
     
-    /*in = open("/dev/stdin");
-    out = open("/dev/stdout");
-    err = open("/dev/stderr");
-    
-    print_hex_4(in);*/
-    
-    ret = run_exe(&buf, size, LOAD_EXE, argc, argv, in, out, err);
-    
-    /*print_string("Exec complete\n");
-    
-    close(in);
-    close(out);
-    close(err);*/
-    
-    return ret;
+    return entry(stdin, stdout, stderr, argc, argv);
 }
 
 int read_file(char* buf, int n, char* file_name) {
@@ -196,12 +189,19 @@ int init(char* cmdline){
 	cls();
 	
 	print_string("Welcome to RhysOS!\n\n");
-	exec("/mem", 0, NULL);
 	print_string("\n");
+	
+	stdin = open("/dev/stdin");
+	stdout = open("/dev/stdout");
+	stderr = open("/dev/stderr");
 	
 	//test();
 	
 	shell();
+	
+	close(stdin);
+	close(stdout);
+	close(stderr);
 	
 	print_string("\n\nDone.");
 
