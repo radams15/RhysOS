@@ -25,6 +25,7 @@ void main() {
 	for(;;){}
 }
 
+
 int exec(char* file_name, int argc, char** argv) {
 	struct FsNode* fs_node;
 	char buf[SHELL_SIZE];
@@ -48,6 +49,10 @@ int exec(char* file_name, int argc, char** argv) {
     entry = run_exe(&buf, size, LOAD_EXE);
     
     return entry(stdin, stdout, stderr, argc, argv);
+}
+
+int shell() {
+	return exec("shell", 0, NULL);
 }
 
 int read_file(char* buf, int n, char* file_name) {
