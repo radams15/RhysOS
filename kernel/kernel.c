@@ -25,7 +25,7 @@ void main() {
 	for(;;){}
 }
 
-int shell() {
+/*int shell() {
 	struct FsNode* fs_node;
 	char buf[SHELL_SIZE];
 	int size;
@@ -42,7 +42,7 @@ int shell() {
     
     entry = run_exe(&buf, size, LOAD_SHELL);
     return entry(stdin, stdout, stderr, 0, NULL);
-}
+}*/
 
 int exec(char* file_name, int argc, char** argv) {
 	struct FsNode* fs_node;
@@ -67,6 +67,10 @@ int exec(char* file_name, int argc, char** argv) {
     entry = run_exe(&buf, size, LOAD_EXE);
     
     return entry(stdin, stdout, stderr, argc, argv);
+}
+
+int shell() {
+	return exec("shell", 0, NULL);
 }
 
 int read_file(char* buf, int n, char* file_name) {
@@ -186,14 +190,16 @@ int init(char* cmdline){
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
 	
-	cls();
-	
-	print_string("Welcome to RhysOS!\n\n");
-	print_string("\n");
-	
 	stdin = open("/dev/stdin");
 	stdout = open("/dev/stdout");
 	stderr = open("/dev/stderr");
+	
+	cls();
+	
+	print_string("Welcome to RhysOS!\n\n");
+	
+	exec("mem", 0, NULL);
+	print_string("\n");
 	
 	//test();
 	
