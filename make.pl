@@ -22,7 +22,7 @@ my $KERNEL_SECTORS = '15';
 my $KERNEL_ADDR = '0x0000';
 my $SHELL_ADDR = '0x2000';
 my $EXE_ADDR = '0x6000';
-my $STACK_ADDR = '0xfff0';
+my $STACK_ADDR = '0x7c00';
 my $HEAP_ADDR = '0x20000';
 
 my $KERNEL_FLAGS = "-DHEAP_ADDRESS=$HEAP_ADDR -DEXE_ADDRESS=$EXE_ADDR -DSHELL_ADDRESS=$SHELL_ADDR";
@@ -46,8 +46,10 @@ sub find {
 
 sub bootloader {
 	make_path("build") if !(-e 'build/');
-	&run("$ASM -felf bootloader/boot.nasm -DSTACK_ADDR=$STACK_ADDR -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.o");
-	&run("$LD -Tbootloader/link.ld build/boot.o --oformat binary -o build/boot.bin");
+	#&run("$ASM -felf bootloader/boot.nasm -DSTACK_ADDR=$STACK_ADDR -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.o");
+	#&run("$LD -Tbootloader/link.ld build/boot.o --oformat binary -o build/boot.bin");
+	
+	&run("$ASM -fbin bootloader/boot.nasm -DSTACK_ADDR=$STACK_ADDR -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.bin");
 	
 	"build/boot.bin";
 }
@@ -61,7 +63,7 @@ sub kernel {
 		make_path($folder) if !(-e $folder);
 
 		&run("$CC -Ikernel/ $KERNEL_FLAGS -c $c_file -o $out");
-		(push @objs, $out) unless $c_file =~ /kernel.c/;
+		(push @objs, $out) unless $c_file =~ /kernel\.c/;
 	}
 	
 	for my $asm_file (&find('kernel/*.nasm')) {
@@ -70,10 +72,10 @@ sub kernel {
 		make_path($folder) if !(-e $folder);
 		
 		&run("$ASM -felf $asm_file -o $out");
-		push @objs, $out;
+		(push @objs, $out) unless $asm_file =~ /kernel\.nasm/;
 	}
 	
-	&run("$LD -Tkernel/link.ld --oformat binary -o build/kernel.bin -d build/kernel/kernel.o ".(join ' ', @objs));
+	&run("$LD -Tkernel/link.ld --oformat binary -o build/kernel.bin -d build/kernel/kernel_nasm.o ");#.(join ' ', @objs));
 	
 	"build/kernel.bin";
 }

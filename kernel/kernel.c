@@ -11,7 +11,9 @@
 void _start() {
 	int err;
 	
-	print_string("RhysOS Initialising!\n");
+	print_char('X');
+	
+	//print_string("RhysOS Initialising!\n");
 
 	/*err = init();
 
@@ -19,9 +21,9 @@ void _start() {
 		print_string("\r\nError in kernel, halting!\r\n");
 	}*/
 
-	for(;;){
+	/*for(;;){
 		print_string("RhysOS Initialising!\n");
-	}
+	}*/
 }
 
 int shell() {
@@ -207,7 +209,7 @@ int init(){
 	
 	//set_cursor(40, 40);
 	
-	shell();
+	//shell();
 	
 	print_string("\n\nDone.");
 
