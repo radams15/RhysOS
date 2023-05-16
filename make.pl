@@ -142,7 +142,25 @@ sub programs {
 		
 		my $out = "$folder/".$conf->param('name');
 		
-		&run("$LD -o $out -T$load_addr -d $runtime ".join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
+		&run("$LD -o $out -d -T$load_addr $runtime ".join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
+		
+
+		open FH, '<', $out;
+		my $original = join '', <FH>;
+		close FH;
+		
+		open FH, '>', $out;
+		
+=pod
+		struct Header {
+			char magic[2];
+			short load_address;
+		}
+=cut
+		
+		print FH pack('A2S', 'RZ', eval($load_addr));
+		print FH $original;
+		close FH;
 		
 		push @programs, $out;
 	}

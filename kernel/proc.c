@@ -3,28 +3,22 @@
 
 #include "serial.h"
 
-static char* proc_buf = (char*) EXE_ADDRESS;
-static char* shell_buf = (char*) SHELL_ADDRESS;
+typedef struct ExeHeader {
+	char type[2];
+	short load_address;
+} ExeHeader_t;
 
 ProcFunc_t run_exe(char* buf, unsigned int size, int type) {
 	int ret;
-	char* out_buf;
+	ExeHeader_t* header = buf; // Extract the header.
 	
-	switch(type) {
-		case LOAD_EXE:
-			out_buf = proc_buf;
-			break;
-		
-		case LOAD_SHELL:
-			out_buf = shell_buf;
-			break;
-		
-		default:
-			print_string("Unknown exec type");
-			return -1;
+	if(strcmp(header->type, "RZ") != 0) {
+		print_string("Cannot execute executable of type: '");
+		print_string(header->type);
+		print_string("'\n");
 	}
 	
-	memcpy(out_buf, buf, size);
+	memcpy((char*) header->load_address, buf+sizeof(ExeHeader_t), size-sizeof(ExeHeader_t)); // Only load the actual program.
 
-	return ((ProcFunc_t)out_buf);
+	return (ProcFunc_t) (header->load_address);
 }
