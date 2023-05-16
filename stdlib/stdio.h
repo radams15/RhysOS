@@ -16,6 +16,7 @@ char getch();
 int print(char* str);
 int putc(char c);
 int readline(char* buffer);
+void exit(char code); // Defined in crt0.c
 
 int cls();
 

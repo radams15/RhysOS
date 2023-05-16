@@ -25,25 +25,6 @@ void main() {
 	for(;;){}
 }
 
-/*int shell() {
-	struct FsNode* fs_node;
-	char buf[SHELL_SIZE];
-	int size;
-	ProcFunc_t entry;
-	
-	fs_node = fs_finddir(fs_root, "shell");
-	
-	if(fs_node == NULL) {
-		print_string("Failed to find shell!\n");
-		return;
-	}
-	
-	size = fs_read(fs_node, 0, sizeof(buf), &buf);
-    
-    entry = run_exe(&buf, size, LOAD_SHELL);
-    return entry(stdin, stdout, stderr, 0, NULL);
-}*/
-
 int exec(char* file_name, int argc, char** argv) {
 	struct FsNode* fs_node;
 	char buf[SHELL_SIZE];
@@ -67,10 +48,6 @@ int exec(char* file_name, int argc, char** argv) {
     entry = run_exe(&buf, size, LOAD_EXE);
     
     return entry(stdin, stdout, stderr, argc, argv);
-}
-
-int shell() {
-	return exec("shell", 0, NULL);
 }
 
 int read_file(char* buf, int n, char* file_name) {
@@ -203,7 +180,7 @@ int init(char* cmdline){
 	
 	//test();
 	
-	shell();
+	exec("shell", 0, NULL);
 	
 	close(stdin);
 	close(stdout);
