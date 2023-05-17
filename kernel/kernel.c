@@ -166,11 +166,17 @@ int init(char* cmdline){
 	makeInterrupt21();
 	memmgr_init();
 	
+	//print_char('A');
+	
 	serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
+	
+	//print_char('B');
 	
 	fs_root = ustar_init(1);
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
+	
+	//print_char('C');
 	
 	stdin = open("/dev/stdin");
 	stdout = open("/dev/stdout");

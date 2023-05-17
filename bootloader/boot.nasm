@@ -16,13 +16,13 @@ print_char:
 	jmp print_char
 print_done:
 
-mov ax,KSEG
-mov ds,ax
-mov ss,ax
-mov es,ax
-mov ax,0xfff0 ; stack offset
-mov sp,ax
-mov bp,ax
+mov ax, KSEG
+mov ds, ax
+mov ss, ax
+mov es, ax
+mov ax, STACK_ADDR ; stack offset
+mov sp, ax
+mov bp, ax
 
 
 mov     cl,KSTART+1      ;cl holds sector number

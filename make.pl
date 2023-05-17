@@ -16,10 +16,12 @@ my $CC = 'bcc';
 my $LD = 'ld86';
 
 # Must be strings for some reason
-my $KERNEL_ADDR = '0x0100';
-my $SHELL_ADDR = '0x3000';
-my $EXE_ADDR = '0x6000';
-my $HEAP_ADDR = '0x20000';
+my $KERNEL_ADDR = '0x0050';
+my $SHELL_ADDR = '0x6000';
+my $EXE_ADDR = '0x8000';
+my $HEAP_ADDR = '0x9000';
+my $STACK_ADDR = '0xfff0';
+
 my $KERNEL_SECTORS = '20';
 
 my $FLOPPY_SECTORS = 2880; # 1.44M floppy
@@ -45,7 +47,7 @@ sub find {
 
 sub bootloader {
 	make_path("build") if !(-e 'build/');
-	&run("$ASM -fbin bootloader/boot.nasm -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.bin");
+	&run("$ASM -fbin bootloader/boot.nasm -DSTACK_ADDR=$STACK_ADDR -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.bin");
 	
 	"build/boot.bin";
 }
