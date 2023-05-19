@@ -89,25 +89,27 @@ int write_file(char* buf, int n, char* file_name) {
 
 int list_directory(char* dir_name, FsNode_t* buf) {
 	int i = 0;
-	DirEnt_t* node = 0;
+	int count = 0;
+	DirEnt_t* node = NULL;
 	FsNode_t* fsnode;
 	FsNode_t* root = get_dir(dir_name);
 	
 	if(root == NULL) {
-		print_string("Cannot find file!\n");
-		return -1;
+		print_string("Cannot find directory!\n");
+		return 0;
 	}
 	
 	while ( (node = fs_readdir(root, i)) != NULL) {
 		fsnode = fs_finddir(root, node->name);
 		if(fsnode != NULL) {
 			memcpy(buf++, fsnode, sizeof(FsNode_t));
+			count++;
 		}
 		
 		i++;
 	}
 	
-	return i;
+	return count;
 }
 
 int handleInterrupt21(int* ax, int bx, int cx, int dx) {
@@ -160,11 +162,10 @@ void test() {
 
 int init(char* cmdline){	
 	FsNode_t* fs_dev;
-	int cursor;
-	char row, col;
+	
+	memmgr_init();
 	
 	makeInterrupt21();
-	memmgr_init();
 	
 	//print_char('A');
 	
@@ -188,8 +189,6 @@ int init(char* cmdline){
 	
 	exec("mem", 0, NULL);
 	print_string("\n");
-	
-	//test();
 	
 	exec("shell", 0, NULL);
 	

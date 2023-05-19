@@ -2,7 +2,15 @@
 
 #include "sysinfo.h"
 
+static int heap_top;
 static int heap;
+
+#define HEAP_MAGIC 0xCAFE
+
+typedef struct BlkHeader {
+	unsigned int magic; // HEAP_MAGIC
+	unsigned int length; // Length of the block
+} BlkHeader_t;
 
 void memmgr_init() {
 	/*int mem_low = lowmem();
@@ -14,7 +22,8 @@ void memmgr_init() {
 		heap = mem_low * 1000;
 	}*/
 	
-	heap = HEAP_ADDRESS;
+	heap_top = HEAP_ADDRESS;
+	heap = heap_top;
 }
 
 /*void* malloc(unsigned int size) {
@@ -24,11 +33,16 @@ void memmgr_init() {
 }*/
 
 void* malloc(unsigned int size) {
-	int out = heap;
+	BlkHeader_t* out = heap;
 	
-	heap += size;
+	heap += size + sizeof(BlkHeader_t) + 8;
+	
+	clear(out, heap-(int)out);
+	
+	out->magic = HEAP_MAGIC;
+	out->length = size;
 
-	return (int*) out;
+	return (int*) out + sizeof(BlkHeader_t);
 }
 
 void free(void* ptr) {

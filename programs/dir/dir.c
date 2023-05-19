@@ -8,6 +8,7 @@ int entry(int argc, char** argv) { return main(argc, argv); }
 
 void dir_listing(char* dir) {
 	int i;
+	int len;
 	FsNode_t dir_buf[MAX_FILES];
 	FsNode_t* file;
 
@@ -16,12 +17,12 @@ void dir_listing(char* dir) {
 	}
 
 	printf("Files in directory '%s'\n", dir);
-	dir_list(dir, &dir_buf);
+	len = dir_list(dir, &dir_buf, &len);
 	
-	for(i=0 ; i<MAX_FILES ; i++) {		
+	for(i=0 ; i<len ; i++) {		
 		file = &dir_buf[i];
 		
-		if(strlen(file->name) == 0)
+		if(file == NULL)
 			break;
 
 		printf("\t - %s\n", file->name);

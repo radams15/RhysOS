@@ -1,5 +1,6 @@
 #include "ustar.h"
 #include "malloc.h"
+#include "util.h"
 
 #define ROOT_DIR_SECTOR 1
 #define SECTOR_SIZE 512

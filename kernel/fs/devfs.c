@@ -9,8 +9,8 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define SECTOR_SIZE 512
 
-static FsNode_t* root_node;
-static FsNode_t* root_nodes;
+static FsNode_t root_node;
+static FsNode_t root_nodes[MAX_FILES];
 static int num_root_nodes;
 
 static DirEnt_t dirent;
@@ -296,29 +296,22 @@ void devfs_setup() {
 
 
 FsNode_t* devfs_init() {
-	root_node = malloc(sizeof(FsNode_t));
-	
-	strcpy(root_node->name, "dev");
-	root_node->flags = FS_DIRECTORY;
-	root_node->inode = 0;
-	root_node->length = 0;
-	root_node->offset = 0;
-	root_node->read = 0;
-	root_node->write = 0;
-	root_node->open = 0;
-	root_node->close = 0;
-	root_node->readdir = devfs_readdir;
-	root_node->finddir = devfs_finddir;
-	root_node->ref = 0;
+	strcpy(root_node.name, "dev");
+	root_node.flags = FS_DIRECTORY;
+	root_node.inode = 0;
+	root_node.length = 0;
+	root_node.offset = 0;
+	root_node.read = 0;
+	root_node.write = 0;
+	root_node.open = 0;
+	root_node.close = 0;
+	root_node.readdir = devfs_readdir;
+	root_node.finddir = devfs_finddir;
+	root_node.ref = 0;
 	
 	num_root_nodes = 0;
-	root_nodes = malloc(sizeof(FsNode_t) * MAX_FILES);
-	
-	if(root_node >= root_nodes) {
-		print_string("FAILLLLL\n");
-	}
 	
 	devfs_setup();
 	
-	return root_node;
+	return &root_node;
 }

@@ -6,10 +6,6 @@ void memset(int *dest, int val, int len) {
     for ( ; len != 0; len--) *temp++ = val;
 }
 
-void strcpy(char* a, char* b) {
-	memcpy(a, b, strlen(b));
-}
-
 void memcpy(char* dest, char* src, unsigned int n) {
 	while (n--) {
         *(dest++) = *(src++);

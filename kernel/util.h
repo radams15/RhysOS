@@ -3,7 +3,7 @@
 
 void memset(int *dest, int val, int len);
 
-void strcpy(char* a, char* b);
+#define strcpy(a, b) memcpy(a, b, strlen(b))
 
 void memcpy(char *dest, char *src, unsigned int n);
 
