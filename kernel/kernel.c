@@ -160,8 +160,24 @@ void test() {
 	}*/
 }
 
-int init(char* cmdline){	
+void a20_init() {
+	if(a20_available()) {
+		int enable_fail;
+		print_string("A20 line is available\n");
+		enable_fail = a20_enable();
+		
+		if(enable_fail)
+			print_string("A20 line failed to enable\n");
+		else
+			print_string("A20 line successfully enabled\n");
+	} else
+		print_string("A20 line is unavaiable\n");
+}
+
+int init(char* cmdline){		
 	FsNode_t* fs_dev;
+	
+	a20_init();
 	
 	memmgr_init();
 	
