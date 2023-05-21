@@ -1,13 +1,11 @@
 #ifndef PROC_H
 #define PROC_H
 
-enum {
-	LOAD_EXE,
-	LOAD_SHELL
-} LoadType;
+enum LoadType {
+	LOAD_EXE = 0,
+	LOAD_SHELL = 1
+};
 
-typedef int (*ProcFunc_t)(int stdin, int stdout, int stderr, int argc, char** argv);
-
-ProcFunc_t run_exe(char* buf, unsigned int size, LoadType type);
+int run_exe(char* buf, unsigned int size, enum LoadType type, int argc, char** argv);
 
 #endif

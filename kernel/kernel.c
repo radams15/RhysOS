@@ -1,58 +1,64 @@
 #include "fs/fs.h"
 #include "tty.h"
 #include "proc.h"
-#include "malloc.h"
 
 #include "fs/ustar.h"
 #include "fs/devfs.h"
 
-#include "serial.h"
-
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
 
-int stdin, stdout, stderr;
-
-void main() {
+void _entry() {
 	int err;
+	
+	print_char('X');
+	
+	//print_string("RhysOS Initialising!\n");
 
-	err = init();
+	/*err = init();
 
 	if(err){
 		print_string("\r\nError in kernel, halting!\r\n");
-	}
+	}*/
 
-	for(;;){}
+	/*for(;;){
+		print_string("RhysOS Initialising!\n");
+	}*/
 }
 
+int shell() {
+	struct FsNode* fs_node;
+	char buf[SHELL_SIZE];
+	int size;
+	
+	fs_node = fs_finddir(fs_root, "shell");
+	
+	if(fs_node == NULL) {
+		print_string("Failed to find shell!\n");
+		return;
+	}
+	
+	size = fs_read(fs_node, 0, sizeof(buf), &buf);
+    
+    return run_exe(&buf, size, LOAD_SHELL, 0, NULL);
+}
 
 int exec(char* file_name, int argc, char** argv) {
 	struct FsNode* fs_node;
 	char buf[SHELL_SIZE];
 	int size;
-	int in, out, err;
-	int ret;
-	ProcFunc_t entry;
 	
 	fs_node = get_dir(file_name);
 	
 	if(fs_node == NULL) {
-		if(file_name != NULL) {
-			print_string(file_name);
-			print_string(" is not recognised as an internal or external command.\n");
-		}
+		print_string(file_name);
+		print_string(" is not recognised as an internal or external command.\n");
 		return -1;
 	}
 	
 	size = fs_read(fs_node, 0, sizeof(buf), &buf);
-
-    entry = run_exe(&buf, size, LOAD_EXE);
     
-    return entry(stdin, stdout, stderr, argc, argv);
-}
-
-int shell() {
-	return exec("shell", 0, NULL);
+    return run_exe(&buf, size, LOAD_EXE, argc, argv);
 }
 
 int read_file(char* buf, int n, char* file_name) {
@@ -89,33 +95,47 @@ int write_file(char* buf, int n, char* file_name) {
 
 int list_directory(char* dir_name, FsNode_t* buf) {
 	int i = 0;
-	int count = 0;
-	DirEnt_t* node = NULL;
+	DirEnt_t* node = 0;
 	FsNode_t* fsnode;
 	FsNode_t* root = get_dir(dir_name);
 	
 	if(root == NULL) {
-		print_string("Cannot find directory!\n");
-		return 0;
+		print_string("Cannot find file!\n");
+		return -1;
 	}
 	
 	while ( (node = fs_readdir(root, i)) != NULL) {
 		fsnode = fs_finddir(root, node->name);
 		if(fsnode != NULL) {
 			memcpy(buf++, fsnode, sizeof(FsNode_t));
-			count++;
 		}
 		
 		i++;
 	}
 	
-	return count;
+	return i;
 }
 
 int handleInterrupt21(int* ax, int bx, int cx, int dx) {
   switch(*ax) {
+    case 0:
+		print_string((char *)bx);
+		break;
+		
+    case 1:
+		print_char((char) bx);
+		break;
+
+    case 2:
+		*ax = readline(bx);
+		break;
+
     case 3:
 		*ax = exec(bx, cx, dx);
+		break;
+
+    case 4:
+		set_graphics_mode(bx);
 		break;
 
     case 5:
@@ -130,10 +150,11 @@ int handleInterrupt21(int* ax, int bx, int cx, int dx) {
 		*ax = write((int) bx, (char*) cx, (int) dx);
 		break;
 		
-    case 8:
+    case 8: {
 		*ax = open((char*) bx);
 		break;
-
+	}
+	
     case 9:
 		close((char*) bx);
 		break;
@@ -152,65 +173,43 @@ int handleInterrupt21(int* ax, int bx, int cx, int dx) {
 }
 
 void test() {
-	int addr;
+	char* buf[20];
 	int i;
 	
-	/*for(i=0 ; i<10 ; i++) {
-		addr = malloc(100);
-	}*/
+	list_directory("/", &buf);
+	for(i=0 ; i<10 ; i++)
+		print_string(buf[i]);
 }
 
-void a20_init() {
-	if(a20_available()) {
-		int enable_fail;
-		print_string("A20 line is available\n");
-		enable_fail = a20_enable();
-		
-		if(enable_fail)
-			print_string("A20 line failed to enable\n");
-		else
-			print_string("A20 line successfully enabled\n");
-	} else
-		print_string("A20 line is unavaiable\n");
-}
-
-int init(char* cmdline){		
+int init(){	
 	FsNode_t* fs_dev;
-	
-	a20_init();
-	
-	memmgr_init();
+	int cursor;
+	char row, col;
 	
 	makeInterrupt21();
-	
-	//print_char('A');
-	
-	serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
-	
-	//print_char('B');
 	
 	fs_root = ustar_init(1);
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
 	
-	//print_char('C');
-	
-	stdin = open("/dev/stdin");
-	stdout = open("/dev/stdout");
-	stderr = open("/dev/stderr");
+	cursor = get_cursor();
+	row = (char) cursor;
+	col = cursor<<4;
 	
 	cls();
 	
-	print_string("Welcome to RhysOS!\n\n");
+	print_string("Welcome to RhysOS!\n\n\t");
+	printi(lowmem(), 10);
+	print_string("k low memory\n\t");
+	printi(highmem(), 10);
+	print_string("k high memory\n\n");
 	
-	exec("mem", 0, NULL);
-	print_string("\n");
 	
-	exec("shell", 0, NULL);
+	//test();
 	
-	close(stdin);
-	close(stdout);
-	close(stderr);
+	//set_cursor(40, 40);
+	
+	//shell();
 	
 	print_string("\n\nDone.");
 

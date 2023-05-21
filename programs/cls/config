@@ -1,3 +1,8 @@
 name: cls
 main: cls.nasm
+<<<<<<< HEAD
 stdlib: 1
+=======
+stdlib: 0
+standalone: 1
+>>>>>>> gcc-ia16

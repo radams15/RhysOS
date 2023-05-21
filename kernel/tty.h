@@ -21,16 +21,12 @@ void print_hex_4(unsigned int n);
 void print_hex_8(unsigned int n);
 
 int get_cursor();
-char get_cursor_col();
-char get_cursor_row();
 void set_cursor(char row, char col);
-
 
 int readline(char* buffer);
 char getch();
 
 void set_graphics_mode(int mode);
-int get_graphics_mode();
 void cls();
 
 #endif

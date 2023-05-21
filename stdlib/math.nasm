@@ -1,5 +1,7 @@
-global _div
-_div:
+bits 16
+
+global div
+div:
     PUSH BP         ; save the base pointer
     MOV BP, SP      ; set up the stack frame
     
@@ -14,8 +16,8 @@ _div:
     RET             ; return to the calling function
 
 
-global _mod
-_mod:
+global mod
+mod:
     PUSH BP         ; save the base pointer
     MOV BP, SP      ; set up the stack frame
     
@@ -30,8 +32,8 @@ _mod:
     RET             ; return to the calling function
 
 
-global _imod
-_imod:
+global imod
+imod:
     push bp                 ; Save old base pointer
     mov bp, sp              ; Set up new base pointer
     mov ax, word [bp+4]     ; Load dividend (num) into AX

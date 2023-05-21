@@ -5,7 +5,7 @@
 
 #define MAX_OPEN_FILES 64
 
-extern int interrupt(int number, int AX, int BX, int CX, int DX);
+int interrupt(int number, int AX, int BX, int CX, int DX);
 
 FsNode_t* open_files[MAX_OPEN_FILES];
 FsNode_t* fs_root;
