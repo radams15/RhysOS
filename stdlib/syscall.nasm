@@ -1,9 +1,9 @@
 bits 16
 
-global interrupt
+global _interrupt
 
 ;int interrupt (int number, int AX, int BX, int CX, int DX)
-interrupt:
+_interrupt:
 	push bp
 	mov bp,sp
 	mov ax,[bp+4]	;get the interrupt number in AL

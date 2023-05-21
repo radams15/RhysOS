@@ -1,13 +1,13 @@
 bits 16
 
-global lowmem
-lowmem:
+global _lowmem
+_lowmem:
 	clc
 	int 12h
 	ret
 
-global highmem
-highmem:
+global _highmem
+_highmem:
 	clc
 	mov ah, 88h
 	int 15h

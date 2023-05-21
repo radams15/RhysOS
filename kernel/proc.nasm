@@ -1,9 +1,9 @@
 bits 16
 
-global makeInterrupt21
-extern handleInterrupt21
+global _makeInterrupt21
+extern _handleInterrupt21
 
-makeInterrupt21:
+_makeInterrupt21:
 	;get the address of the service routine
 	mov dx, interrupt21ServiceRoutine
 	push ds
@@ -25,7 +25,7 @@ interrupt21ServiceRoutine:
 	push bx
 	push ax
 	sti
-	call handleInterrupt21
+	call _handleInterrupt21
 	pop ax
 	pop bx
 	pop cx

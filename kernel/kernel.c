@@ -8,45 +8,29 @@
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
 
-void _entry() {
-	int err;
-	
-	print_char('X');
-	
-	//print_string("RhysOS Initialising!\n");
+int stdin, stdout, stderr;
 
-	/*err = init();
+void main() {
+	int err;
+
+	print_string("RhysOS Initialising!\n");
+
+	err = init();
 
 	if(err){
 		print_string("\r\nError in kernel, halting!\r\n");
-	}*/
+	}
 
 	/*for(;;){
 		print_string("RhysOS Initialising!\n");
 	}*/
 }
 
-int shell() {
-	struct FsNode* fs_node;
-	char buf[SHELL_SIZE];
-	int size;
-	
-	fs_node = fs_finddir(fs_root, "shell");
-	
-	if(fs_node == NULL) {
-		print_string("Failed to find shell!\n");
-		return;
-	}
-	
-	size = fs_read(fs_node, 0, sizeof(buf), &buf);
-    
-    return run_exe(&buf, size, LOAD_SHELL, 0, NULL);
-}
-
 int exec(char* file_name, int argc, char** argv) {
 	struct FsNode* fs_node;
 	char buf[SHELL_SIZE];
 	int size;
+	ProcFunc_t entry;
 	
 	fs_node = get_dir(file_name);
 	
@@ -58,7 +42,9 @@ int exec(char* file_name, int argc, char** argv) {
 	
 	size = fs_read(fs_node, 0, sizeof(buf), &buf);
     
-    return run_exe(&buf, size, LOAD_EXE, argc, argv);
+	entry = run_exe(&buf, size);
+     
+	return entry(stdin, stdout, stderr, argc, argv);
 }
 
 int read_file(char* buf, int n, char* file_name) {
@@ -118,24 +104,8 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 
 int handleInterrupt21(int* ax, int bx, int cx, int dx) {
   switch(*ax) {
-    case 0:
-		print_string((char *)bx);
-		break;
-		
-    case 1:
-		print_char((char) bx);
-		break;
-
-    case 2:
-		*ax = readline(bx);
-		break;
-
     case 3:
 		*ax = exec(bx, cx, dx);
-		break;
-
-    case 4:
-		set_graphics_mode(bx);
 		break;
 
     case 5:
@@ -172,44 +142,44 @@ int handleInterrupt21(int* ax, int bx, int cx, int dx) {
   }
 }
 
-void test() {
-	char* buf[20];
-	int i;
-	
-	list_directory("/", &buf);
-	for(i=0 ; i<10 ; i++)
-		print_string(buf[i]);
+void a20_init() {
+       if(a20_available()) {
+               int enable_fail;
+               print_string("A20 line is available\n");
+               enable_fail = a20_enable();
+               
+               if(enable_fail)
+                       print_string("A20 line failed to enable\n");
+               else
+                       print_string("A20 line successfully enabled\n");
+       } else
+               print_string("A20 line is unavaiable\n");
 }
+
 
 int init(){	
 	FsNode_t* fs_dev;
 	int cursor;
 	char row, col;
 	
-	makeInterrupt21();
+	a20_init();
 	
+	memmgr_init();
+	
+	makeInterrupt21();
+
 	fs_root = ustar_init(1);
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
-	
-	cursor = get_cursor();
-	row = (char) cursor;
-	col = cursor<<4;
-	
+
 	cls();
 	
-	print_string("Welcome to RhysOS!\n\n\t");
-	printi(lowmem(), 10);
-	print_string("k low memory\n\t");
-	printi(highmem(), 10);
-	print_string("k high memory\n\n");
-	
-	
-	//test();
-	
-	//set_cursor(40, 40);
-	
-	//shell();
+	stdin = open("/dev/stdin");
+	stdout = open("/dev/stdout");
+	stderr = open("/dev/stderr");
+
+	exec("/mem", 0, 0);
+	exec("/shell", 0, 0);
 	
 	print_string("\n\nDone.");
 
