@@ -1,5 +1,7 @@
 org 0x7c00
 
+section .text
+
 KSEG	equ	KERNEL_ADDR ; address to place kernel in
 KSIZE	equ	KERNEL_SECTORS ; sectors in kernel
 KSTART	equ	2 ; start sector in initrd

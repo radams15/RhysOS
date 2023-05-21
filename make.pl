@@ -73,7 +73,7 @@ sub kernel {
 		push @objs, $out;
 	}
 	
-	&run("wlink FILE build/kernel/kernel.o FILE ".(join ' FILE ', @objs)." OUTPUT RAW OFFSET=$KERNEL_ADDR OPTION NODEFAULTLIBS, START=_cstart_ NAME build/kernel.bin");
+	&run("wlink FILE build/kernel/kernel.o FILE ".(join ' FILE ', @objs)." OUTPUT RAW OFFSET=$KERNEL_ADDR OPTION NODEFAULTLIBS, START=_cstart_ order clname code offset=$KERNEL_ADDR clname data NAME build/kernel.bin");
 	
 	"build/kernel.bin";
 }
