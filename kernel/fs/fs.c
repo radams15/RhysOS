@@ -2,10 +2,11 @@
 
 #include "util.h"
 #include "proc.h"
+#include "tty.h"
 
 #define MAX_OPEN_FILES 64
 
-extern int interrupt(int number, int AX, int BX, int CX, int DX);
+extern int intr(int number, int AX, int BX, int CX, int DX);
 
 FsNode_t* open_files[MAX_OPEN_FILES];
 FsNode_t* fs_root;
@@ -77,7 +78,7 @@ void read_sector(int* buffer, int sector){
 	int head = mod((sector / 18), 2);
 	int floppyDevice = 0;
 
-	interrupt(0x13, (2 * 256 + 1), (int)buffer, (track*256 + relativeSector), (head*256 + floppyDevice));
+	intr(0x13, (2 * 256 + 1), (int)buffer, (track*256 + relativeSector), (head*256 + floppyDevice));
 }
 
 unsigned int fs_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {

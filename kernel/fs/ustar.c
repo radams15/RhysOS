@@ -48,7 +48,7 @@ unsigned int ustar_read(node, byte_offset, byte_size, out_buffer)
     sector_offset = byte_offset % SECTOR_SIZE;
 
     while (bytes_read < byte_size) {
-        read_sector(&temp_buffer, start_sector);
+        read_sector((int*) &temp_buffer, start_sector);
 
         sector_bytes = MIN(SECTOR_SIZE - sector_offset, byte_size - bytes_read);
 
@@ -104,7 +104,7 @@ int ustar_load_root() {
 	
 	sector = ROOT_DIR_SECTOR;
 	
-	read_sector(&file, sector);
+	read_sector((int*) &file, sector);
 	
 	i=0;
 	while(strcmp("ustar", file.new.ustar) == 0) {
@@ -130,7 +130,7 @@ int ustar_load_root() {
 		i++;
 		sector += size_sectors;
 		
-		read_sector(&file, sector);
+		read_sector((int*) &file, sector);
 	}
 	
 	num_root_nodes = i;

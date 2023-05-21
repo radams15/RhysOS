@@ -13,10 +13,10 @@
 
 int stdin, stdout, stderr;
 
-void main() {
+void _cstart() {
 	int err;
 
-	err = init();
+	err = init("");
 
 	if(err){
 		print_string("\r\nError in kernel, halting!\r\n");
@@ -46,7 +46,7 @@ int exec(char* file_name, int argc, char** argv) {
 	
 	size = fs_read(fs_node, 0, sizeof(buf), &buf);
 
-    entry = run_exe(&buf, size, LOAD_EXE);
+    entry = run_exe(&buf, size);
     
     return entry(stdin, stdout, stderr, argc, argv);
 }
@@ -143,7 +143,7 @@ int handleInterrupt21(int* ax, int bx, int cx, int dx) {
 		break;
 
     default:
-		print_string("Unknown interrupt: ");
+		print_string("Unknown intr: ");
 		print_hex_4(*ax);
 		print_string("!\r\n");
 		*ax = -1;

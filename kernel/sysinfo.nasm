@@ -1,11 +1,11 @@
-global _lowmem
-_lowmem:
+global lowmem_
+lowmem_:
 	clc
 	int 12h
 	ret
 
-global _highmem
-_highmem:
+global highmem_
+highmem_:
 	clc
 	mov ah, 88h
 	int 15h

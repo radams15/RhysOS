@@ -1,8 +1,8 @@
-global _get_cursor
-global _get_cursor_row
-global _get_cursor_col
+global get_cursor_
+global get_cursor_row_
+global get_cursor_col_
 
-_get_cursor:
+get_cursor_:
 	xor ax, ax
 	mov ah, 0x03
 	xor bh, bh ; display page = 0
@@ -10,13 +10,13 @@ _get_cursor:
 	mov ax, dx
 	ret
 	
-_get_cursor_row:
-	call _get_cursor
+get_cursor_row_:
+	call get_cursor_
 	xor al, al
 	mov al, ah
 	ret
 
-_get_cursor_col:
-	call _get_cursor
+get_cursor_col_:
+	call get_cursor_
 	xor ah, ah
 	ret

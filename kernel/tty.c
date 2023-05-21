@@ -2,17 +2,17 @@
 
 int graphics_mode = GRAPHICS_CGA_80x25; // CGA 80x24
 
-int interrupt (int number, int AX, int BX, int CX, int DX);
+int intr(int number, int AX, int BX, int CX, int DX);
 
 void set_cursor(char row, char col) {
-	interrupt(0x10, 0x02<<8, 0, 0, (row<<8) | col);
+	intr(0x10, 0x02<<8, 0, 0, (row<<8) | col);
 }
 
 void set_resolution(int mode) {
-	interrupt(0x10, mode, 0, 0, 0);
+	intr(0x10, mode, 0, 0, 0);
 }
 
-void print_char(int c) {
+void print_char(char c) {
 	if(c == '\t') {
 		print_string("    ");
 		return;
@@ -36,9 +36,9 @@ void print_char(int c) {
 
 
 	if(c == '\n')
-		interrupt(0x10, 0x0E00 + '\r', 0, 0, 0);
+		intr(0x10, 0x0E00 + '\r', 0, 0, 0);
 
-	interrupt(0x10, 0x0E00 + c, 0, 0, 0);
+	intr(0x10, 0x0E00 + c, 0, 0, 0);
 }
 
 void print_string(char* str) {
@@ -109,7 +109,7 @@ int readline(char* buffer) {
 char getch() {
 	char out;
 	
-	out = interrupt(0x16, 0, 0, 0, 0);
+	out = intr(0x16, 0, 0, 0, 0);
 	print_char(out); // echo back char
 	
 	return out;
@@ -139,5 +139,5 @@ int get_graphics_mode() {
 }
 
 void cls() {
-	interrupt(0x10, get_graphics_ah(graphics_mode), 0, 0, 0);
+	intr(0x10, get_graphics_ah(graphics_mode), 0, 0, 0);
 }

@@ -1,9 +1,9 @@
-global _makeInterrupt21
-extern _handleInterrupt21
+global makeInterrupt21_
+extern handleInterrupt21_
 
-_makeInterrupt21:
+makeInterrupt21_:
 	;get the address of the service routine
-	mov dx,_interrupt21ServiceRoutine
+	mov dx,interrupt21ServiceRoutine_
 	push ds
 	mov ax, 0	;interrupts are in lowest memory
 	mov ds,ax
@@ -17,13 +17,13 @@ _makeInterrupt21:
 ;this is called when interrupt 21 happens
 ;it will call your function:
 ;void handleInterrupt21 (int AX, int BX, int CX, int DX)
-_interrupt21ServiceRoutine:
+interrupt21ServiceRoutine_:
 	push dx
 	push cx
 	push bx
 	push ax
 	sti
-	call _handleInterrupt21
+	call handleInterrupt21_
 	pop ax
 	pop bx
 	pop cx

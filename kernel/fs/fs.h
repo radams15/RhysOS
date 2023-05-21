@@ -21,7 +21,7 @@ void read_sector(int* buffer, int sector);
 
 typedef unsigned int (*ReadFunc)(struct FsNode*, unsigned int, unsigned int, unsigned char*);
 typedef unsigned int (*WriteFunc)(struct FsNode*, unsigned int, unsigned int, unsigned char*);
-typedef unsigned int (*OpenFunc)(struct FsNode*);
+typedef unsigned int (*OpenFunc)(struct FsNode*, unsigned int, unsigned int);
 typedef unsigned int (*CloseFunc)(struct FsNode*);
 typedef struct DirEnt* (*ReaddirFunc)(struct FsNode*, unsigned int);
 typedef struct FsNode* (*FinddirFunc)(struct FsNode*, char* name);

@@ -1,5 +1,6 @@
 #include "proc.h"
 #include "util.h"
+#include "tty.h"
 
 #include "serial.h"
 
@@ -8,9 +9,9 @@ typedef struct ExeHeader {
 	short load_address;
 } ExeHeader_t;
 
-ProcFunc_t run_exe(char* buf, unsigned int size, int type) {
+ProcFunc_t run_exe(char* buf, unsigned int size) {
 	int ret;
-	ExeHeader_t* header = buf; // Extract the header.
+	ExeHeader_t* header = (ExeHeader_t*) buf; // Extract the header.
 	
 	if(strcmp(header->type, "RZ") != 0) {
 		print_string("Cannot execute executable of type: '");

@@ -38,7 +38,7 @@ FsNode_t* devfs_finddir(FsNode_t* node, char* name) {
    return NULL;
 }
 
-void stdout_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+unsigned int stdout_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	int i;
 	
 	for(i=offset ; i<size ; i++) {
@@ -46,7 +46,7 @@ void stdout_write(FsNode_t* node, unsigned int offset, unsigned int size, unsign
 	}
 }
 
-void stderr_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+unsigned int stderr_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	int i;
 	
 	for(i=offset ; i<size ; i++) {
@@ -54,7 +54,7 @@ void stderr_write(FsNode_t* node, unsigned int offset, unsigned int size, unsign
 	}
 }
 
-void stdin_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+unsigned int stdin_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	int i;
 	
 	for(i=0 ; i<size ; i++) {
@@ -62,7 +62,7 @@ void stdin_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned
 	}
 }
 
-void com1_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+unsigned int com1_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	int i;
 	
 	for(i=0 ; i<size ; i++) {
@@ -70,7 +70,7 @@ void com1_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned 
 	}
 }
 
-void com1_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+unsigned int com1_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	int i;
 	
 	for(i=offset ; i<size ; i++) {
@@ -79,31 +79,31 @@ void com1_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned
 }
 
 
-void int2chars(unsigned int in, unsigned char* buffer) {
+unsigned int int2chars(unsigned int in, unsigned char* buffer) {
 	buffer[0] = (unsigned char) in & 0xff; // low byte
 	buffer[1] = (in >> 8) & 0xff; // high byte
 }
 
-int chars2int(unsigned char* buffer) {
+unsigned int chars2int(unsigned char* buffer) {
 	return (buffer[1] << 8) | buffer[0];
 }
 
-void lowmem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+unsigned int lowmem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	unsigned int mem = lowmem();
 	int2chars(mem, buffer);
 }
 
-void highmem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+unsigned int highmem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	int mem = highmem();
 	int2chars(mem, buffer);
 }
 
-void mem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+unsigned int mem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	int mem = lowmem() + highmem();
 	int2chars(mem, buffer);
 }
 
-void fda_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, unsigned char* out_buffer) {
+unsigned int fda_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, unsigned char* out_buffer) {
 	int mem = lowmem() + highmem();
 	
 	signed int start_sector;
@@ -124,7 +124,7 @@ void fda_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, 
     sector_offset = byte_offset % SECTOR_SIZE;
 
     while (bytes_read < byte_size) {
-        read_sector(&temp_buffer, start_sector);
+        read_sector((int*) &temp_buffer, start_sector);
 
         sector_bytes = MIN(SECTOR_SIZE - sector_offset, byte_size - bytes_read);
 
@@ -138,12 +138,12 @@ void fda_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, 
     out_buffer[bytes_read] = 0; // Null terminate, just in case it's a string.
 }
 
-void graphics_mode_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, unsigned char* out_buffer) {
+unsigned int graphics_mode_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, unsigned char* out_buffer) {
 	int mode = get_graphics_mode();
 	int2chars(mode, out_buffer);
 }
 
-void graphics_mode_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+unsigned int graphics_mode_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
 	int mode = chars2int(buffer);
 	set_graphics_mode(mode);
 }
