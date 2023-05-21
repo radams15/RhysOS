@@ -1,7 +1,10 @@
 bits 16
 
 global _start
-global handleInterrupt21
+
+extern _entry
+
+section .text
 
 jmp _start
 
@@ -23,18 +26,25 @@ print_str:
 	cmp al, 0
 	je .print_done
 
-	int 0x10
+	int 10h
 	inc si
 	jmp print_str
-
 .print_done:
 	ret
 
+
 _start:
-	print msg
-	jmp _start
+	
+	mov si, msg
+	mov ah, 0Eh
+.lop:
+	;mov al, [si]
+	mov al, 'H'
+	int 10h
+	call _entry
+	;jmp .lop
 
 handleInterrupt21:
 	ret
 
-msg: db `Hello world\r\n`, 0
+msg: db 'Hello world', 0ah, 0dh, 0

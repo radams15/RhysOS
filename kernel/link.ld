@@ -1,9 +1,22 @@
+OUTPUT_FORMAT("binary");
+
+ENTRY(_start);
+
 SECTIONS
 {
-     . = 0x0000;
-     .text :
-     {
-          _start = .;
-     } = 0
+    . = 0x1000;
+    .text : 
+    {
+        *(.text);
+    }
+    .data :
+    {
+        *(.data);
+        *(.rodata*);
+        *(.bss);
+    }    
+    /DISCARD/ :
+    {
+        *(.comment);
+    }
 }
-

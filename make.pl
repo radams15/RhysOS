@@ -17,12 +17,11 @@ my $LD = 'ia16-elf-ld';
 
 my $KERNEL_SECTORS = '15';
 
-
 # Must be strings for some reason
-my $KERNEL_ADDR = '0x0000';
+my $KERNEL_ADDR = '0x1000';
 my $SHELL_ADDR = '0x2000';
 my $EXE_ADDR = '0x6000';
-my $STACK_ADDR = '0x7c00';
+my $STACK_ADDR = '0xfff0';
 my $HEAP_ADDR = '0x20000';
 
 my $KERNEL_FLAGS = "-DHEAP_ADDRESS=$HEAP_ADDR -DEXE_ADDRESS=$EXE_ADDR -DSHELL_ADDRESS=$SHELL_ADDR";
@@ -63,7 +62,7 @@ sub kernel {
 		make_path($folder) if !(-e $folder);
 
 		&run("$CC -Ikernel/ $KERNEL_FLAGS -c $c_file -o $out");
-		(push @objs, $out) unless $c_file =~ /kernel\.c/;
+		(push @objs, $out);# unless $c_file =~ /kernel\.c/;
 	}
 	
 	for my $asm_file (&find('kernel/*.nasm')) {
@@ -75,7 +74,7 @@ sub kernel {
 		(push @objs, $out) unless $asm_file =~ /kernel\.nasm/;
 	}
 	
-	&run("$LD -Tkernel/link.ld --oformat binary -o build/kernel.bin -d build/kernel/kernel_nasm.o ");#.(join ' ', @objs));
+	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.bin -d build/kernel/kernel_nasm.o ".(join ' ', @objs));
 	
 	"build/kernel.bin";
 }

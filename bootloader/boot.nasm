@@ -1,6 +1,7 @@
 bits 16
-
 KSTART	equ	2 ; start sector in initrd
+
+org 7c00h
 
 jmp boot
 
@@ -36,8 +37,8 @@ drive_reset:
 	ret
 
 boot:
-	;call drive_reset
-
+	; setup stack, data sections
+	cli
 	mov ax,KERNEL_ADDR
 	mov ds,ax
 	mov ss,ax
@@ -45,6 +46,9 @@ boot:
 	mov ax,STACK_ADDR ; stack offset
 	mov sp,ax
 	mov bp,ax
+	sti
+	
+	;call drive_reset ; reset floppy drive
 	
 	print boot_msg
 
@@ -52,17 +56,17 @@ boot:
 	mov     dh,0     ;dh holds head number - 0
 	mov     ch,0     ;ch holds track number - 0
 	mov     ah,2            ;absolute disk read
-	mov     al,KERNEL_SECTORS        ;read KSIZE sectors
+	mov     al,KERNEL_SECTORS        ;number of sectors
 	mov     dl,0            ;read from floppy disk A
 	mov     bx,0		;read into 0 (in the segment)
 	
-	;int     13h	;call BIOS disk read function
+	int     13h	;call BIOS disk read function
 	
 	jc .disk_fail
 	
 	print read_success_msg
 	
-	;jmp KERNEL_ADDR:0
+	jmp KERNEL_ADDR:0
 
 .disk_fail:
 	print read_fail_msg
