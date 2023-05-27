@@ -1,6 +1,6 @@
 #include "tty.h"
 
-int graphics_mode = GRAPHICS_CGA_80x25; // CGA 80x24
+int graphics_mode = GRAPHICS_MONO_80x25;
 
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
@@ -115,19 +115,6 @@ char getch() {
 	return out;
 }
 
-int get_graphics_ah(int mode) {
-	switch(mode) {
-		case GRAPHICS_CGA_80x25:
-			return 0x03;
-		
-		case GRAPHICS_CGA_40x25:
-			return 0x00;
-			
-		default:
-			return 0x03;
-	}
-}
-
 void set_graphics_mode(int mode) {
 	graphics_mode = mode;
 	
@@ -139,5 +126,5 @@ int get_graphics_mode() {
 }
 
 void cls() {
-	interrupt(0x10, get_graphics_ah(graphics_mode), 0, 0, 0);
+	interrupt(0x10, graphics_mode, 0, 0, 0);
 }

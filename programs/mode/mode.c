@@ -29,9 +29,11 @@ int main(int argc, char** argv) {
 		printf("Current mode: %d\n", get_graphics_mode());
 	} else if(argc == 2) {
 		if(STREQ("40", argv[1])) {
-			set_graphics_mode(GRAPHICS_CGA_40x25);
+			set_graphics_mode(GRAPHICS_MONO_40x25);
+		} else if(STREQ("cga", argv[1])) {
+			set_graphics_mode(GRAPHICS_CGA_320x200);
 		} else {
-			set_graphics_mode(GRAPHICS_CGA_80x25);
+			set_graphics_mode(GRAPHICS_MONO_80x25);
 		}
 	} else {
 		printf("Usage: %s [MODE]\n", argv[0]);

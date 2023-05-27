@@ -6,6 +6,8 @@
 #include "fs/ustar.h"
 #include "fs/devfs.h"
 
+#include "graphics.h"
+
 #include "serial.h"
 
 #define EXE_SIZE 8192
@@ -179,12 +181,14 @@ int init(char* cmdline){
 	
 	makeInterrupt21();
 	
+	//graphics_init();
+	
 	serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 
 	fs_root = ustar_init(1);
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
-	
+			
 	stdin = open("/dev/stdin");
 	stdout = open("/dev/stdout");
 	stderr = open("/dev/stderr");
