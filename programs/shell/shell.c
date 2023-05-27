@@ -31,6 +31,10 @@ static int run_external(char* exe, char* rest) {
 			dest = tok;
 			*(tok-1) = 0;
             out_fh = open(dest);
+            
+            if(out_fh == -1)
+            	out_fh = stdout;
+            	
             err_fh = out_fh;
 			break;
 		}
@@ -40,6 +44,10 @@ static int run_external(char* exe, char* rest) {
             dest = tok;
             *(tok-1) = 0;
             in_fh = open(dest);
+            
+            if(in_fh == -1)
+            	in_fh = stdin;
+            
             break;
         }
 
@@ -62,7 +70,11 @@ int run_line(char* line, int length) {
 		int fh;
 		
 		fh = open(line+strlen(exe)+1);
-		stdout = stdin = stderr = fh;
+		
+		if(fh == -1)
+			printf("Error: File '%s' does not exist!\n", line+strlen(exe)+1);
+		else
+			stdout = stdin = stderr = fh;
 	} else {
 		run_external(exe, line+strlen(exe)+1);
 	}
