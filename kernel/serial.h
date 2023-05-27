@@ -1,10 +1,6 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
-#ifndef SERIAL_ECHO
-#define SERIAL_ECHO 1
-#endif
-
 typedef enum Port {
 	COM1 = 0,
 	COM2 = 1

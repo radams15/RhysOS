@@ -13,35 +13,38 @@ static int run_external(char* exe, char* rest) {
 	char* argv[MAX_PARAMS];
 	char* tok;
 	char* dest = NULL;
-	int out_fh;
-	
+	int out_fh = 1;
+    int in_fh = 0;
+
 	argc = 1;
 	argv[0] = exe;
-	
+
 	tok = strtok(rest, " ");
-	
-	while(tok != NULL) {	
+
+	while(tok != NULL) {
 		*(tok-1) = 0; // null terminate section (replacing space)
-		
+
 		if(strcmp(tok, ">") == 0) { // redirection?
 			tok = strtok(NULL, ">");
 			dest = tok;
 			*(tok-1) = 0;
+            out_fh = open(dest);
 			break;
 		}
-		
+
+        if(strcmp(tok, "<") == 0) { // redirection?
+            tok = strtok(NULL, "<");
+            dest = tok;
+            *(tok-1) = 0;
+            in_fh = open(dest);
+            break;
+        }
+
 		argv[argc++] = tok;
 		tok = strtok(NULL, " ");
 	}
-	
-	
-	if(dest != NULL) {
-		out_fh = open(dest);
-	} else {
-		out_fh = stdout;
-	}
-	
-	execa(exe, argc, argv, stdin, out_fh, out_fh);
+    
+	return execa(exe, argc, argv, in_fh, out_fh, out_fh);
 }
 
 int run_line(char* line, int length) {

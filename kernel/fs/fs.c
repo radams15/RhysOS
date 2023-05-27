@@ -26,6 +26,33 @@ void seek(int fh, unsigned int location) {
 	fh_get_node(fh)->offset = location;
 }
 
+int create_file(char* name) {
+	FsNode_t* fsnode = fs_root;
+	char* tok;
+	char* previous_tok = NULL;
+	
+	char buf[256];
+	memcpy(&buf, name, 100);
+	buf[strlen(name)] = 0;
+	
+	tok = strtok(buf, "/");
+	
+	while(tok != NULL && fsnode != NULL) {
+		fsnode = fs_finddir(fsnode, tok);
+
+		
+
+		previous_tok = tok;
+		tok = strtok(NULL, "/");
+	}
+	
+	
+	
+		
+
+	return NULL;
+}
+
 int open(char* name) {
 	int i;
 	FsNode_t* handle;
@@ -33,7 +60,12 @@ int open(char* name) {
 	handle = get_dir(name);
 	
 	if(handle == NULL) {
-		return -1;
+		handle = create_file(name);
+		
+		if(handle == NULL) {
+			print_string("Could not find directory!\n");
+			return -1;
+		}
 	}
 	
 	for(i=0 ; i<MAX_OPEN_FILES ; i++) {

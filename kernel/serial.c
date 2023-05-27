@@ -1,5 +1,9 @@
 #include "serial.h"
 
+#ifndef SERIAL_ECHO
+#define SERIAL_ECHO 1
+#endif
+
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
 void serial_init(Port_t port, Baud_t baud, Parity_t parity, StopBits_t stop_bits, DataBits_t data_bits) {
@@ -14,8 +18,12 @@ void serial_putc(Port_t port, char c) {
 }
 
 char serial_getc(Port_t port) {
-	int out = interrupt(0x14, (0x02<<8), 0, 0, port);
-
+	int out;
+		
+	do {
+		out = interrupt(0x14, (0x02<<8), 0, 0, port);
+	} while(out == 0);
+	
 #if SERIAL_ECHO
 	serial_putc(port, out);
 #endif
