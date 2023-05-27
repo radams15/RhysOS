@@ -42,3 +42,18 @@ _imod:
     pop bp                  ; Restore old base pointer
     ret                     ; Return with result in AX
 
+global _outb
+_outb:
+	push bp
+	mov bp, SP
+	
+	push dx
+	
+	mov dx, [bp+4] ; port
+	mov al, [bp+6] ; data
+	out dx, al
+	
+	pop bx
+	
+	pop bp
+	ret

@@ -23,4 +23,6 @@ int oct2bin(unsigned char* str, int size);
 
 char* strtok(register char* s, register char* delim);
 
+void outb(int port, char data);
+
 #endif

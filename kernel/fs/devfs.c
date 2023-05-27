@@ -199,6 +199,22 @@ void devfs_setup() {
 	
 	i++;
 	
+	strcpy(root_nodes[i].name, "con");
+	root_nodes[i].flags = FS_FILE;
+	root_nodes[i].inode = i;
+	root_nodes[i].length = 1;
+	root_nodes[i].offset = 0;
+	root_nodes[i].read = stdin_read;
+	root_nodes[i].write = stdout_write;
+	root_nodes[i].open = 0;
+	root_nodes[i].close = 0;
+	root_nodes[i].readdir = 0;
+	root_nodes[i].finddir = 0;
+	root_nodes[i].ref = 0;
+	num_root_nodes++;
+	
+	i++;
+	
 	strcpy(root_nodes[i].name, "highmem");
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;

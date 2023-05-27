@@ -13,8 +13,10 @@ static int run_external(char* exe, char* rest) {
 	char* argv[MAX_PARAMS];
 	char* tok;
 	char* dest = NULL;
-	int out_fh = 1;
-    int in_fh = 0;
+	
+	int err_fh = stderr;
+	int out_fh = stdout;
+    int in_fh = stdin;
 
 	argc = 1;
 	argv[0] = exe;
@@ -29,6 +31,7 @@ static int run_external(char* exe, char* rest) {
 			dest = tok;
 			*(tok-1) = 0;
             out_fh = open(dest);
+            err_fh = out_fh;
 			break;
 		}
 
@@ -44,7 +47,7 @@ static int run_external(char* exe, char* rest) {
 		tok = strtok(NULL, " ");
 	}
     
-	return execa(exe, argc, argv, in_fh, out_fh, out_fh);
+	return execa(exe, argc, argv, in_fh, out_fh, err_fh);
 }
 
 int run_line(char* line, int length) {
@@ -55,7 +58,14 @@ int run_line(char* line, int length) {
 	
 	exe = tok;
 	
-	run_external(exe, line+strlen(exe)+1);
+	if(strcmp(exe, "ctty") == 0) {
+		int fh;
+		
+		fh = open(line+strlen(exe)+1);
+		stdout = stdin = stderr = fh;
+	} else {
+		run_external(exe, line+strlen(exe)+1);
+	}
 }
 
 int loop() {
