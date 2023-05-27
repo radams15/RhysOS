@@ -2,8 +2,6 @@
 
 #define CHUNK_SIZE 0x64
 
-int entry(int argc, char** argv) { return main(argc, argv); }
-
 int type(char* file) {
 	int n;
 	char buffer[CHUNK_SIZE+1];

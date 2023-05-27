@@ -4,8 +4,6 @@
 
 #define MAX_FILES 30
 
-int entry(int argc, char** argv) { return main(argc, argv); }
-
 void dir_listing(char* dir) {
 	int i;
 	int len;

@@ -4,8 +4,6 @@
 
 #define MAX_PARAMS 16
 
-int entry() {return main();}
-
 static char* prompt = "> ";
 
 static int run_external(char* exe, char* rest) {
