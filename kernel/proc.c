@@ -8,7 +8,7 @@ typedef struct ExeHeader {
 	short load_address;
 } ExeHeader_t;
 
-ProcFunc_t run_exe(char* buf, unsigned int size, int type) {
+ProcFunc_t run_exe(char* buf, unsigned int size) {
 	int ret;
 	ExeHeader_t* header = buf; // Extract the header.
 	

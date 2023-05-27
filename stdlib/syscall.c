@@ -1,17 +1,25 @@
 #include "syscall.h"
 
-int syscall(int ax, int bx, int cx, int dx) {
+extern int stdin, stdout, stderr;
+
+int syscall(int ax, int bx, int cx, int a, int b, int c, int d) {
 	int out;
+	
+	int extra[4];
+	extra[0] = a;
+	extra[1] = b;
+	extra[2] = c;
+	extra[3] = d;
 	
 	out = ax;
 	
-	interrupt(0x21, &out, bx, cx, dx);
+	interrupt(0x21, &out, bx, cx, &extra);
 	
 	return out;
 }
 
-int exec(char* file, int argc, char** argv) {
-	return syscall(3, file, argc, argv);
+int execa(char* file, int argc, char** argv, int in, int out, int err) {
+	return syscall(3, file, argc, argv, in, out, err);
 }
 
 int dir_list(char* dir_name, struct File* buf) {

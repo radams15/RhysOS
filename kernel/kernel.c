@@ -26,12 +26,12 @@ void main() {
 }
 
 
-int exec(char* file_name, int argc, char** argv) {
+int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 	struct FsNode* fs_node;
 	char buf[SHELL_SIZE];
 	int size;
-	int in, out, err;
 	int ret;
+		
 	ProcFunc_t entry;
 	
 	fs_node = get_dir(file_name);
@@ -46,13 +46,9 @@ int exec(char* file_name, int argc, char** argv) {
 	
 	size = fs_read(fs_node, 0, sizeof(buf), &buf);
 
-    entry = run_exe(&buf, size, LOAD_EXE);
-    
-    return entry(stdin, stdout, stderr, argc, argv);
-}
-
-int shell() {
-	return exec("shell", 0, NULL);
+    entry = run_exe(&buf, size);
+        
+    ret = entry(in, out, err, argc, argv);
 }
 
 int read_file(char* buf, int n, char* file_name) {
@@ -112,10 +108,10 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 	return count;
 }
 
-int handleInterrupt21(int* ax, int bx, int cx, int dx) {
+int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
   switch(*ax) {
     case 3:
-		*ax = exec(bx, cx, dx);
+		*ax = exec(bx, cx, dx[0], dx[1], dx[2], dx[3]);
 		break;
 
     case 5:
@@ -123,11 +119,11 @@ int handleInterrupt21(int* ax, int bx, int cx, int dx) {
 		break;
 
     case 6:
-		*ax = read((int) bx, (char*) cx, (int) dx);
+		*ax = read((int) bx, (char*) cx, (int) dx[0]);
 		break;
 	
     case 7:
-		*ax = write((int) bx, (char*) cx, (int) dx);
+		*ax = write((int) bx, (char*) cx, (int) dx[0]);
 		break;
 		
     case 8:
@@ -183,17 +179,11 @@ int init(char* cmdline){
 	
 	makeInterrupt21();
 	
-	//print_char('A');
-	
 	serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
-	
-	//print_char('B');
-	
+
 	fs_root = ustar_init(1);
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
-	
-	//print_char('C');
 	
 	stdin = open("/dev/stdin");
 	stdout = open("/dev/stdout");
@@ -203,10 +193,10 @@ int init(char* cmdline){
 	
 	print_string("Welcome to RhysOS!\n\n");
 	
-	exec("mem", 0, NULL);
+	exec("mem", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
 	
-	exec("shell", 0, NULL);
+	exec("shell", 0, NULL, stdin, stdout, stderr);
 	
 	close(stdin);
 	close(stdout);
