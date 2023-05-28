@@ -17,6 +17,8 @@ int stdin, stdout, stderr;
 
 void main() {
 	int err;
+	
+	print_string("Kernel loaded!\n");
 
 	err = init();
 
