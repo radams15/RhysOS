@@ -1,0 +1,3 @@
+name: time
+main: main.c
+stdlib: true

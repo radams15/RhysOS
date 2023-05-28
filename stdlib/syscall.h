@@ -29,7 +29,6 @@ typedef struct FsNode {
 	struct FsNode* ref; // Pointer to symlink or mount
 } FsNode_t;
 
-
 typedef int (*FsCallback)(struct File*);
 
 int execa(char* file, int argc, char** argv, int in, int out, int err);

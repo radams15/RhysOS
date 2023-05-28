@@ -148,6 +148,10 @@ void graphics_mode_write(FsNode_t* node, unsigned int offset, unsigned int size,
 	set_graphics_mode(mode);
 }
 
+void time_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, unsigned char* out_buffer) {
+	time(out_buffer);
+}
+
 void devfs_setup() {
 	int i = 0;
 	
@@ -302,6 +306,22 @@ void devfs_setup() {
 	root_nodes[i].offset = 0;
 	root_nodes[i].read = com1_read;
 	root_nodes[i].write = com1_write;
+	root_nodes[i].open = 0;
+	root_nodes[i].close = 0;
+	root_nodes[i].readdir = 0;
+	root_nodes[i].finddir = 0;
+	root_nodes[i].ref = 0;
+	num_root_nodes++;
+	
+	i++;
+	
+	strcpyz(root_nodes[i].name, "time");
+	root_nodes[i].flags = FS_FILE;
+	root_nodes[i].inode = i;
+	root_nodes[i].length = 1;
+	root_nodes[i].offset = 0;
+	root_nodes[i].read = time_read;
+	root_nodes[i].write = 0;
 	root_nodes[i].open = 0;
 	root_nodes[i].close = 0;
 	root_nodes[i].readdir = 0;
