@@ -17,16 +17,16 @@ my $LD = 'ld86';
 
 # Must be strings for some reason
 my $KERNEL_ADDR = '0x0050';
-my $SHELL_ADDR = '0x6000';
-my $EXE_ADDR = '0x8000';
-my $HEAP_ADDR = '0x9000';
+my $SHELL_ADDR = '0x4000';
+my $EXE_ADDR = '0x6000';
+my $HEAP_ADDR = '0x7000';
 my $STACK_ADDR = '0xfff0';
 
-my $KERNEL_SECTORS = '20';
+my $KERNEL_SECTORS = '24';
 
 my $FLOPPY_SECTORS = 2880; # 1.44M floppy
 
-my $KERNEL_FLAGS = "-DHEAP_ADDRESS=$HEAP_ADDR -DEXE_ADDRESS=$EXE_ADDR -DSHELL_ADDRESS=$SHELL_ADDR";
+my $KERNEL_FLAGS = "-DHEAP_ADDRESS=$HEAP_ADDR -DEXE_ADDRESS=$EXE_ADDR -DSHELL_ADDRESS=$SHELL_ADDR -DKERNEL_ADDRESS=$KERNEL_ADDR";
 
 sub run {
 	my ($cmd) = @_;
@@ -61,15 +61,15 @@ sub kernel {
 		make_path($folder) if !(-e $folder);
 
 		&run("$CC -ansi -Ikernel/ $KERNEL_FLAGS -c $c_file -o $out");
-		(push @objs, $out) unless $c_file =~ /kernel.c/;
+		(push @objs, $out) unless $c_file =~ /kernel\.c/;
 	}
 	
 	for my $asm_file (&find('kernel/*.nasm')) {
-		(my $out = $asm_file) =~ s:(kernel/.*)\.nasm:build/$1_nasm.o:;
+		(my $out = $asm_file) =~ s:(kernel/\.*)\.nasm:build/$1_nasm.o:;
 		my $folder = dirname($out);
 		make_path($folder) if !(-e $folder);
 		
-		&run("$ASM -fas86 $asm_file -o $out");
+		&run("$ASM -fas86 $KERNEL_FLAGS $asm_file -o $out");
 		push @objs, $out;
 	}
 	

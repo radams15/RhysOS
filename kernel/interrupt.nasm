@@ -1,5 +1,9 @@
+bits 16
+
 global _interrupt
-global _enableInterrupts
+global _sti
+global _cli
+global _make_rtc_interrupt
 
 ;int interrupt (int number, int AX, int BX, int CX, int DX)
 _interrupt:
@@ -24,6 +28,47 @@ intr:
 	pop bp
 	ret
 
-_enableInterrupts:
+
+extern _tick
+
+_tick_handler:
+	cli
+	push dx
+	push cx
+	push bx
+	push ax
+	push ds
+	
+	mov ax, KERNEL_ADDRESS ; Restore KSEG
+	mov ds, ax
+	
+	call _tick
+	pop ds
+	pop ax
+	pop bx
+	pop cx
+	pop dx
 	sti
+
+	iret
+
+_make_rtc_interrupt:
+	mov dx,_tick_handler
+	push ds
+	mov ax, 0	;interrupts are in lowest memory
+	mov ds,ax
+	mov si,0x1c*4
+	mov ax,cs	;have interrupt go to the current segment
+	mov [si+2],ax
+	mov [si],dx	;set up our vector
+	pop ds
+	
+	ret
+
+_sti:
+	sti
+	ret
+
+_cli:
+	cli
 	ret

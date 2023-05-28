@@ -45,13 +45,28 @@ _imod:
 global _outb
 _outb:
 	push bp
-	mov bp, SP
+	mov bp, sp
 	
 	push dx
 	
 	mov dx, [bp+4] ; port
 	mov al, [bp+6] ; data
 	out dx, al
+	
+	pop bx
+	
+	pop bp
+	ret
+	
+global _inb
+_inb:
+	push bp
+	mov bp, sp
+	
+	push dx
+	
+	mov dx, [bp+4] ; port
+	in ax, dx
 	
 	pop bx
 	
