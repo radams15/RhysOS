@@ -20,7 +20,7 @@ DirEnt_t* devfs_readdir(FsNode_t* node, unsigned int index) {
 		return NULL;
 	}
 	
-	strcpy(dirent.name, root_nodes[index-1].name);
+	strcpyz(dirent.name, root_nodes[index-1].name);
 	dirent.name[strlen(root_nodes[index-1].name)] = 0;
 	dirent.inode = root_nodes[index-1].inode;
 	
@@ -151,7 +151,7 @@ void graphics_mode_write(FsNode_t* node, unsigned int offset, unsigned int size,
 void devfs_setup() {
 	int i = 0;
 	
-	strcpy(root_nodes[i].name, "stdout");
+	strcpyz(root_nodes[i].name, "stdout");
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
@@ -167,7 +167,7 @@ void devfs_setup() {
 	
 	i++;
 	
-	strcpy(root_nodes[i].name, "stdin");
+	strcpyz(root_nodes[i].name, "stdin");
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
@@ -183,7 +183,7 @@ void devfs_setup() {
 	
 	i++;
 	
-	strcpy(root_nodes[i].name, "stderr");
+	strcpyz(root_nodes[i].name, "stderr");
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
@@ -199,7 +199,7 @@ void devfs_setup() {
 	
 	i++;
 	
-	strcpy(root_nodes[i].name, "con");
+	strcpyz(root_nodes[i].name, "con");
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
@@ -215,7 +215,7 @@ void devfs_setup() {
 	
 	i++;
 	
-	strcpy(root_nodes[i].name, "highmem");
+	strcpyz(root_nodes[i].name, "highmem");
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 2;
@@ -231,7 +231,7 @@ void devfs_setup() {
 	
 	i++;
 	
-	strcpy(root_nodes[i].name, "lowmem");
+	strcpyz(root_nodes[i].name, "lowmem");
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 2;
@@ -247,7 +247,7 @@ void devfs_setup() {
 	
 	i++;
 	
-	strcpy(root_nodes[i].name, "mem");
+	strcpyz(root_nodes[i].name, "mem");
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 2;
@@ -263,7 +263,7 @@ void devfs_setup() {
 	
 	i++;
 	
-	strcpy(root_nodes[i].name, "fda");
+	strcpyz(root_nodes[i].name, "fda");
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
@@ -279,7 +279,7 @@ void devfs_setup() {
 	
 	i++;
 	
-	strcpy(root_nodes[i].name, "graphmode");
+	strcpyz(root_nodes[i].name, "graphmode");
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
@@ -295,7 +295,7 @@ void devfs_setup() {
 	
 	i++;
 	
-	strcpy(root_nodes[i].name, "com1");
+	strcpyz(root_nodes[i].name, "com1");
 	root_nodes[i].flags = FS_FILE;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
@@ -312,7 +312,7 @@ void devfs_setup() {
 
 
 FsNode_t* devfs_init() {
-	strcpy(root_node.name, "dev");
+	strcpyz(root_node.name, "dev");
 	root_node.flags = FS_DIRECTORY;
 	root_node.inode = 0;
 	root_node.length = 0;

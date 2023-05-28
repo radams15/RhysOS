@@ -7,7 +7,7 @@
 #include "fs/devfs.h"
 
 #include "graphics.h"
-
+#include "clock.h"
 #include "serial.h"
 
 #define EXE_SIZE 8192
@@ -149,15 +149,6 @@ int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
   }
 }
 
-void test() {
-	int addr;
-	int i;
-	
-	/*for(i=0 ; i<10 ; i++) {
-		addr = malloc(100);
-	}*/
-}
-
 void a20_init() {
 	if(a20_available()) {
 		int enable_fail;
@@ -168,8 +159,9 @@ void a20_init() {
 			print_string("A20 line failed to enable\n");
 		else
 			print_string("A20 line successfully enabled\n");
-	} else
+	} else {
 		print_string("A20 line is unavaiable\n");
+	}
 }
 
 int init(char* cmdline){		
@@ -180,8 +172,12 @@ int init(char* cmdline){
 	memmgr_init();
 	
 	makeInterrupt21();
+	rtc_init();
 	
 	//graphics_init();
+	
+	make_rtc_interrupt();
+	//enable_rtc();
 	
 	serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 
@@ -193,7 +189,7 @@ int init(char* cmdline){
 	stdout = open("/dev/stdout");
 	stderr = open("/dev/stderr");
 	
-	cls();
+	//cls();
 	
 	print_string("Welcome to RhysOS!\n\n");
 	

@@ -5,7 +5,7 @@
 extern void make_rtc_interrupt();
 
 void tick() {
-	print_string("TICK\n");
+	//print_string("TICK\n");
 }
 
 int rtc_init() {

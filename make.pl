@@ -65,7 +65,7 @@ sub kernel {
 	}
 	
 	for my $asm_file (&find('kernel/*.nasm')) {
-		(my $out = $asm_file) =~ s:(kernel/\.*)\.nasm:build/$1_nasm.o:;
+		(my $out = $asm_file) =~ s:(kernel/.*).nasm:build/$1_nasm.o:;
 		my $folder = dirname($out);
 		make_path($folder) if !(-e $folder);
 		
