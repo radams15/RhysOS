@@ -1,0 +1,5 @@
+name: 'Build'
+description: 'Build ISO'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
