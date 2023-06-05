@@ -15,8 +15,6 @@ static int run_batch(char* path) {
     
     fh = open(path);
     
-    printf("Running batch file: '%s'\n", path);
-    
 	if(fh == -1) {
 		printf("Error reading file '%s'!\n", path);
 		return 1;
@@ -29,9 +27,7 @@ static int run_batch(char* path) {
         linebuf[len] = c;
         len++;
         
-        if(c == '\n') {
-            printf("Line: '%s'\n\n", linebuf);
-            
+        if(c == '\n') {            
             linebuf[len-1] = 0;
             if(linebuf[len-2] == '\r')
                 linebuf[len-2] = 0;
@@ -150,7 +146,7 @@ int main() {
 		ret = loop();
 	}
 	
-	print("Shell exited!");
+	print("Shell exited! Program exit code %x\n", ret);
 
-	return 0x6;
+	return 0;
 }
