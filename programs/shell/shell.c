@@ -15,6 +15,8 @@ static int run_batch(char* path) {
     
     fh = open(path);
     
+    printf("Running batch file: '%s'\n", path);
+    
 	if(fh == -1) {
 		printf("Error reading file '%s'!\n", path);
 		return 1;

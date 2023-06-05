@@ -71,6 +71,7 @@ int open(char* name) {
 	for(i=0 ; i<MAX_OPEN_FILES ; i++) {
 		if(open_files[i] == NULL) {
 			open_files[i] = handle;
+			seek(i, 0);
 			return i;
 		}
 	}

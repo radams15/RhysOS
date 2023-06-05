@@ -200,7 +200,7 @@ sub build {
 	my $stdlib = &stdlib;
 	my @programs = &programs($runtime, $stdlib);
 	
-	&img($bootloader, $kernel, \@programs, ['docs/syscalls.md', 'docs/fs_spec.md', 'test.bat']);
+	&img($bootloader, $kernel, \@programs, ['docs/syscalls.md', 'docs/fs_spec.md',  &find('root/*')]);
 }
 
 sub clean {
