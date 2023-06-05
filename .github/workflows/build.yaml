@@ -8,3 +8,12 @@ jobs:
       - uses: actions/checkout@v3
       - run: sudo apt-get update && sudo apt-get install -y bcc nasm make binutils perl libconfig-simple-perl libfile-find-rule-perl
       - run: perl make.pl build
+      
+      - name: Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GH_TOKEN }}"
+          automatic_release_tag: "latest"
+          title: "System Floppy"
+          files: |
+            build/system.img
