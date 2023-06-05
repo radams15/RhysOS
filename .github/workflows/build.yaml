@@ -6,5 +6,5 @@ jobs:
     name: Install Dependencies
     steps:
       - uses: actions/checkout@v3
-      - run: apt-get update && apt-get install -y bcc nasm make binutils perl libconfig-simple-perl libfile-find-rule-perl
+      - run: sudo apt-get update && sudo apt-get install -y bcc nasm make binutils perl libconfig-simple-perl libfile-find-rule-perl
       - run: perl make.pl build
