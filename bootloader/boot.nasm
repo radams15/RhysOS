@@ -16,7 +16,7 @@ jmp 0:boot
 	mov ax, 0
 	mov ds, ax
 	
-	mov si, boot_msg
+	mov si, %1
 	call print_str
 	
 	pop ds
@@ -36,6 +36,37 @@ print_str:
 	jmp .top
 .print_done:
 	ret
+	
+print_n:
+	mov ah, 0Eh
+.top
+	mov al, [si]
+	cmp si, bx
+	je .print_done
+	
+	cmp al, 7 ; beep
+	je .next
+
+	int 10h
+.next:
+	inc si
+	jmp .top
+.print_done:
+	ret
+	
+testkrn:
+    print test_msg
+    mov ax, KSEG
+	mov ds, ax
+	mov ss, ax
+	mov es, ax
+	print test_msg
+    mov si, 0
+    push bx
+    mov bx, 11*1024
+    call print_n
+    pop bx
+    ret
 
 boot:
 	mov ax, KSEG ; setup segmentation
@@ -57,12 +88,30 @@ boot:
 	mov     dl,0            ;read from floppy disk A
 	mov     bx,0		;read into 0 (in the segment)
 	int     13h	;call BIOS disk read function
+	
+	jnc .noerr
+	
+	print err_msg
+	jmp $
+	
+.noerr:
+	print ok_msg
 
+	;call KSEG:0
+	call testkrn
+	print done_msg
+    call KSEG:0
+	print done_msg
 .end:
-	jmp KSEG:0
-	jmp .end
+	jmp $
 
 boot_msg: db 'Booting RhysOS...', 0xa, 0xd, 0
+ok_msg: db 'OK!', 0xa, 0xd, 0
+done_msg: db 0xa, 0xd, 'Done!', 0xa, 0xd, 0
+test_msg: db 'Test!', 0xa, 0xd, 0
+err_msg: db 'int 13h error!', 0xa, 0xd, 0
+
+buf times 64 db 0
 
 times 510-($-$$) db 0
 
