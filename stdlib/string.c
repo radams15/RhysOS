@@ -27,6 +27,24 @@ int strcmp(char* a, char* b) {
 	return strncmp(a, b, strlen(a));
 }
 
+int endswith(char* a, char* suffix) {
+    char* a_end;
+    char* suff_end;
+    
+    a_end = a+(strlen(a)-1);
+    suff_end = suffix+(strlen(suffix)-1);
+    
+    for(;suff_end >= suffix ; ) {
+        if(*a_end != *suff_end)
+            return 0;
+    
+        suff_end--;
+        a_end--;
+    }
+    
+    return 1;
+}
+
 char* strtok(register char* s, register char* delim) {
 	register char *spanp;
 	register int c, sc;

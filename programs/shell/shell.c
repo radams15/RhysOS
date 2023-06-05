@@ -6,6 +6,46 @@
 
 static char* prompt = "> ";
 
+static int run_batch(char* path) {
+    int fh;
+    int totalread;
+    int len;
+    int c;
+    char linebuf[1024];
+    
+    fh = open(path);
+    
+	if(fh == -1) {
+		printf("Error reading file '%s'!\n", path);
+		return 1;
+	}
+    
+    totalread = 0;
+    len=0;
+    
+    while((c = fgetch(fh)) != 0) { // Each line
+        linebuf[len] = c;
+        len++;
+        
+        if(c == '\n') {
+            printf("Line: '%s'\n\n", linebuf);
+            
+            linebuf[len-1] = 0;
+            if(linebuf[len-2] == '\r')
+                linebuf[len-2] = 0;
+                
+            totalread += len;
+            len = 0;
+            
+            run_line(linebuf, len);
+        }
+        
+        seek(fh, totalread+len);
+    }
+    
+    close(fh);
+}
+
 static int run_external(char* exe, char* rest) {
 	int argc;
 	char* argv[MAX_PARAMS];
@@ -52,8 +92,12 @@ static int run_external(char* exe, char* rest) {
 		argv[argc++] = tok;
 		tok = strtok(NULL, " ");
 	}
-    
-	return execa(exe, argc, argv, in_fh, out_fh, err_fh);
+	
+	if(endswith(exe, ".bat")) {
+	    return run_batch(exe);
+	} else {
+    	return execa(exe, argc, argv, in_fh, out_fh, err_fh);
+	}
 }
 
 int run_line(char* line, int length) {

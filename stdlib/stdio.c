@@ -67,11 +67,28 @@ int cls() {
 
 
 char getch() {
+	return fgetch(stdin);
+}
+
+
+char fgetch(int fh) {
 	char out[1];
 	
-	read(stdin, &out, 1);
+	read(fh, &out, 1);
 	
 	return out[0];
+}
+
+int freadline(int fh, char* buffer) {
+	char* buffer_head = buffer;
+	char c;
+	
+	while((c=fgetch(fh)) != '\r') {
+		*(buffer++) = c;
+	}
+	
+	*(buffer++) = 0; // null-terminate
+	return buffer-buffer_head;
 }
 
 
@@ -91,6 +108,8 @@ int readline(char* buffer) {
 	}
 	
 	*(buffer++) = 0; // null-terminate
+	
+	return buffer-buffer_head;
 }
 
 
