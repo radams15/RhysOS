@@ -61,6 +61,8 @@ int mainloop(char* fname) {
 	for(x=0 ; x<320 ; x++) // Draw top bar
 	    for(y=0 ; y<5 ; y++)
     		graphics_putc(x, y, 1);
+    		
+    return 0;
 }
 
 int main(int argc, char** argv) {
@@ -71,7 +73,7 @@ int main(int argc, char** argv) {
     
     set_graphics_mode(GRAPHICS_CGA_320x200);
     
-    err = mainloop("test.bat");
+    err = mainloop("/test.bat");
     
     getch();
     
