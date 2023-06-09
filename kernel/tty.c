@@ -13,6 +13,14 @@ void set_resolution(int mode) {
 }
 
 void print_char(int c) {
+    print_char_colour(c, 0x0, 0xF); // https://en.wikipedia.org/wiki/BIOS_color_attributes
+}
+
+void print_char_colour(int c, char fg, char bg) {
+    int colour;
+    
+    colour = (fg<<2) | (bg & 0xF);
+    
 	if(c == '\t') {
 		print_string("    ");
 		return;
@@ -36,9 +44,13 @@ void print_char(int c) {
 
 
 	if(c == '\n')
-		interrupt(0x10, 0x0E00 + '\r', 0, 0, 0);
+		print_char('\r');
 
+    if(c > 13) // Only chars above 13 need colour
+    	interrupt(0x10, 0x0900 + c, colour, 1, 0);
+	
 	interrupt(0x10, 0x0E00 + c, 0, 0, 0);
+	//set_cursor(get_cursor_row(), get_cursor_col());
 }
 
 void print_string(char* str) {

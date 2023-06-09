@@ -58,8 +58,6 @@ unsigned int ustar_read(node, byte_offset, byte_size, out_buffer)
         start_sector++;
         sector_offset = 0;
     }
-    
-    out_buffer[bytes_read] = 0; // Null terminate, just in case it's a string.
 
     return bytes_read;
 }

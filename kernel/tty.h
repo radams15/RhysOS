@@ -11,7 +11,8 @@ void clear_screen();
 
 void set_resolution(int mode);
 
-void print_char(c);
+void print_char(int c);
+void print_char_colour(int c, char fg, char bg);
 
 void print_stringn(char* str, int n);
 void print_string(char* str);

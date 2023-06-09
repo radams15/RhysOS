@@ -50,7 +50,7 @@ void stderr_write(FsNode_t* node, unsigned int offset, unsigned int size, unsign
 	int i;
 	
 	for(i=offset ; i<size ; i++) {
-		print_char(buffer[i]);
+		print_char_colour(buffer[i], 0x0, 0xC);
 	}
 }
 

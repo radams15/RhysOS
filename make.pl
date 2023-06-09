@@ -17,12 +17,12 @@ my $LD = 'ld86';
 
 # Must be strings for some reason
 my $KERNEL_ADDR = '0x0050';
-my $SHELL_ADDR = '0x4000';
-my $EXE_ADDR = '0x6000';
-my $HEAP_ADDR = '0x7000';
+my $SHELL_ADDR = '0x4500';
+my $EXE_ADDR = '0x7000';
+my $HEAP_ADDR = '0x9000';
 my $STACK_ADDR = '0xfff0';
 
-my $KERNEL_SECTORS = '24';
+my $KERNEL_SECTORS = '28';
 
 my $FLOPPY_SECTORS = 2880; # 1.44M floppy
 
