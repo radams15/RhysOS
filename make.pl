@@ -61,7 +61,7 @@ sub kernel {
 		make_path($folder) if !(-e $folder);
 
 		&run("owcc -Ikernel/ $KERNEL_FLAGS -c $c_file -o $out");
-		(push @objs, $out) unless $c_file =~ /kernel.c/;
+		(push @objs, $out);
 	}
 	
 	for my $asm_file (&find('kernel/*.nasm')) {
@@ -70,11 +70,14 @@ sub kernel {
 		make_path($folder) if !(-e $folder);
 		
 		&run("$ASM -fobj $asm_file -o $out");
-		push @objs, $out;
+		(push @objs, $out) unless $asm_file =~ /kernel.nasm/;
 	}
 	
-	&run("wlink FILE build/kernel/kernel.o FILE ".(join ' FILE ', @objs)." OUTPUT RAW OFFSET=$KERNEL_ADDR OPTION NODEFAULTLIBS, START=_cstart_ order clname code offset=$KERNEL_ADDR clname data NAME build/kernel.bin");
-	
+	#&run("owcc -Os -s -fnostdlib -march=i86 -o build/kernel.bin build/kernel/kernel_nasm.o");
+	&run("wlink FILE build/kernel/kernel_nasm.o FORMAT RAW BIN NAME build/kernel.bin OPTION OFFSET=0x1000, NODEFAULTLIBS,START=entry ORDER CLNAME CODE CLNAME DATA");
+	#&run("wlink FILE build/kernel/kernel_nasm.o,".(join ',', @objs) . " FORMAT RAW BIN NAME build/kernel.bin OPTION OFFSET=0x1000, NODEFAULTLIBS,START=entry ORDER CLNAME CODE CLNAME DATA");
+	#&run("wlink FILE build/kernel/kernel_nasm.o FILE ".(join ' FILE ', @objs)." OUTPUT RAW OFFSET=$KERNEL_ADDR OPTION NODEFAULTLIBS, START=entry order clname code offset=$KERNEL_ADDR clname data NAME build/kernel.bin");
+
 	"build/kernel.bin";
 }
 

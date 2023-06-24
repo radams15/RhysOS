@@ -15,14 +15,16 @@ int stdin, stdout, stderr;
 
 void _cstart() {
 	int err;
+	
+	print_char('a');
 
-	err = init("");
+	/*err = init("");
 
 	if(err){
 		print_string("\r\nError in kernel, halting!\r\n");
 	}
 
-	for(;;){}
+	for(;;){}*/
 }
 
 
