@@ -187,5 +187,24 @@ void printf(char* text, va_list va_alist) {
 	va_end(ptr);
 }
 
+void term_set_bg(char colour) {
+	int fh;
+	
+	fh = open("/dev/ttybg");
+	
+	write(fh, &colour, 1);
+	
+	close(fh);
+}
+
+void term_set_fg(char colour) {
+	int fh;
+	
+	fh = open("/dev/ttyfg");
+	
+	write(fh, &colour, 1);
+	
+	close(fh);
+}
 
 int __mkargv() {}

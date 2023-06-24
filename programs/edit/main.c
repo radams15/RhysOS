@@ -47,8 +47,14 @@ void render(int fd) {
     seek(fd, 0);
 }
 
+int topbar() {
+	int x, y;
+	for(x=0 ; x<80 ; x++) // Draw top bar
+			for(y=0 ; y<1 ; y++)
+				graphics_putc(x, y, 1);
+}
+
 int mainloop(char* fname) {
-    int x, y;
     int fd;
     
     fd = open(fname);
@@ -58,9 +64,8 @@ int mainloop(char* fname) {
 	graphics_set_palette(2);
 	graphics_set_bg(1);
 	
-	for(x=0 ; x<320 ; x++) // Draw top bar
-	    for(y=0 ; y<5 ; y++)
-    		graphics_putc(x, y, 1);
+	topbar();
+	
     		
     return 0;
 }
@@ -71,7 +76,7 @@ int main(int argc, char** argv) {
     
     before_mode = get_graphics_mode();
     
-    set_graphics_mode(GRAPHICS_CGA_320x200);
+    set_graphics_mode(GRAPHICS_COLOUR_80x25);
     
     err = mainloop("/test.bat");
     

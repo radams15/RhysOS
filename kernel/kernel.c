@@ -190,7 +190,7 @@ int init(char* cmdline){
 	stdin = open("/dev/stdin");
 	stdout = open("/dev/stdout");
 	stderr = open("/dev/stderr");
-	
+		
 	//cls();
 	
 	print_string("Welcome to RhysOS!\n\n");

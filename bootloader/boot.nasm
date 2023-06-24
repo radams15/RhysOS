@@ -71,7 +71,7 @@ boot:
 	mov     cl,1      ;cl holds sector number
 	mov     dh,1     ;dh holds head number - 0
 	mov     ch,0     ;ch holds track number - 0
-	mov     al, (KSIZE-KSTART-SECT_PER_TRACK+2)       ;read rest of sectors
+	mov     al, (SECT_PER_TRACK)       ;read rest of sectors
 	mov     dl,0            ;read from floppy disk A
 	mov     ah,2            ;absolute disk read
 	int     13h	;call BIOS disk read function

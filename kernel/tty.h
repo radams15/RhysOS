@@ -14,6 +14,9 @@ void set_resolution(int mode);
 void print_char(int c);
 void print_char_colour(int c, char fg, char bg);
 
+void set_bg(char colour);
+void set_fg(char colour);
+
 void print_stringn(char* str, int n);
 void print_string(char* str);
 void printi(int num, int base);

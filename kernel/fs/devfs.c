@@ -5,7 +5,7 @@
 
 #include "serial.h"
 
-#define MAX_FILES 16
+#define MAX_FILES 32
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define SECTOR_SIZE 512
 
@@ -150,6 +150,15 @@ void graphics_mode_write(FsNode_t* node, unsigned int offset, unsigned int size,
 
 void time_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, unsigned char* out_buffer) {
 	time(out_buffer);
+}
+
+
+void tty_fg_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+	set_fg(buffer[0]);
+}
+
+void tty_bg_write(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+	set_bg(buffer[0]);
 }
 
 void devfs_setup() {
@@ -321,6 +330,38 @@ void devfs_setup() {
 	root_nodes[i].length = 1;
 	root_nodes[i].offset = 0;
 	root_nodes[i].read = time_read;
+	root_nodes[i].write = 0;
+	root_nodes[i].open = 0;
+	root_nodes[i].close = 0;
+	root_nodes[i].readdir = 0;
+	root_nodes[i].finddir = 0;
+	root_nodes[i].ref = 0;
+	num_root_nodes++;
+	
+	/*i++;
+	
+	strcpyz(root_nodes[i].name, "ttybg");
+	root_nodes[i].flags = FS_FILE;
+	root_nodes[i].inode = i;
+	root_nodes[i].length = 1;
+	root_nodes[i].offset = 0;
+	root_nodes[i].read = tty_bg_write;
+	root_nodes[i].write = 0;
+	root_nodes[i].open = 0;
+	root_nodes[i].close = 0;
+	root_nodes[i].readdir = 0;
+	root_nodes[i].finddir = 0;
+	root_nodes[i].ref = 0;
+	num_root_nodes++;*/
+	
+	i++;
+	
+	strcpyz(root_nodes[i].name, "ttyfg");
+	root_nodes[i].flags = FS_FILE;
+	root_nodes[i].inode = i;
+	root_nodes[i].length = 1;
+	root_nodes[i].offset = 0;
+	root_nodes[i].read = tty_fg_write;
 	root_nodes[i].write = 0;
 	root_nodes[i].open = 0;
 	root_nodes[i].close = 0;
