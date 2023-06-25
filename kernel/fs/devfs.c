@@ -55,11 +55,25 @@ void stderr_write(FsNode_t* node, unsigned int offset, unsigned int size, unsign
 }
 
 void stdin_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
+	//unsigned char* top;
 	int i;
 	
 	for(i=0 ; i<size ; i++) {
 		buffer[i] = getch();
 	}
+	/*char c;
+	
+	while(buffer < top+size) {
+		c = getch();
+		
+		if(c == 0x8) { // backspace
+			*(buffer--) = ' ';
+		} else {
+			*(buffer++) = c;
+		}
+	}
+	
+	*(buffer++) = 0; // null-terminate*/
 }
 
 void com1_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {

@@ -8,7 +8,7 @@ char text_fg = 0x0;
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
 void set_cursor(char row, char col) {
-	interrupt(0x10, 0x02<<8, 0, 0, (row<<8) | col);
+	interrupt(0x10, 0x02<<4, 0, 0, (row<<4) | col);
 }
 
 void set_bg(char colour) {
@@ -100,7 +100,7 @@ void printi(int num, int base) {
     }
 
     while (num != 0) {
-        remainder = imod(num, base);
+        remainder = num % base;
         
         if (remainder < 10)
             *--ptr = '0' + remainder;

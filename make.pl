@@ -18,7 +18,7 @@ my $LD = 'ia16-elf-ld';
 # Must be strings for some reason
 my $KERNEL_ADDR = '0x0050';
 my $SHELL_ADDR = '0x4500';
-my $EXE_ADDR = '0x7000';
+my $EXE_ADDR = '0x8000';
 my $HEAP_ADDR = '0x9000';
 my $STACK_ADDR = '0xfff0';
 

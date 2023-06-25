@@ -48,7 +48,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 		return -1;
 	}
 	
-	size = fs_read(fs_node, 0, sizeof(buf), &buf);
+	size = fs_read(fs_node, 0, sizeof(buf), buf);
 
     entry = run_exe(&buf, size);
         
@@ -102,13 +102,14 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 	while ( (node = fs_readdir(root, i)) != NULL) {
 		fsnode = fs_finddir(root, node->name);
 		if(fsnode != NULL) {
-			memcpy(buf++, fsnode, sizeof(FsNode_t));
+			if(buf != NULL)
+				memcpy(buf++, fsnode, sizeof(FsNode_t));
 			count++;
 		}
 		
 		i++;
 	}
-	
+
 	return count;
 }
 
@@ -166,6 +167,28 @@ void a20_init() {
 	}
 }
 
+void test() {
+	int i;
+	int len;
+	FsNode_t dir_buf[16];
+	FsNode_t* file;
+
+	for(i=0 ; i<16 ; i++) {
+		dir_buf[i].name[0] = 0;
+	}
+
+	len = list_directory("/dev", dir_buf);
+	
+	for(i=0 ; i<len ; i++) {		
+		file = &dir_buf[i];
+		
+		if(file == NULL)
+			break;
+
+		print_string("\t - "); print_string(file->name); print_string("\n");
+	}
+}
+
 int init(char* cmdline){		
 	FsNode_t* fs_dev;
 	
@@ -198,6 +221,8 @@ int init(char* cmdline){
 	//cls();
 	
 	print_string("Welcome to RhysOS!\n\n");
+	
+	//test();
 	
 	exec("mem", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
