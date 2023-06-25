@@ -35,7 +35,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 	char buf[SHELL_SIZE];
 	int size;
 	int ret;
-		
+	
 	ProcFunc_t entry;
 	
 	fs_node = get_dir(file_name);

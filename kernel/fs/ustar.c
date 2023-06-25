@@ -111,9 +111,7 @@ int ustar_load_root() {
 		size_sectors = (size / SECTOR_SIZE) + 2;
 		
 		strcpy(root_nodes[i].name, file.old.name);
-		
-		print_string(root_nodes[i].name); print_string("\n");
-		
+				
 		root_nodes[i].flags = FS_FILE;
 		root_nodes[i].inode = i;
 		root_nodes[i].start_sector = sector+1; // +1 to ignore header

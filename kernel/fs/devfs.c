@@ -352,7 +352,7 @@ void devfs_setup() {
 	root_nodes[i].readdir = 0;
 	root_nodes[i].finddir = 0;
 	root_nodes[i].ref = 0;
-	num_root_nodes++;*/
+	num_root_nodes++;
 	
 	i++;
 	
@@ -368,7 +368,7 @@ void devfs_setup() {
 	root_nodes[i].readdir = 0;
 	root_nodes[i].finddir = 0;
 	root_nodes[i].ref = 0;
-	num_root_nodes++;
+	num_root_nodes++;*/
 }
 
 

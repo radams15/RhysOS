@@ -104,12 +104,12 @@ FsNode_t* get_dir(char* name) {
 	return fsnode;
 }
 
-void read_sector(int* buffer, int sector){	
-	int relativeSector = mod(sector, 18) + 1;
+void read_sector(int* buffer, int sector){
+	int relativeSector = (sector%18)+1;
 	int track = sector / 36;
-	int head = mod((sector / 18), 2);
+	int head = (sector / 18) % 2;
 	int floppyDevice = 0;
-
+		
 	interrupt(0x13, (2 * 256 + 1), (int)buffer, (track*256 + relativeSector), (head*256 + floppyDevice));
 }
 
