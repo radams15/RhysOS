@@ -87,14 +87,14 @@ sub stdlib {
 	
 	for my $c_file (&find('stdlib/*.c')) {		
 		(my $out = $c_file) =~ s:stdlib/(.*)\.c:build/stdlib/$1.o:;
-		&run("$CC -fleading-underscore $KERNEL_FLAGS -ffreestanding -c $c_file -Istdlib/ -o $out");
+		&run("bcc -ansi -c $c_file -Istdlib/ -o $out");
 		
 		push @objs, $out;
 	}
 	
 	for my $asm_file (&find('stdlib/*.nasm')) {
 		(my $out = $asm_file) =~ s:stdlib/(.*)\.nasm:build/stdlib/$1_nasm.o:;
-		&run("$ASM $KERNEL_FLAGS -felf $asm_file -Istdlib/ -o $out");
+		&run("$ASM -fas86 $asm_file -Istdlib/ -o $out");
 		push @objs, $out;
 	}
 	
@@ -104,7 +104,7 @@ sub stdlib {
 }
 
 sub runtime {
-	&run("ia16-elf-gcc -fleading-underscore $KERNEL_FLAGS -ffreestanding -fno-inline -march=i8086 -mtune=i8086 -c runtime/crt0.c -Istdlib -o build/crt0.o");
+	&run("bcc -ansi -c runtime/crt0.c -Istdlib -o build/crt0.o");
 	
 	"build/crt0.o";
 }
@@ -124,26 +124,13 @@ sub programs {
 		
 		my $conf = Config::Simple->import_from("$program/config");
 		
-		my $load_address = $conf->param('shell') ? $SHELL_ADDR : $EXE_ADDR;
-=pod
-		my $load_script = "$folder/link.ld";
-		
-		# Make new linker script with desired address.
-		open FH, '<', "programs/link.ld";
-		my $load_script_content = join '', <FH>;
-		close FH;
-		$load_script_content =~ s/ADDRESS/$load_address/g;
-		
-		open FH, '>', $load_script;
-		print FH $load_script_content;
-		close FH;
-=cut
+		my $load_addr = $conf->param('shell') ? $SHELL_ADDR : $EXE_ADDR;
 		
 		my @objs;
 		for my $file ( ($conf->param('main')), $conf->param('files') ) {
 			if ($file =~ /\.c$/) {
 				(my $out_obj = $file) =~ s:(.*)\.c:$folder/$1.o:;
-				&run("ia16-elf-gcc -fleading-underscore $KERNEL_FLAGS -ffreestanding -fno-inline -march=i8086 -mtune=i8086 -c $program/$file -I$program/ -Istdlib -o $out_obj");
+				&run("bcc -ansi -c $program/$file -I$program/ -Istdlib -o $out_obj");
 				
 				push @objs, $out_obj;
 			}
@@ -151,7 +138,7 @@ sub programs {
 			if ($file =~ /\.nasm$/) {
 				(my $out_obj = $file) =~ s:(.*)\.nasm:$folder/$1.o:;
 				
-				&run("$ASM -felf $program/$file -I$program/ -Istdlib -o $out_obj");
+				&run("$ASM -fas86 $program/$file -I$program/ -Istdlib -o $out_obj");
 				
 				push @objs, $out_obj;
 			}
@@ -160,9 +147,10 @@ sub programs {
 		
 		my $out = "$folder/".$conf->param('name');
 		
-		&run("$LD -o $out -Ttext $load_address --oformat binary -d ".($conf->param('standalone')? ' ':" $runtime ").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":' ') );
+		&run("ld86 -o $out -d -T$load_addr $runtime ".join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
 		
-open FH, '<', $out;
+
+		open FH, '<', $out;
 		my $original = join '', <FH>;
 		close FH;
 		
@@ -175,7 +163,7 @@ open FH, '<', $out;
 		}
 =cut
 		
-		print FH pack('A2S', 'RZ', eval($load_address));
+		print FH pack('A2S', 'RZ', eval($load_addr));
 		print FH $original;
 		close FH;
 		

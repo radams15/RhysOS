@@ -105,12 +105,26 @@ FsNode_t* get_dir(char* name) {
 }
 
 void read_sector(int* buffer, int sector){
-	int relativeSector = (sector%18)+1;
+	/*int relativeSector = (sector%18)+1;
 	int track = sector / 36;
 	int head = (sector / 18) % 2;
 	int floppyDevice = 0;
 		
-	interrupt(0x13, (2 * 256 + 1), (int)buffer, (track*256 + relativeSector), (head*256 + floppyDevice));
+	interrupt(0x13, (2 * 256 + 1), (int)buffer, (track*256 + relativeSector), (head*256 + floppyDevice));*/
+	
+	int track = sector / (18 * 2);     // Number of tracks
+    int head = (sector / 18) % 2;      // Head number (0 or 1)
+    int sector_number = (sector % 18) + 1;  // Sector number (1-based)
+
+    // Prepare the registers
+    int ax = 0x0201;                   // AH = 0x02 (Read), AL = 0x01 (Number of sectors to read)
+    int bx = (int)buffer;              // Buffer address
+    int cx = (track << 8) | sector_number;   // CH = Track number, CL = Sector number
+    int dx = (head << 8);              // DH = Head number, DL = Drive number (e.g., floppy drive 0)
+
+    // Call BIOS interrupt 13h
+    interrupt(0x13, ax, bx, cx, dx);
+
 }
 
 unsigned int fs_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
