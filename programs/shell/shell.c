@@ -146,7 +146,7 @@ int main() {
 		ret = loop();
 	}
 	
-	print("Shell exited! Program exit code %x\n", ret);
+	printf("Shell exited! Program exit code %x\n", ret);
 
 	return 0;
 }

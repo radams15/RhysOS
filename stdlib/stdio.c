@@ -2,7 +2,7 @@
 #include "syscall.h"
 #include "math.h"
 
-#include <varargs.h>
+#include <stdarg.h>
 
 #define FORMAT_MARK '%'
 
@@ -169,18 +169,18 @@ void vfprintf(int fh, register char* text, register va_list args) {
     }
 }
 
-void fprintf(int fd, char* text, va_list va_alist) {
+void fprintf(int fd, char* text, ...) {
 	va_list ptr;
-	va_start(ptr);
+	va_start(ptr, fd);
 	
 	vfprintf(fd, text, ptr);
 	
 	va_end(ptr);
 }
 
-void printf(char* text, va_list va_alist) {
+void printf(char* text, ...) {
 	va_list ptr;
-	va_start(ptr);
+	va_start(ptr, text);
 	
 	vfprintf(stdout, text, ptr);
 	

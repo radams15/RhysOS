@@ -23,27 +23,27 @@ int execa(char* file, int argc, char** argv, int in, int out, int err) {
 }
 
 int dir_list(char* dir_name, struct File* buf) {
-	return syscall(5, dir_name, buf, 0);
+	return syscall(5, dir_name, buf, 0, 0, 0, 0);
 }
 
 int read(int fh, unsigned char* buffer, unsigned int size) {
-	return syscall(6, fh, buffer, size);
+	return syscall(6, fh, buffer, size, 0, 0, 0);
 }
 
 int write(int fh, unsigned char* buffer, unsigned int size) {
-	return syscall(7, fh, buffer, size);
+	return syscall(7, fh, buffer, size, 0, 0, 0);
 }
 
 int open(char* name) {
-	return syscall(8, name, 0, 0);
+	return syscall(8, name, 0, 0, 0, 0, 0);
 }
 
 void close(int fh) {
-	return syscall(9, fh, 0, 0);
+	return syscall(9, fh, 0, 0, 0, 0, 0);
 }
 
 void seek(int fh, unsigned int location) {
-	return syscall(10, fh, location, 0);
+	return syscall(10, fh, location, 0, 0, 0, 0);
 }
 
 

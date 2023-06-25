@@ -172,20 +172,24 @@ int init(char* cmdline){
 	a20_init();
 	
 	memmgr_init();
+	print_string("Memory manager enabled\n");
 	
 	makeInterrupt21();
+	print_string("Int 21h enabled\n");
 	rtc_init();
+	print_string("RTC enabled\n");
 	
 	//graphics_init();
 	
 	make_rtc_interrupt();
-	//enable_rtc();
 	
 	serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
+	print_string("/dev/COM1 enabled\n");
 
 	fs_root = ustar_init(1);
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
+	print_string("Root filesystem mounted\n");
 			
 	stdin = open("/dev/stdin");
 	stdout = open("/dev/stdout");
