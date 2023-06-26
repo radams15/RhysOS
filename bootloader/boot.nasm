@@ -41,8 +41,8 @@ print_str:
 boot:
 	mov ax, KSEG ; setup segmentation
 	mov ds, ax
-	mov ss, ax
 	mov es, ax
+	mov ss, ax
 
 	mov ax, STACK_ADDR ; setup stack
 	mov sp, ax

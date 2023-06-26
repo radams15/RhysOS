@@ -8,6 +8,6 @@ enum {
 
 typedef int (*ProcFunc_t)(int stdin, int stdout, int stderr, int argc, char** argv);
 
-ProcFunc_t run_exe(char* buf, unsigned int size);
+int run_exe(char* buf, unsigned int size, int argc, char** argv, int stdin, int stdout, int stderr);
 
 #endif

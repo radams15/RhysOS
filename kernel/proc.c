@@ -20,7 +20,7 @@ int memcmp(char* a, char* b, int n) {
 	return 0; // Are the same
 }
 
-ProcFunc_t run_exe(char* buf, unsigned int size) {
+int run_exe(char* buf, unsigned int size, int argc, char** argv, int stdin, int stdout, int stderr) {
 	int ret;
 	char* dst_mem;
 	ExeHeader_t* header;
@@ -39,5 +39,5 @@ ProcFunc_t run_exe(char* buf, unsigned int size) {
     	memcpy(dst_mem, buf+sizeof(ExeHeader_t), size-sizeof(ExeHeader_t)); // Only load the actual program.
 	}
 
-	return (ProcFunc_t) (header->load_address);
+	return ((ProcFunc_t) (header->load_address)) (stdin, stdout, stderr, argc, argv);
 }

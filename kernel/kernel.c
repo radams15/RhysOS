@@ -39,7 +39,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 	ProcFunc_t entry;
 	
 	fs_node = get_dir(file_name);
-	
+		
 	if(fs_node == NULL) {
 		if(file_name != NULL) {
 			print_string(file_name);
@@ -50,9 +50,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 	
 	size = fs_read(fs_node, 0, sizeof(buf), buf);
 
-    entry = run_exe(&buf, size);
-        
-    ret = entry(in, out, err, argc, argv);
+    return run_exe(&buf, size, argc, argv, in, out, err);
 }
 
 int read_file(char* buf, int n, char* file_name) {
@@ -177,7 +175,7 @@ void test() {
 		dir_buf[i].name[0] = 0;
 	}
 
-	len = list_directory("/dev", dir_buf);
+	len = list_directory("/", dir_buf);
 	
 	for(i=0 ; i<len ; i++) {		
 		file = &dir_buf[i];

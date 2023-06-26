@@ -47,8 +47,6 @@ sub find {
 
 sub bootloader {
 	make_path("build") if !(-e 'build/');
-	#&run("$ASM -felf bootloader/boot.nasm -DSTACK_ADDR=$STACK_ADDR -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.o");
-	#&run("$LD -Tbootloader/link.ld build/boot.o --oformat binary -o build/boot.bin");
 	
 	&run("$ASM -fbin bootloader/boot.nasm -DSTACK_ADDR=$STACK_ADDR -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.bin");
 	
