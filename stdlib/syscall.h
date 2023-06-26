@@ -7,7 +7,6 @@
 
 extern int interrupt (int number, int AX, int BX, int CX, int DX);
 
-
 typedef struct DirEnt {
 	char name[FILE_NAME_MAX];
 	unsigned int inode;

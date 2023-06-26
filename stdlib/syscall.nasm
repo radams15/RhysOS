@@ -1,3 +1,5 @@
+bits 16
+
 global _interrupt
 
 ;int interrupt (int number, int AX, int BX, int CX, int DX)

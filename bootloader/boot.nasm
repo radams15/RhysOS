@@ -27,7 +27,7 @@ jmp 0:boot
 
 print_str:
 	mov ah, 0Eh
-.top
+.top:
 	mov al, [si]
 	cmp al, 0
 	je .print_done

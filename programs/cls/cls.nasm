@@ -1,3 +1,5 @@
+bits 16
+
 extern _main
 
 %define MODE 2 ; 80x24 mode

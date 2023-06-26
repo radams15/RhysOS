@@ -217,7 +217,7 @@ int init(char* cmdline){
 	stdin = open("/dev/stdin");
 	stdout = open("/dev/stdout");
 	stderr = open("/dev/stderr");
-		
+	
 	//cls();
 	
 	print_string("Welcome to RhysOS!\n\n");
@@ -226,7 +226,6 @@ int init(char* cmdline){
 	
 	exec("mem", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
-	
 	exec("shell", 0, NULL, stdin, stdout, stderr);
 	
 	close(stdin);
