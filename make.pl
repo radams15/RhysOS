@@ -7,6 +7,8 @@ use File::Basename;
 use File::Path qw/make_path/;
 use File::Find::Rule;
 
+use POSIX qw/ceil/;
+
 use Data::Dumper;
 
 use Config::Simple;
@@ -78,8 +80,29 @@ sub kernel {
 		(push @objs, $out);
 	}
 	
-	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.bin -d build/kernel/kernel.o ".(join ' ', @objs));
-	
+	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel.o ".(join ' ', @objs));
+
+	&run("objcopy -O binary --only-section=.text build/kernel.elf build/kernel.text");
+
+	&run("objcopy -O binary --only-section=.data build/kernel.elf build/kernel.data");
+
+	my $textsize = ceil((stat 'build/kernel.text')[7]/512);
+	my $datasize = ceil((stat 'build/kernel.data')[7]/512);
+
+=pod
+		struct Header {
+			char magic[2];
+			short textstart;
+			short datastart;
+			short textsize;
+			short datasize;
+		}
+=cut
+	open KBIN, '>', 'build/kernel.bin';
+	print KBIN pack('A2SSSS', 'RZ', 0, $textsize, $textsize+1, $datasize);
+
+	close KBIN;
+
 	"build/kernel.bin";
 }
 
