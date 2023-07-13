@@ -2,9 +2,10 @@ bits 16
 org 7c00h
 
 
-KSEG	equ	KERNEL_ADDR ; address to place kernel in
-KSIZE	equ	KERNEL_SECTORS ; sectors in kernel
-KSTART	equ	2 ; start sector in initrd
+CODE_SEG	equ 0x0050
+BOOT2_ADDR	equ	0 ; address to place kernel in
+BOOT2_SIZ	equ	2 ; sectors in kernel
+BOOT2_SECT	equ	2 ; start sector in initrd
 SECT_PER_TRACK equ 18
 
 jmp 0:boot
@@ -13,13 +14,13 @@ jmp 0:boot
 	push si
 	push ax
 	push ds
-	
+
 	mov ax, 0
 	mov ds, ax
-	
+
 	mov si, %1
 	call print_str
-	
+
 	pop ds
 	pop ax
 	pop si
@@ -27,7 +28,7 @@ jmp 0:boot
 
 print_str:
 	mov ah, 0Eh
-.top:
+.top
 	mov al, [si]
 	cmp al, 0
 	je .print_done
@@ -39,7 +40,7 @@ print_str:
 	ret
 
 boot:
-	mov ax, KSEG ; setup segmentation
+	mov ax, CODE_SEG ; setup segmentation
 	mov ds, ax
 	mov ss, ax
 	mov es, ax
@@ -47,48 +48,33 @@ boot:
 	mov ax, STACK_ADDR ; setup stack
 	mov sp, ax
 	mov bp, ax
-	
+
 	print boot_msg
-	
+
 	; Read 18 sectors of head 0
-	
-	
-	mov     cl,KSTART+1      ;cl holds sector number
+
+
+	mov     cl,BOOT2_SECT+1      ;cl holds sector number, +1 as 1-indexed
 	mov     dh,0     ;dh holds head number - 0
 	mov     ch,0     ;ch holds track number - 0
-	mov     al,SECT_PER_TRACK-KSTART        ;read up to 18 sectors
-	mov     bx,0		;read into 0 (in the segment)
+	mov     al, BOOT2_SIZ        ;read up to 18 sectors
+	mov     bx, BOOT2_ADDR		;read into 0 (in the segment)
 	mov     dl,0            ;read from floppy disk A
 	mov     ah,2            ;absolute disk read
 	int     13h	;call BIOS disk read function
-	
-	jc .err
-	
-	; Read up to 18 more sectors on head 1
-	
-	add bx, ((SECT_PER_TRACK-KSTART)*512)
-	
-	mov     cl,1      ;cl holds sector number
-	mov     dh,1     ;dh holds head number - 0
-	mov     ch,0     ;ch holds track number - 0
-	mov     al, (SECT_PER_TRACK)       ;read rest of sectors
-	mov     dl,0            ;read from floppy disk A
-	mov     ah,2            ;absolute disk read
-	int     13h	;call BIOS disk read function
-	
-	jc .err
 
+	jc .err
 .done:
 	print kernel_read_msg
 
-    jmp KSEG:0
+    jmp CODE_SEG:BOOT2_ADDR
 .end:
 	jmp $
-	
+
 .err:
 	print err_msg
 	jmp $
-	
+
 boot_msg: db 'Booting RhysOS...', 0xa, 0xd, 0
 kernel_read_msg: db 'Kernel read complete!', 0xa, 0xd, 0
 err_msg: db 'Disk read error!', 0xa, 0xd, 0

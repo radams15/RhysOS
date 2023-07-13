@@ -47,12 +47,14 @@ sub find {
 
 sub bootloader {
 	make_path("build") if !(-e 'build/');
-	#&run("$ASM -felf bootloader/boot.nasm -DSTACK_ADDR=$STACK_ADDR -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.o");
-	#&run("$LD -Tbootloader/link.ld build/boot.o --oformat binary -o build/boot.bin");
 	
 	&run("$ASM -fbin bootloader/boot.nasm -DSTACK_ADDR=$STACK_ADDR -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.bin");
+
+	&run("$CC -fleading-underscore $KERNEL_FLAGS -c bootloader/boot2.c -o build/boot2.o");
+	&run("$ASM -felf $KERNEL_FLAGS bootloader/boot2.nasm -o build/boot2_asm.o");
+	&run("$LD -T bootloader/link.ld -o build/boot2.bin -d build/boot2.o build/boot2_asm.o");
 	
-	"build/boot.bin";
+	"build/boot.bin", "build/boot2.bin";
 }
 
 sub kernel {
@@ -209,12 +211,12 @@ sub qemu {
 }
 
 sub build {
-	my $bootloader = &bootloader;
+	my ($boot1, $boot2) = &bootloader;
 	my $kernel = &kernel;
 	my $runtime = &runtime;
 	my $stdlib = &stdlib;
 	my @programs = &programs($runtime, $stdlib);
-	&img($bootloader, $kernel, \@programs, ['docs/syscalls.md', 'docs/fs_spec.md']);
+	&img($boot1, $boot2, [$kernel, @programs], ['docs/syscalls.md', 'docs/fs_spec.md']);
 }
 
 sub clean {
