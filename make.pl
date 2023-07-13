@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use warnings;
 use strict;
@@ -48,8 +48,12 @@ sub find {
 sub bootloader {
 	make_path("build") if !(-e 'build/');
 	&run("$ASM -fbin bootloader/boot.nasm -DSTACK_ADDR=$STACK_ADDR -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.bin");
+
+	&run("$CC -ansi $KERNEL_FLAGS -c bootloader/boot2.c -o build/boot2.o");
+	&run("$ASM -fas86 $KERNEL_FLAGS bootloader/boot2.nasm -o build/boot2_asm.o");
+	&run("$LD -T0x0000 -o build/boot2.bin -d build/boot2.o build/boot2_asm.o");
 	
-	"build/boot.bin";
+	"build/boot.bin", "build/boot2.bin";
 }
 
 sub kernel {
@@ -190,17 +194,17 @@ sub img {
 }
 
 sub qemu {
-	&run("qemu-system-i386 -machine pc -fda build/system.img -boot a -m 1M");
+	&run("qemu-system-i386 -machine pc -fda build/system.img -boot a -m 1M -serial telnet:localhost:25232");
 }
 
 sub build {
-	my $bootloader = &bootloader;
+	my ($boot1, $boot2) = &bootloader;
 	my $kernel = &kernel;
 	my $runtime = &runtime;
 	my $stdlib = &stdlib;
 	my @programs = &programs($runtime, $stdlib);
 	
-	&img($bootloader, $kernel, \@programs, ['docs/syscalls.md', 'docs/fs_spec.md',  &find('root/*')]);
+	&img($boot1, $boot2, [$kernel, @programs], ['docs/syscalls.md', 'docs/fs_spec.md',  &find('root/*')]);
 }
 
 sub clean {
