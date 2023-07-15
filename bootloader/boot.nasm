@@ -4,7 +4,7 @@ org 7c00h
 
 CODE_SEG	equ 0x0050
 BOOT2_ADDR	equ	0 ; address to place kernel in
-BOOT2_SIZ	equ	2 ; sectors in kernel
+BOOT2_SIZ	equ	3 ; sectors in kernel
 BOOT2_SECT	equ	2 ; start sector in initrd
 SECT_PER_TRACK equ 18
 

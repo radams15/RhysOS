@@ -18,13 +18,15 @@ int stdin, stdout, stderr;
 void main() {
 	int err;
 	
-	print_string("Kernel loaded!\n");
+	print_char('X');
+	
+	/*print_string("Kernel loaded!\n");
 
 	err = init();
 
 	if(err){
 		print_string("\r\nError in kernel, halting!\r\n");
-	}
+	}*/
 
 	for(;;){}
 }

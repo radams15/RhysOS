@@ -9,6 +9,8 @@ SECTIONS
     {
         *(.text);
     }
+
+    . = 0x5000;
     .data :
     {
         *(.data);

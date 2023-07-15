@@ -101,6 +101,15 @@ sub kernel {
 	open KBIN, '>', 'build/kernel.bin';
 	print KBIN pack('A2SSSS', 'RZ', 0, $textsize, $textsize+1, $datasize);
 
+	for my $file ('build/kernel.text', 'build/kernel.data') {
+		open FH, '<', $file;
+		while(<FH>) {
+			print KBIN;
+		}
+		print KBIN '\x0' x 512;
+		close FH;
+	}
+
 	close KBIN;
 
 	"build/kernel.bin";
