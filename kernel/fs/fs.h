@@ -18,6 +18,7 @@
 */
 
 void read_sector(int* buffer, int sector);
+void read_sector_to_segment(int disk, int track, int head, int sector, int dst_addr, int dst_seg);
 
 typedef unsigned int (*ReadFunc)(struct FsNode*, unsigned int, unsigned int, unsigned char*);
 typedef unsigned int (*WriteFunc)(struct FsNode*, unsigned int, unsigned int, unsigned char*);

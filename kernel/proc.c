@@ -12,12 +12,12 @@ int memcmp(char* a, char* b, int n) {
     int i;
     
     for(i=0 ; i<n ; i++) { // If first 64 bytes are the same then program is already loaded.
-	    if(a[i] != b[i]) {
-	        return 1;
+        if(a[i] != b[i]) {
+          return 1;
         }
-	}
-	
-	return 0; // Are the same
+    }
+    
+    return 0; // Are the same
 }
 
 ProcFunc_t run_exe(char* buf, unsigned int size) {
@@ -36,7 +36,7 @@ ProcFunc_t run_exe(char* buf, unsigned int size) {
 	dst_mem = (char*) header->load_address;
 	
 	if(memcmp(buf+sizeof(ExeHeader_t), dst_mem, 64) != 0) {
-    	memcpy(dst_mem, buf+sizeof(ExeHeader_t), size-sizeof(ExeHeader_t)); // Only load the actual program.
+    	  memcpy(dst_mem, buf+sizeof(ExeHeader_t), size-sizeof(ExeHeader_t)); // Only load the actual program.
 	}
 
 	return (ProcFunc_t) (header->load_address);

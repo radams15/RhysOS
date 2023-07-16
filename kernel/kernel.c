@@ -230,9 +230,9 @@ int init(){
 	
 	//test();
 	
-	/*exec("mem", 0, NULL, stdin, stdout, stderr);
+	//exec("mem", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
-	exec("shell", 0, NULL, stdin, stdout, stderr);*/
+	//exec("shell", 0, NULL, stdin, stdout, stderr);
 	
 	close(stdin);
 	close(stdout);
