@@ -1,3 +1,8 @@
+void main();
+void top() {
+  main();
+}
+
 #include "fs/fs.h"
 #include "tty.h"
 #include "proc.h"
@@ -20,9 +25,9 @@ void main() {
 	
 	print_char('X');
 	
-	/*print_string("Kernel loaded!\n");
+	print_string("Kernel loaded!\n");
 
-	err = init();
+	/*err = init();
 
 	if(err){
 		print_string("\r\nError in kernel, halting!\r\n");

@@ -62,6 +62,14 @@ _read_sector:
 
 	pop bp
 	ret
+	
+printc:
+        push bx
+        mov ah, 0Eh
+        xor bx, bx
+        int 10h
+        pop bx
+        ret
 
 ; void call_kernel()
 _call_kernel:
@@ -70,9 +78,15 @@ _call_kernel:
 
         push ds
         
-        mov ax, 0x900
+        ;mov ax, 0x3000
+        ;mov ds, ax
+        ;jmp 0x2000:0x1000
+        
+        mov ax, 0x3000
         mov ds, ax
-        call 0x100:0x50
+        mov si, 0x1000
+        mov ax, [si]
+        call printc
         
         pop ds
 

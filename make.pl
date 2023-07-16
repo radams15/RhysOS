@@ -98,15 +98,25 @@ sub kernel {
 			short datasize;
 		}
 =cut
+
 	open KBIN, '>', 'build/kernel.bin';
-	print KBIN pack('A2SSSS', 'RZ', 0, $textsize, $textsize+1, $datasize);
+	binmode KBIN;
+	my $header = pack('A2SSSS', 'RZ', 1, $textsize+1, $textsize+2, $datasize);
+	print KBIN $header;
+	print KBIN "\xFF" x (length($header) % 512);
 
 	for my $file ('build/kernel.text', 'build/kernel.data') {
-		open FH, '<', $file;
-		while(<FH>) {
-			print KBIN;
+	        open FH, '<', $file;
+	        binmode FH;
+	        my $data = '';
+		while(1) {
+                        my $success = read FH, $data, 100, length($data);
+                        die $! if not defined $success;
+                        last if not $success;
 		}
-		print KBIN '\x0' x 512;
+		print KBIN $data;
+		printf "******** File: %s SIZE: %d, padding: %d ****************\n", $file, length($data), (length($data) % 512);
+		print KBIN "\x0E" x (length($data) % 512);
 		close FH;
 	}
 

@@ -1,8 +1,8 @@
 int main();
 void entry() { main(); }
 
-#define CODE_SEGMENT 0x100
-#define DATA_SEGMENT 0x900
+#define CODE_SEGMENT 0x2000
+#define DATA_SEGMENT 0x3000
 
 #define SECTORS_PER_TRACK 18
 #define BYTES_PER_SECTOR 512
@@ -38,6 +38,8 @@ void read_sector_lba_dummy(int disk, int lba, int dst_addr, int dst_seg) {
 }
 
 void printc(char c) {
+    if(c == '\n')
+      printc('\r');
     interrupt(0x10, 0x0E00 + c, 0, 0, 0);
 }
 
@@ -53,7 +55,7 @@ void printi(int num, int base) {
     int remainder;
     
     if(base == 0) {
-    	print("Cannot have a base of 0!\r\n");
+    	print("Cannot have a base of 0!\n");
     	return;
     }
     
@@ -100,35 +102,33 @@ int main() {
     print(header.magic);
     print("'\r\n");
     if(header.magic[0] != 'R' && header.magic[1] != 'Z') {
-      print("Invalid kernel magic, abort.\r\n");
-      goto main_end;
+      print("Invalid kernel magic, abort.\n");
+      //goto main_end;
     }
-
-    // Load the text segment.
 
     int sector;
     int i;
-    int addr = 0x50; // Read to address 0 in CODE_SEGMENT
+    int addr = 0x1000; // Read to address 0 in CODE_SEGMENT
     for(i=0 ; i<header.textsize ; i++) {
-        sector = header.textstart + i;
+        sector = KERNEL_SECT + header.textstart + i;
 
         read_sector_lba_dummy(0, sector, addr, CODE_SEGMENT);
         addr += BYTES_PER_SECTOR;
     }
 
-    addr = 0x5000; // Read to address 0 in DATA_SEGMENT
+    addr = 0x1000; // Read to address 0 in DATA_SEGMENT
     for(i=0 ; i<header.datasize ; i++) {
-        sector = header.datastart + i;
+        sector = KERNEL_SECT + header.datastart + i;
 
         read_sector_lba_dummy(0, sector, addr, DATA_SEGMENT);
         addr += BYTES_PER_SECTOR;
     }
 
-    print("Loaded!\r\n");
+    print("Loaded!\n");
 
     call_kernel();
 
-    print("Done!\r\n");
+    print("Done!\n");
 
 main_end:
     for(;;) {}
