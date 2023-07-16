@@ -178,7 +178,7 @@ int main() {
           print(" => Length: ");
           printi(size_sectors, 10);
           print("\n");
-          load_segment(0, sect+1, size_sectors, 0x1000, DATA_SEGMENT);
+          load_segment(0, sect+1, size_sectors, 0x5000, DATA_SEGMENT);
         }
         
         sect += size_sectors;

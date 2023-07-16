@@ -1,10 +1,10 @@
 OUTPUT_FORMAT("elf32-i386");
 
-ENTRY(main);
+ENTRY(_main);
 
 SECTIONS
 {
-    . = 0;
+    . = 0x1000;
     .text :
     {
         *(.text);

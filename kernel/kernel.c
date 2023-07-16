@@ -1,7 +1,5 @@
 void main();
-void top() {
-  main();
-}
+void entry(){main();}
 
 #include "fs/fs.h"
 #include "tty.h"
@@ -20,18 +18,21 @@ void top() {
 
 int stdin, stdout, stderr;
 
+int init();
+
 void main() {
 	int err;
 	
-	print_char('X');
+	for(int i='A' ; i<'z' ; i++)
+	  print_char(i);
 	
 	print_string("Kernel loaded!\n");
 
-	/*err = init();
+	err = init();
 
 	if(err){
 		print_string("\r\nError in kernel, halting!\r\n");
-	}*/
+	}
 
 	for(;;){}
 }
@@ -196,7 +197,7 @@ void test() {
 	}
 }
 
-int init(char* cmdline){		
+int init(){		
 	FsNode_t* fs_dev;
 	
 	a20_init();
@@ -206,12 +207,10 @@ int init(char* cmdline){
 	
 	makeInterrupt21();
 	print_string("Int 21h enabled\n");
-	rtc_init();
-	print_string("RTC enabled\n");
 	
-	//graphics_init();
-	
+	rtc_init();	
 	make_rtc_interrupt();
+	print_string("RTC enabled\n");
 	
 	serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 	print_string("/dev/COM1 enabled\n");
@@ -231,9 +230,9 @@ int init(char* cmdline){
 	
 	//test();
 	
-	exec("mem", 0, NULL, stdin, stdout, stderr);
+	/*exec("mem", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
-	exec("shell", 0, NULL, stdin, stdout, stderr);
+	exec("shell", 0, NULL, stdin, stdout, stderr);*/
 	
 	close(stdin);
 	close(stdout);
