@@ -99,30 +99,7 @@ sub kernel {
 		}
 =cut
 
-	open KBIN, '>', 'build/kernel.bin';
-	binmode KBIN;
-	my $header = pack('A2SSSS', 'RZ', 1, $textsize+1, $textsize+2, $datasize);
-	print KBIN $header;
-	print KBIN "\xFF" x (length($header) % 512);
-
-	for my $file ('build/kernel.text', 'build/kernel.data') {
-	        open FH, '<', $file;
-	        binmode FH;
-	        my $data = '';
-		while(1) {
-                        my $success = read FH, $data, 100, length($data);
-                        die $! if not defined $success;
-                        last if not $success;
-		}
-		print KBIN $data;
-		printf "******** File: %s SIZE: %d, padding: %d ****************\n", $file, length($data), (length($data) % 512);
-		print KBIN "\x0E" x (length($data) % 512);
-		close FH;
-	}
-
-	close KBIN;
-
-	"build/kernel.bin";
+	'build/kernel.text', 'build/kernel.data';
 }
 
 sub stdlib {	
@@ -254,11 +231,11 @@ sub qemu {
 
 sub build {
 	my ($boot1, $boot2) = &bootloader;
-	my $kernel = &kernel;
+	my @kernel = &kernel;
 	my $runtime = &runtime;
 	my $stdlib = &stdlib;
 	my @programs = &programs($runtime, $stdlib);
-	&img($boot1, $boot2, [$kernel, @programs], ['docs/syscalls.md', 'docs/fs_spec.md']);
+	&img($boot1, $boot2, [@kernel, @programs], ['docs/syscalls.md', 'docs/fs_spec.md']);
 }
 
 sub clean {
