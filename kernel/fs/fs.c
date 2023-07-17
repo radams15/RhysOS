@@ -4,6 +4,7 @@
 #include "proc.h"
 
 #define MAX_OPEN_FILES 64
+#define SECTORS_PER_TRACK 18
 
 extern int interrupt(int number, int AX, int BX, int CX, int DX);
 
@@ -198,3 +199,12 @@ FsNode_t* fs_finddir(FsNode_t* node, char* name) {
 	
 	return -1;
 }*/
+
+
+void read_lba_to_segment(int disk, int lba, int dst_addr, int dst_seg) {
+	int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
+	int track = (lba / (SECTORS_PER_TRACK * 2));
+	int sector = (lba % SECTORS_PER_TRACK + 1);
+
+    read_sector_to_segment(disk, track, head, sector, dst_addr, dst_seg);
+}

@@ -37,32 +37,6 @@ void main() {
 	for(;;){}
 }
 
-
-int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
-	struct FsNode* fs_node;
-	char buf[SHELL_SIZE];
-	int size;
-	int ret;
-	
-	ProcFunc_t entry;
-	
-	fs_node = get_dir(file_name);
-	
-	if(fs_node == NULL) {
-		if(file_name != NULL) {
-			print_string(file_name);
-			print_string(" is not recognised as an internal or external command.\n");
-		}
-		return -1;
-	}
-	
-	size = fs_read(fs_node, 0, sizeof(buf), buf);
-
-    entry = run_exe(&buf, size);
-        
-    ret = entry(in, out, err, argc, argv);
-}
-
 int read_file(char* buf, int n, char* file_name) {
 	struct FsNode* fs_node;
 	int size;
@@ -122,6 +96,9 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 }
 
 int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
+  print_string("Interrupt: ");
+  printi(*ax, 10);
+  print_string("\n");
   switch(*ax) {
     case 3:
 		*ax = exec(bx, cx, dx[0], dx[1], dx[2], dx[3]);
@@ -230,7 +207,7 @@ int init(){
 	
 	//test();
 	
-	//exec("mem", 0, NULL, stdin, stdout, stderr);
+	exec("test2", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
 	//exec("shell", 0, NULL, stdin, stdout, stderr);
 	

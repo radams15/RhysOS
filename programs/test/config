@@ -1,3 +1,0 @@
-name: hello
-main: test.c
-stdlib: true

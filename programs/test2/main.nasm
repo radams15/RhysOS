@@ -1,7 +1,9 @@
 bits 16
 
 global _main
-extern _cls
+extern _printf
+
+jmp _main
 
 section .text
 
@@ -22,13 +24,14 @@ _main:
 	push bp
 	mov bp, sp
 	
-	;call _cls
-	
 	mov si, test
 	call print_str
+
+        ;push test
+        ;call _printf
 
 	pop bp
 	ret
 
-section .data:
+section .data
 test: db `Hello world!\r\n`, 0

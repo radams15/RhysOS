@@ -83,7 +83,6 @@ sub kernel {
 	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel.o ".(join ' ', @objs));
 
 	&run("objcopy -O binary --only-section=.text build/kernel.elf build/kernel.text");
-
 	&run("objcopy -O binary --only-section=.data build/kernel.elf build/kernel.data");
 
 	my $textsize = ceil((stat 'build/kernel.text')[7]/512);
@@ -128,6 +127,12 @@ sub runtime {
 	&run("ia16-elf-gcc -ffreestanding -fleading-underscore -fno-inline -march=i8086 -mtune=i8086 -c runtime/crt0.c -Istdlib -o build/crt0.o");
 	
 	"build/crt0.o";
+}
+
+sub padding {
+        my ($size, $to) = @_;
+        
+        (ceil($size/$to)*$to)-$size;
 }
 
 sub programs {
@@ -182,9 +187,20 @@ sub programs {
 		
 		&run("$LD -o $out -d -T$load_script ".($conf->param('stdlib')? " $runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
 		
+                &run("objcopy -O binary --only-section=.text $out $out.text");
+                &run("objcopy -O binary --only-section=.data $out $out.data");
 
-		open FH, '<', $out;
-		my $original = join '', <FH>;
+                my $textsize = ceil((stat "$out.text")[7]);
+                my $datasize = ceil((stat "$out.data")[7]);
+
+		open FH, '<', "$out.text";
+		binmode FH;
+		my $text = join '', <FH>;
+		close FH;
+		
+		open FH, '<', "$out.data";
+		binmode FH;
+		my $data = join '', <FH>;
 		close FH;
 		
 		open FH, '>', $out;
@@ -193,11 +209,17 @@ sub programs {
 		struct Header {
 			char magic[2];
 			short load_address;
+			short text_size;
+			short data_size;
 		}
 =cut
 		
-		print FH pack('A2S', 'RZ', eval($load_addr));
-		print FH $original;
+		my $header = pack('A2SSS', 'RZ', eval($load_addr), ceil($textsize/512), ceil($datasize/512));
+		print FH $header;
+		print FH $text;
+		print FH "\x0" x &padding($textsize+length($header), 512);
+		print FH $data;
+		#print FH "\x0" x &padding($datasize, 512);
 		close FH;
 		
 		push @programs, $out;

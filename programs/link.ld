@@ -1,14 +1,15 @@
-OUTPUT_FORMAT("binary");
+OUTPUT_FORMAT("elf32-i386");
 
-ENTRY(main);
+ENTRY(_start);
 
 SECTIONS
 {
-    . = ADDRESS;
+    . = 0x1000;
     .text :
     {
         *(.text);
     }
+    . = 0x7000;
     .data :
     {
         *(.data);
