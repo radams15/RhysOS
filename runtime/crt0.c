@@ -1,6 +1,7 @@
 int enter(int proc_stdin, int proc_stdout, int proc_stderr, int argc, char** argv);
 int start(int proc_stdin, int proc_stdout, int proc_stderr, int argc, char** argv) {
-  return enter(proc_stdin, proc_stdout, proc_stderr, argc, argv);
+  enter(proc_stdin, proc_stdout, proc_stderr, argc, argv);
+  asm volatile("retf");
 }
 
 #include <stdio.h>
@@ -22,8 +23,6 @@ int enter(int proc_stdin, int proc_stdout, int proc_stderr, int argc, char** arg
 	stderr = 2;
 	
 	ret = main(0, NULL);
-	
-	asm volatile("retf");
-	
-	//return ret;
+
+	return ret;
 }

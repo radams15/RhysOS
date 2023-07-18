@@ -27,11 +27,29 @@ _main:
 	mov si, test
 	call print_str
 
-        ;push test
-        ;call _printf
+        mov ax, axp
+        mov bx, stdout
+        mov DWORD [axp], 8 ; open
+        int 21h
+        mov ax, [axp]
+        mov [fh], ax ; fh -> dx
+
+        sti
+        mov ax, axp
+        mov DWORD [axp], 7 ; write
+        mov bx, [fh] ; fh
+        mov cx, test ; str
+        mov dx, test_len ; length
+        int 21h
 
 	pop bp
 	ret
 
+
 section .data
+
 test: db `Hello world!\r\n`, 0
+test_len: dw 13
+axp: dd 1
+stdout: db '/dev/stdout', 0
+fh: dw 0
