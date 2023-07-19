@@ -63,7 +63,8 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 		read_lba_to_segment(0, sec, addr, 0x3000); // Data to 0x3000:0x7000
 		addr += 512;
 	}
-	
-    
-    return call_prog();
+
+    out = call_prog();
+    print_string("Call complete!\n");
+    return out;
 }

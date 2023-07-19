@@ -42,11 +42,5 @@ _interrupt21ServiceRoutine:
 
 global _call_prog
 _call_prog:
-	push bp
-	mov bp, sp
-        
-        call 0x5000:0x1008 ; requires 'retf' in process to return here
-        
-	pop bp
-	ret
-
+        call 0x5000:0x1008 ; requires 'retf' in process to return as far call
+        ret

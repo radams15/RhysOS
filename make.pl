@@ -124,7 +124,7 @@ sub stdlib {
 }
 
 sub runtime {
-	&run("ia16-elf-gcc -ffreestanding -fleading-underscore -fno-inline -march=i8086 -mtune=i8086 -c runtime/crt0.c -Istdlib -o build/crt0.o");
+	&run("$ASM -felf runtime/crt0.nasm -Istdlib/ -o build/crt0.o");
 	
 	"build/crt0.o";
 }
