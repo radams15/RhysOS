@@ -96,9 +96,6 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 }
 
 int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
-  print_string("Interrupt: ");
-  printi(*ax, 10);
-  print_string("\n");
   switch(*ax) {
     case 3:
 		*ax = exec(bx, cx, dx[0], dx[1], dx[2], dx[3]);

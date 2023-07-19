@@ -25,7 +25,7 @@ int memcmp(char* a, char* b, int n) {
     return 0; // Are the same
 }
 
-int call_prog();
+int call_prog(int argc, char** argv, int in, int out, int err);
 
 int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 	struct FsNode* fs_node;
@@ -45,8 +45,6 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 		return -1;
 	}
 	
-	print_string(file_name);
-	
 	read_lba_to_segment(0, fs_node->start_sector, &header, 0x3000);
 	
 	int addr = 0x1000;
@@ -64,7 +62,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 		addr += 512;
 	}
 
-    out = call_prog();
+    out = call_prog(argc, argv, in, out, err);
     print_string("Call complete!\n");
     return out;
 }

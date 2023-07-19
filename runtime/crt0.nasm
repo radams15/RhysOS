@@ -10,16 +10,22 @@ extern _stderr
 extern _main
 
 _start:
-        mov DWORD [_stdin], 0
-        mov DWORD [_stdout], 1
-        mov DWORD [_stderr], 2
+        mov al, [bp+10] ; set stdin, stdout, stderr from the stack
+        mov [_stdin], al
+        
+        mov al, [bp+12]
+        mov [_stdout], al
+        
+        mov al, [bp+14]
+        mov [_stderr], al
+        
         
         push bx
         
         push 0
         push 0
         call _main
-        pop bx
+        pop bx ; remove argc, argv
         pop bx
         
         pop bx
