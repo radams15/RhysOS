@@ -40,7 +40,12 @@ _interrupt21ServiceRoutine:
 
 	iret
 
-global _call_prog
-_call_prog:
-        call 0x5000:0x1008 ; requires 'retf' in process to return as far call
+%macro far_call_func 2
+global _call_%1
+_call_%1:
+        call %1:%2
         ret
+%endmacro
+
+far_call_func 0x5000, 0x1008
+far_call_func 0x8000, 0x1008

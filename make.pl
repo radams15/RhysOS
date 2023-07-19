@@ -19,8 +19,13 @@ my $LD = 'ia16-elf-ld';
 
 # Must be strings for some reason
 my $KERNEL_ADDR = '0x0050';
-my $SHELL_ADDR = '0x4500';
-my $EXE_ADDR = '0x7000';
+
+my $SHELL_ADDR = '0x8000';
+my $EXE_ADDR = '0x6000';
+
+my $SHELL_SEGMENT = '0x8000';
+my $EXE_SEGMENT = '0x5000';
+
 my $HEAP_ADDR = '0x9000';
 my $STACK_ADDR = '0xfff0';
 
@@ -138,6 +143,7 @@ sub programs {
 		my $conf = Config::Simple->import_from("$program/config");
 		
 		my $load_addr = $conf->param('shell') ? $SHELL_ADDR : $EXE_ADDR;
+		my $segment = $conf->param('shell') ? $SHELL_SEGMENT : $EXE_SEGMENT;
 		
 		my $load_script = "$folder/link.ld";
 		
@@ -201,12 +207,11 @@ sub programs {
 		}
 =cut
 		
-		my $header = pack('A2SSS', 'RZ', eval($load_addr), ceil($textsize/512), ceil($datasize/512));
+		my $header = pack('A2SSSS', 'RZ', eval($load_addr), eval($segment), ceil($textsize/512), ceil($datasize/512));
 		print FH $header;
 		print FH $text;
 		print FH "\x0" x &padding($textsize+length($header), 512);
 		print FH $data;
-		#print FH "\x0" x &padding($datasize, 512);
 		close FH;
 		
 		push @programs, $out;

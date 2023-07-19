@@ -9,7 +9,7 @@ SECTIONS
     {
         *(.text);
     }
-    . = 0x7000;
+    . = ADDRESS;
     .data :
     {
         *(.data);
