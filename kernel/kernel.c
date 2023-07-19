@@ -95,7 +95,7 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 	return count;
 }
 
-int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
+int handleInterrupt21(int* ax, int bx, int cx, int* dx) { 
   switch(*ax) {
     case 3:
 		*ax = exec(bx, cx, dx[0], dx[1], dx[2], dx[3]);
@@ -202,11 +202,9 @@ int init(){
 	
 	print_string("Welcome to RhysOS!\n\n");
 	
-	//test();
-	
-	exec("test2", 0, NULL, stdin, stdout, stderr);
+	exec("mem", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
-	//exec("shell", 0, NULL, stdin, stdout, stderr);
+	exec("shell", 0, NULL, stdin, stdout, stderr);
 	
 	close(stdin);
 	close(stdout);

@@ -2,34 +2,49 @@ bits 16
 
 global _main
 extern _printf
+extern _write
 extern _stdout
+
+section .text
 
 jmp _main
 
-section .text
+print_str:
+	mov ah, 0Eh
+.top
+	mov al, [si]
+	cmp al, 0
+	je .print_done
+
+	int 10h
+	inc si
+	jmp .top
+.print_done:
+	ret
 
 _main:
 	push bp
 	mov bp, sp
-        
-        mov ax, [_stdout]
-        mov [fh], ax ; fh -> dx
+	
+	push bx
 
-        mov ax, axp
-        mov DWORD [axp], 7 ; write
-        mov bx, [fh] ; fh
-        mov cx, test ; str
-        mov dx, test_len ; length
-        int 21h
+        push WORD [test_len]
+        push WORD test
+        push WORD [_stdout]
+        call _write
+        
+        add sp, 6
+        
+        pop bx
         
 	pop bp
+
 	ret
 
 
 section .data
 
-test: db `Hello world peas!\r\n`
+test: db `Hello world!\r\n`
 test_len: dw $-test
 axp: dd 1
 stdout: db '/dev/stdout', 0
-fh: dw 0

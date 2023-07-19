@@ -37,6 +37,9 @@ int open(char* name);
 void close(int fh);
 void seek(int fh, unsigned int location);
 
+int interrupt_10(int AX, int BX, int CX, int DX);
+int interrupt_21(int AX, int BX, int CX, int DX);
+
 #define exec(file, argc, argv) execa(file, argc, argv, stdin, stdout, stderr)
 
 void int2chars(unsigned int in, unsigned char* buffer);

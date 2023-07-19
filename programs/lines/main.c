@@ -32,15 +32,15 @@ void set_graphics_mode(int mode) {
 
 
 int graphics_set_bg(char bg) {
-	return interrupt(0x10, (0x0B<<8), (0x00<<8) + bg, 0, 0);
+	return interrupt_10((0x0B<<8), (0x00<<8) + bg, 0, 0);
 }
 
 int graphics_set_palette(char palette) {
-	return interrupt(0x10, (0x0B<<8), (0x01<<8) + palette, 0, 0);
+	return interrupt_10((0x0B<<8), (0x01<<8) + palette, 0, 0);
 }
 
 int graphics_putc(int x, int y, int colour) {
-	return interrupt(0x10, (0x0C<<8) + colour, 0, x, y);
+	return interrupt_10((0x0C<<8) + colour, 0, x, y);
 }
 
 void mainloop() {

@@ -85,19 +85,6 @@ sub kernel {
 	&run("objcopy -O binary --only-section=.text build/kernel.elf build/kernel.text");
 	&run("objcopy -O binary --only-section=.data build/kernel.elf build/kernel.data");
 
-	my $textsize = ceil((stat 'build/kernel.text')[7]/512);
-	my $datasize = ceil((stat 'build/kernel.data')[7]/512);
-
-=pod
-		struct Header {
-			char magic[2];
-			short textstart;
-			short datastart;
-			short textsize;
-			short datasize;
-		}
-=cut
-
 	'build/kernel.text', 'build/kernel.data';
 }
 
@@ -185,10 +172,10 @@ sub programs {
 		
 		my $out = "$folder/".$conf->param('name');
 		
-		&run("$LD -o $out -d -T$load_script ".($conf->param('stdlib')? " $runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
+		&run("$LD -o $out.elf -d -T$load_script ".($conf->param('stdlib')? " $runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
 		
-                &run("objcopy -O binary --only-section=.text $out $out.text");
-                &run("objcopy -O binary --only-section=.data $out $out.data");
+                &run("objcopy -O binary --only-section=.text $out.elf $out.text");
+                &run("objcopy -O binary --only-section=.data $out.elf $out.data");
 
                 my $textsize = ceil((stat "$out.text")[7]);
                 my $datasize = ceil((stat "$out.data")[7]);

@@ -77,18 +77,12 @@ _call_kernel:
 	mov bp, sp
 
         push ds
-        
+
         mov ax, 0x3000
         mov ds, ax
         mov ss, ax
         mov es, ax
         jmp 0x2000:0x1000
-        
-        ;mov ax, 0x3000
-        ;mov ds, ax
-        ;mov si, 0x1000
-        ;mov ax, [si]
-        ;call printc
         
         pop ds
 

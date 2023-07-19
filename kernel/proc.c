@@ -42,7 +42,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 			print_string(file_name);
 			print_string(" is not recognised as an internal or external command.\n");
 		}
-		return -1;
+		return 2;
 	}
 	
 	read_lba_to_segment(0, fs_node->start_sector, &header, 0x3000);
@@ -62,7 +62,5 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 		addr += 512;
 	}
 
-    out = call_prog(argc, argv, in, out, err);
-    print_string("Call complete!\n");
-    return out;
+    return call_prog(argc, argv, in, out, err);
 }

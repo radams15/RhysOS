@@ -2,6 +2,8 @@
 
 extern int stdin, stdout, stderr;
 
+extern void biosprint();
+
 int syscall(int ax, int bx, int cx, int a, int b, int c, int d) {
 	int out;
 	
@@ -12,8 +14,8 @@ int syscall(int ax, int bx, int cx, int a, int b, int c, int d) {
 	extra[3] = d;
 	
 	out = ax;
-	
-	interrupt(0x21, &out, bx, cx, &extra);
+
+	interrupt_21(&out, bx, cx, &extra);
 	
 	return out;
 }
@@ -30,8 +32,8 @@ int read(int fh, unsigned char* buffer, unsigned int size) {
 	return syscall(6, fh, buffer, size, 0, 0, 0);
 }
 
-int write(int fh, unsigned char* buffer, unsigned int size) {
-	return syscall(7, fh, buffer, size, 0, 0, 0);
+int write(int fh, unsigned char* buffer, unsigned int size) {        
+        return syscall(7, fh, buffer, size, 0, 0, 0);
 }
 
 int open(char* name) {
