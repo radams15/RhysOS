@@ -22,11 +22,6 @@ int init();
 
 void main() {
 	int err;
-	
-	for(int i='A' ; i<'z' ; i++)
-	  print_char(i);
-	
-	print_string("Kernel loaded!\n");
 
 	err = init();
 
@@ -182,8 +177,7 @@ int init(){
 	makeInterrupt21();
 	print_string("Int 21h enabled\n");
 	
-	rtc_init();	
-	make_rtc_interrupt();
+	rtc_init();
 	print_string("RTC enabled\n");
 	
 	serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
@@ -198,7 +192,7 @@ int init(){
 	stdout = open("/dev/stdout");
 	stderr = open("/dev/stderr");
 	
-	//cls();
+	cls();
 	
 	print_string("Welcome to RhysOS!\n\n");
 	

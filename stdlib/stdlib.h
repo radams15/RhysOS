@@ -2,7 +2,7 @@
 #define STDLIB_H
 
 typedef struct TimeDelta {
-	int tick;
+    int tick;
 	int sec;
 	int min;
 	int hr;

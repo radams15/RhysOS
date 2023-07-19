@@ -13,6 +13,6 @@ int main(int argc, char** argv) {
 	close(fh);
 	
 	printf("%d:%d:%d:%d\n", time.hr, time.min, time.sec, time.tick);
-	
+
 	return 0;
 }

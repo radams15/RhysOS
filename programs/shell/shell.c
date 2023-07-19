@@ -126,9 +126,13 @@ int loop() {
 	memset(&line, 0, 1024/8);
 	
 	printf(prompt);
-	readline(line);
-	printf("\n");
+	int len = readline(line);
 	
+        printf("\n");
+	
+	if(len == 0)
+	  return 0;
+
 	run_line(line, sizeof(line));
 	
 	printf("\n");
@@ -139,8 +143,6 @@ int loop() {
 int main() {
 	char name[32];
 	int ret = 0;
-	
-	//cls();
 	
 	while(!ret) {
 		ret = loop();

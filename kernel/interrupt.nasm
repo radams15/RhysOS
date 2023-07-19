@@ -39,7 +39,7 @@ _tick_handler:
 	push ax
 	push ds
 	
-	mov ax, KERNEL_ADDRESS ; Restore KSEG
+	mov ax, 0x3000 ; Restore KSEG
 	mov ds, ax
 	
 	call _tick

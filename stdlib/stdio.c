@@ -106,21 +106,24 @@ int freadline(int fh, char* buffer) {
 int readline(char* buffer) {
 	char* buffer_head = buffer;
 	char c;
+	int len = 0;
 	
 	while((c=getch()) != '\r') {
 		if(c == 0x8 && buffer != buffer_head) { // backspace
+		        len--;
 			*(buffer--) = ' ';
 			
 			putc(' '); // Overwrite with space
 			putc('\x2'); // Move cursor back
 		} else {
+		        len++;
 			*(buffer++) = c;
 		}
 	}
 	
 	*(buffer++) = 0; // null-terminate
 	
-	return buffer-buffer_head;
+	return len;
 }
 
 void vfprintf(int fh, register char* text, register va_list args) {
