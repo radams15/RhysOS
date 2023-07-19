@@ -18,6 +18,8 @@ global _mod
 _mod:
     PUSH BP         ; save the base pointer
     MOV BP, SP      ; set up the stack frame
+    push bx
+    push dx
     
     mov ax, word [bp+4]     ; Load dividend (num) into AX
     mov bx, word [bp+6]     ; Load divisor (base) into BX
@@ -25,6 +27,9 @@ _mod:
     XOR DX, DX      ; clear the high word of the dividend
     DIV BX          ; divide the dividend by the divisor
     MOV AX, DX      ; move the remainder into AX
+    
+    pop dx
+    pop bx
 
     POP BP          ; restore the base pointer
     RET             ; return to the calling function

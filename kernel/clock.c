@@ -13,7 +13,7 @@ int time(struct TimeDelta* buf) {
 }
 
 void tick() {
-	counter.tick++;
+	counter.tick = counter.tick + 1;
 	
 	if(counter.tick >= 18) {
 		counter.tick = 0;

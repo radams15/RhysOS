@@ -4,6 +4,7 @@
 #include "proc.h"
 
 #define MAX_OPEN_FILES 64
+#define SECTORS_PER_TRACK 18
 
 extern int interrupt(int number, int AX, int BX, int CX, int DX);
 
@@ -93,6 +94,7 @@ FsNode_t* get_dir(char* name) {
 	memcpy(&buf, name, 100);
 	buf[strlen(name)] = 0;
 	
+	
 	tok = strtok(buf, "/");
 	
 	while(tok != NULL && fsnode != NULL) {
@@ -105,12 +107,19 @@ FsNode_t* get_dir(char* name) {
 }
 
 void read_sector(int* buffer, int sector){	
-	int relativeSector = mod(sector, 18) + 1;
-	int track = sector / 36;
-	int head = mod((sector / 18), 2);
-	int floppyDevice = 0;
+    int track = sector / (18 * 2);     // Number of tracks
+    int head = (sector / 18) % 2;      // Head number (0 or 1)
+    int sector_number = (sector % 18) + 1;  // Sector number (1-based)
 
-	interrupt(0x13, (2 * 256 + 1), (int)buffer, (track*256 + relativeSector), (head*256 + floppyDevice));
+    // Prepare the registers
+    int ax = 0x0201;                   // AH = 0x02 (Read), AL = 0x01 (Number of sectors to read)
+    int bx = (int)buffer;              // Buffer address
+    int cx = (track << 8) | sector_number;   // CH = Track number, CL = Sector number
+    int dx = (head << 8);              // DH = Head number, DL = Drive number (e.g., floppy drive 0)
+
+    // Call BIOS interrupt 13h
+    interrupt(0x13, ax, bx, cx, dx);
+
 }
 
 unsigned int fs_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
@@ -190,3 +199,12 @@ FsNode_t* fs_finddir(FsNode_t* node, char* name) {
 	
 	return -1;
 }*/
+
+
+void read_lba_to_segment(int disk, int lba, int dst_addr, int dst_seg) {
+	int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
+	int track = (lba / (SECTORS_PER_TRACK * 2));
+	int sector = (lba % SECTORS_PER_TRACK + 1);
+
+    read_sector_to_segment(disk, track, head, sector, dst_addr, dst_seg);
+}

@@ -1,9 +1,15 @@
+bits 16
+
 global _makeInterrupt21
 extern _handleInterrupt21
 
 _makeInterrupt21:
 	;get the address of the service routine
-	mov dx,_interrupt21ServiceRoutine
+	push dx
+	push ax
+	push si
+	mov dx, _interrupt21ServiceRoutine ; causes a crash
+	
 	push ds
 	mov ax, 0	;interrupts are in lowest memory
 	mov ds,ax
@@ -12,6 +18,9 @@ _makeInterrupt21:
 	mov [si+2],ax
 	mov [si],dx	;set up our vector
 	pop ds
+	pop si
+	pop ax
+	pop dx
 	ret
 
 ;this is called when interrupt 21 happens
@@ -30,3 +39,13 @@ _interrupt21ServiceRoutine:
 	pop dx
 
 	iret
+
+%macro far_call_func 2
+global _call_%1
+_call_%1:
+        call %1:%2
+        ret
+%endmacro
+
+far_call_func 0x5000, 0x1008
+far_call_func 0x8000, 0x1008

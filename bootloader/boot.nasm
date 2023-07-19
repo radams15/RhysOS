@@ -4,7 +4,7 @@ org 7c00h
 
 CODE_SEG	equ 0x0050
 BOOT2_ADDR	equ	0 ; address to place kernel in
-BOOT2_SIZ	equ	2 ; sectors in kernel
+BOOT2_SIZ	equ	3 ; sectors in kernel
 BOOT2_SECT	equ	2 ; start sector in initrd
 SECT_PER_TRACK equ 18
 
@@ -14,13 +14,13 @@ jmp 0:boot
 	push si
 	push ax
 	push ds
-	
+
 	mov ax, 0
 	mov ds, ax
-	
+
 	mov si, %1
 	call print_str
-	
+
 	pop ds
 	pop ax
 	pop si
@@ -48,12 +48,12 @@ boot:
 	mov ax, STACK_ADDR ; setup stack
 	mov sp, ax
 	mov bp, ax
-	
+
 	print boot_msg
-	
+
 	; Read 18 sectors of head 0
-	
-	
+
+
 	mov     cl,BOOT2_SECT+1      ;cl holds sector number, +1 as 1-indexed
 	mov     dh,0     ;dh holds head number - 0
 	mov     ch,0     ;ch holds track number - 0
@@ -70,11 +70,11 @@ boot:
     jmp CODE_SEG:BOOT2_ADDR
 .end:
 	jmp $
-	
+
 .err:
 	print err_msg
 	jmp $
-	
+
 boot_msg: db 'Booting RhysOS...', 0xa, 0xd, 0
 kernel_read_msg: db 'Kernel read complete!', 0xa, 0xd, 0
 err_msg: db 'Disk read error!', 0xa, 0xd, 0

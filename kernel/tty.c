@@ -2,10 +2,21 @@
 
 int graphics_mode = GRAPHICS_MONO_80x25;
 
+char text_bg = 0xF;
+char text_fg = 0x0;
+
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
 void set_cursor(char row, char col) {
-	interrupt(0x10, 0x02<<8, 0, 0, (row<<8) | col);
+	interrupt(0x10, 0x02<<4, 0, 0, (row<<4) | col);
+}
+
+void set_bg(char colour) {
+	text_bg = colour;
+}
+
+void set_fg(char colour) {
+	text_fg = colour;
 }
 
 void set_resolution(int mode) {
@@ -13,7 +24,7 @@ void set_resolution(int mode) {
 }
 
 void print_char(int c) {
-    print_char_colour(c, 0x0, 0xF); // https://en.wikipedia.org/wiki/BIOS_color_attributes
+    print_char_colour(c, text_fg, text_bg); // https://en.wikipedia.org/wiki/BIOS_color_attributes
 }
 
 void print_char_colour(int c, char fg, char bg) {
@@ -89,7 +100,7 @@ void printi(int num, int base) {
     }
 
     while (num != 0) {
-        remainder = imod(num, base);
+        remainder = num % base;
         
         if (remainder < 10)
             *--ptr = '0' + remainder;

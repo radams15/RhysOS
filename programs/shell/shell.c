@@ -126,9 +126,13 @@ int loop() {
 	memset(&line, 0, 1024/8);
 	
 	printf(prompt);
-	readline(line);
-	printf("\n");
+	int len = readline(line);
 	
+        printf("\n");
+	
+	if(len == 0)
+	  return 0;
+
 	run_line(line, sizeof(line));
 	
 	printf("\n");
@@ -140,13 +144,11 @@ int main() {
 	char name[32];
 	int ret = 0;
 	
-	//cls();
-	
 	while(!ret) {
 		ret = loop();
 	}
 	
-	print("Shell exited! Program exit code %x\n", ret);
+	printf("Shell exited! Program exit code %x\n", ret);
 
 	return 0;
 }

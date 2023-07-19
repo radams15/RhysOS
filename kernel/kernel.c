@@ -1,3 +1,6 @@
+void main();
+void entry(){main();}
+
 #include "fs/fs.h"
 #include "tty.h"
 #include "proc.h"
@@ -15,10 +18,10 @@
 
 int stdin, stdout, stderr;
 
+int init();
+
 void main() {
 	int err;
-	
-	print_string("Kernel loaded!\n");
 
 	err = init();
 
@@ -27,32 +30,6 @@ void main() {
 	}
 
 	for(;;){}
-}
-
-
-int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
-	struct FsNode* fs_node;
-	char buf[SHELL_SIZE];
-	int size;
-	int ret;
-		
-	ProcFunc_t entry;
-	
-	fs_node = get_dir(file_name);
-	
-	if(fs_node == NULL) {
-		if(file_name != NULL) {
-			print_string(file_name);
-			print_string(" is not recognised as an internal or external command.\n");
-		}
-		return -1;
-	}
-	
-	size = fs_read(fs_node, 0, sizeof(buf), &buf);
-
-    entry = run_exe(&buf, size);
-        
-    ret = entry(in, out, err, argc, argv);
 }
 
 int read_file(char* buf, int n, char* file_name) {
@@ -102,17 +79,18 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 	while ( (node = fs_readdir(root, i)) != NULL) {
 		fsnode = fs_finddir(root, node->name);
 		if(fsnode != NULL) {
-			memcpy(buf++, fsnode, sizeof(FsNode_t));
+			if(buf != NULL)
+				memcpy(buf++, fsnode, sizeof(FsNode_t));
 			count++;
 		}
 		
 		i++;
 	}
-	
+
 	return count;
 }
 
-int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
+int handleInterrupt21(int* ax, int bx, int cx, int* dx) { 
   switch(*ax) {
     case 3:
 		*ax = exec(bx, cx, dx[0], dx[1], dx[2], dx[3]);
@@ -166,38 +144,60 @@ void a20_init() {
 	}
 }
 
-int init(char* cmdline){		
+void test() {
+	int i;
+	int len;
+	FsNode_t dir_buf[16];
+	FsNode_t* file;
+
+	for(i=0 ; i<16 ; i++) {
+		dir_buf[i].name[0] = 0;
+	}
+
+	len = list_directory("/dev", dir_buf);
+	
+	for(i=0 ; i<len ; i++) {		
+		file = &dir_buf[i];
+		
+		if(file == NULL)
+			break;
+
+		print_string("\t - "); print_string(file->name); print_string("\n");
+	}
+}
+
+int init(){		
 	FsNode_t* fs_dev;
 	
 	a20_init();
 	
 	memmgr_init();
+	print_string("Memory manager enabled\n");
 	
 	makeInterrupt21();
+	print_string("Int 21h enabled\n");
+	
 	rtc_init();
-	
-	//graphics_init();
-	
-	make_rtc_interrupt();
-	//enable_rtc();
+	print_string("RTC enabled\n");
 	
 	serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
+	print_string("/dev/COM1 enabled\n");
 
 	fs_root = ustar_init(1);
 	fs_dev = devfs_init();
 	ustar_mount(fs_dev, "dev");
+	print_string("Root filesystem mounted\n");
 			
 	stdin = open("/dev/stdin");
 	stdout = open("/dev/stdout");
 	stderr = open("/dev/stderr");
 	
-	//cls();
+	cls();
 	
 	print_string("Welcome to RhysOS!\n\n");
 	
 	exec("mem", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
-	
 	exec("shell", 0, NULL, stdin, stdout, stderr);
 	
 	close(stdin);

@@ -1,3 +1,5 @@
+bits 16
+
 global _div
 _div:
     PUSH BP         ; save the base pointer

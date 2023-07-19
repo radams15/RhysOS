@@ -7,7 +7,6 @@
 
 extern int interrupt (int number, int AX, int BX, int CX, int DX);
 
-
 typedef struct DirEnt {
 	char name[FILE_NAME_MAX];
 	unsigned int inode;
@@ -37,6 +36,9 @@ int write(int fh, unsigned char* buffer, unsigned int size);
 int open(char* name);
 void close(int fh);
 void seek(int fh, unsigned int location);
+
+int interrupt_10(int AX, int BX, int CX, int DX);
+int interrupt_21(int AX, int BX, int CX, int DX);
 
 #define exec(file, argc, argv) execa(file, argc, argv, stdin, stdout, stderr)
 

@@ -13,9 +13,9 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 static int sector_start;
-static FsNode_t* root_node;
-static FsNode_t* root_nodes;
-static unsigned int num_root_nodes;
+static FsNode_t root_node;
+static FsNode_t root_nodes[MAX_FILES];
+static int num_root_nodes;
 
 static DirEnt_t dirent;
 
@@ -93,6 +93,17 @@ FsNode_t* ustar_finddir(FsNode_t* node, char* name) {
    return NULL;
 }
 
+int ceil_division(int dividend, int divisor) {
+    int quotient = dividend / divisor;    // Perform the division
+
+    if (dividend % divisor != 0) {
+        quotient++;   // Increment the quotient if there is a remainder
+    }
+
+    return quotient;
+}
+
+
 int ustar_load_root() {
 	int sector;
 	int size_sectors;
@@ -108,10 +119,10 @@ int ustar_load_root() {
 	while(strcmp("ustar", file.new.ustar) == 0) {
 		size = oct2bin(file.old.size, 11);
 		
-		size_sectors = (size / SECTOR_SIZE) + 2;
+		size_sectors = ceil_division(size, SECTOR_SIZE)+1;
 		
 		strcpy(root_nodes[i].name, file.old.name);
-		
+				
 		root_nodes[i].flags = FS_FILE;
 		root_nodes[i].inode = i;
 		root_nodes[i].start_sector = sector+1; // +1 to ignore header
@@ -127,9 +138,11 @@ int ustar_load_root() {
 		
 		i++;
 		sector += size_sectors;
-		
+				
 		read_sector(&file, sector);
 	}
+	
+	print_string(file.new.ustar);
 	
 	num_root_nodes = i;
 	
@@ -160,26 +173,21 @@ FsNode_t* ustar_init(int fs_sector_start) {
 	int i;
 	
 	sector_start = fs_sector_start;
-	
-	root_node = malloc(sizeof(FsNode_t));
-	
-	strcpy(root_node->name, "/");
-	root_node->flags = FS_DIRECTORY;
-	root_node->inode = 0;
-	root_node->length = 0;
+		
+	strcpy(root_node.name, "/");
+	root_node.flags = FS_DIRECTORY;
+	root_node.inode = 0;
+	root_node.length = 0;
 	root_nodes[i].offset = 0;
-	root_node->read = 0;
-	root_node->write = 0;
-	root_node->open = 0;
-	root_node->close = 0;
-	root_node->readdir = ustar_readdir;
-	root_node->finddir = ustar_finddir;
-	root_node->ref = 0;
-	
-	
-	root_nodes = malloc(sizeof(FsNode_t) * MAX_FILES);
-	
+	root_node.read = 0;
+	root_node.write = 0;
+	root_node.open = 0;
+	root_node.close = 0;
+	root_node.readdir = ustar_readdir;
+	root_node.finddir = ustar_finddir;
+	root_node.ref = 0;
+		
 	ustar_load_root();
 	
-	return root_node;
+	return &root_node;
 }

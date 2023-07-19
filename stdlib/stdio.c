@@ -2,7 +2,7 @@
 #include "syscall.h"
 #include "math.h"
 
-#include <varargs.h>
+#include <stdarg.h>
 
 #define FORMAT_MARK '%'
 
@@ -106,21 +106,24 @@ int freadline(int fh, char* buffer) {
 int readline(char* buffer) {
 	char* buffer_head = buffer;
 	char c;
+	int len = 0;
 	
 	while((c=getch()) != '\r') {
 		if(c == 0x8 && buffer != buffer_head) { // backspace
+		        len--;
 			*(buffer--) = ' ';
 			
 			putc(' '); // Overwrite with space
 			putc('\x2'); // Move cursor back
 		} else {
+		        len++;
 			*(buffer++) = c;
 		}
 	}
 	
 	*(buffer++) = 0; // null-terminate
 	
-	return buffer-buffer_head;
+	return len;
 }
 
 void vfprintf(int fh, register char* text, register va_list args) {
@@ -169,23 +172,42 @@ void vfprintf(int fh, register char* text, register va_list args) {
     }
 }
 
-void fprintf(int fd, char* text, va_list va_alist) {
+void fprintf(int fd, char* text, ...) {
 	va_list ptr;
-	va_start(ptr);
+	va_start(ptr, fd);
 	
 	vfprintf(fd, text, ptr);
 	
 	va_end(ptr);
 }
 
-void printf(char* text, va_list va_alist) {
+void printf(char* text, ...) {
 	va_list ptr;
-	va_start(ptr);
+	va_start(ptr, text);
 	
 	vfprintf(stdout, text, ptr);
 	
 	va_end(ptr);
 }
 
+void term_set_bg(char colour) {
+	int fh;
+	
+	fh = open("/dev/ttybg");
+	
+	write(fh, &colour, 1);
+	
+	close(fh);
+}
+
+void term_set_fg(char colour) {
+	int fh;
+	
+	fh = open("/dev/ttyfg");
+	
+	write(fh, &colour, 1);
+	
+	close(fh);
+}
 
 int __mkargv() {}
