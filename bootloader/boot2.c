@@ -1,9 +1,6 @@
 int main();
 void entry() { main(); }
 
-#define CODE_SEGMENT 0x2000
-#define DATA_SEGMENT 0x3000
-
 #define SECTORS_PER_TRACK 18
 #define BYTES_PER_SECTOR 512
 
@@ -160,7 +157,7 @@ int main() {
         
         if(strncmp(header.old.name, "kernel.text", 11) == 0) {
           print("Loading code: [");
-          load_segment(0, sect+1, size_sectors, 0x1000, CODE_SEGMENT);
+          load_segment(0, sect+1, size_sectors, 0x1000, KERNEL_SEGMENT);
           print("]\n");
         } else if(strncmp(header.old.name, "kernel.data", 11) == 0) {
           print("Loading data: [");

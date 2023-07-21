@@ -2,7 +2,7 @@ bits 16
 org 7c00h
 
 
-CODE_SEG	equ 0x0050
+BOOT2_SEG	equ 0x0050
 BOOT2_ADDR	equ	0 ; address to place kernel in
 BOOT2_SIZ	equ	3 ; sectors in kernel
 BOOT2_SECT	equ	2 ; start sector in initrd
@@ -40,12 +40,12 @@ print_str:
 	ret
 
 boot:
-	mov ax, CODE_SEG ; setup segmentation
+	mov ax, BOOT2_SEG ; setup segmentation
 	mov ds, ax
 	mov ss, ax
 	mov es, ax
 
-	mov ax, STACK_ADDR ; setup stack
+	mov ax, STACK_SEGMENT ; setup stack
 	mov sp, ax
 	mov bp, ax
 
@@ -67,7 +67,7 @@ boot:
 .done:
 	print kernel_read_msg
 
-    jmp CODE_SEG:BOOT2_ADDR
+    jmp BOOT2_SEG:BOOT2_ADDR
 .end:
 	jmp $
 

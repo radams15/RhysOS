@@ -14,26 +14,25 @@ use Data::Dumper;
 use Config::Simple;
 
 my $ASM = 'nasm';
-my $CC = 'ia16-elf-gcc -ffreestanding '; #-march=i8086 -mtune=i8086
+my $CC = 'ia16-elf-gcc -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore';
 my $LD = 'ia16-elf-ld';
 
 # Must be strings for some reason
-my $KERNEL_ADDR = '0x0050';
+my $KERNEL_SEGMENT = '0x2000';
+my $DATA_SEGMENT = '0x3000';
 
 my $SHELL_ADDR = '0x8000';
 my $EXE_ADDR = '0x6000';
-
 my $SHELL_SEGMENT = '0x8000';
 my $EXE_SEGMENT = '0x5000';
 
-my $HEAP_ADDR = '0x9000';
-my $STACK_ADDR = '0xfff0';
+my $STACK_SEGMENT = '0xfff0';
 
-my $KERNEL_SECTORS = '28';
+my $HEAP_ADDR = '0x9000';
 
 my $FLOPPY_SECTORS = 2880; # 1.44M floppy
 
-my $KERNEL_FLAGS = "-DHEAP_ADDRESS=$HEAP_ADDR -DEXE_ADDRESS=$EXE_ADDR -DSHELL_ADDRESS=$SHELL_ADDR -DKERNEL_ADDRESS=$KERNEL_ADDR";
+my $KERNEL_FLAGS = "-DSTACK_SEGMENT=$STACK_SEGMENT -DHEAP_ADDRESS=$HEAP_ADDR -DKERNEL_SEGMENT=$KERNEL_SEGMENT -DDATA_SEGMENT=$DATA_SEGMENT -DSHELL_SEGMENT=$SHELL_SEGMENT -DEXE_SEGMENT=$EXE_SEGMENT";
 
 sub run {
 	my ($cmd) = @_;
@@ -55,9 +54,9 @@ sub find {
 sub bootloader {
 	make_path("build") if !(-e 'build/');
 	
-	&run("$ASM -fbin bootloader/boot.nasm -DSTACK_ADDR=$STACK_ADDR -DKERNEL_ADDR=$KERNEL_ADDR -DKERNEL_SECTORS=$KERNEL_SECTORS -Ibootloader -o build/boot.bin");
+	&run("$ASM -fbin bootloader/boot.nasm $KERNEL_FLAGS -Ibootloader -o build/boot.bin");
 
-	&run("$CC -fleading-underscore $KERNEL_FLAGS -c bootloader/boot2.c -o build/boot2.o");
+	&run("$CC $KERNEL_FLAGS -c bootloader/boot2.c -o build/boot2.o");
 	&run("$ASM -felf $KERNEL_FLAGS bootloader/boot2.nasm -o build/boot2_asm.o");
 	&run("$LD -T bootloader/link.ld -o build/boot2.bin -d build/boot2.o build/boot2_asm.o");
 	
@@ -72,7 +71,7 @@ sub kernel {
 		my $folder = dirname($out);
 		make_path($folder) if !(-e $folder);
 
-		&run("$CC -Ikernel/ -fleading-underscore $KERNEL_FLAGS -c $c_file -o $out");
+		&run("$CC -Ikernel/ $KERNEL_FLAGS -c $c_file -o $out");
 		(push @objs, $out) unless $c_file =~ /kernel\.c/;
 	}
 
@@ -99,7 +98,7 @@ sub stdlib {
 	
 	for my $c_file (&find('stdlib/*.c')) {		
 		(my $out = $c_file) =~ s:stdlib/(.*)\.c:build/stdlib/$1.o:;
-		&run("$CC -ffreestanding -fleading-underscore -fno-inline -march=i8086 -mtune=i8086 -c $c_file -Istdlib/ -o $out");
+		&run("$CC -c $c_file -Istdlib/ -o $out");
 		
 		push @objs, $out;
 	}
@@ -161,7 +160,7 @@ sub programs {
 		for my $file ( ($conf->param('main')), $conf->param('files') ) {
 			if ($file =~ /\.c$/) {
 				(my $out_obj = $file) =~ s:(.*)\.c:$folder/$1.o:;
-				&run("ia16-elf-gcc -ffreestanding -fleading-underscore -fno-inline -march=i8086 -mtune=i8086 -c $program/$file -I$program/ -Istdlib -o $out_obj");
+				&run("$CC -c $program/$file -I$program/ -Istdlib -o $out_obj");
 				
 				push @objs, $out_obj;
 			}

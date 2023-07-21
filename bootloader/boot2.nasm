@@ -78,11 +78,11 @@ _call_kernel:
 
         push ds
 
-        mov ax, 0x3000
+        mov ax, DATA_SEGMENT
         mov ds, ax
         mov ss, ax
         mov es, ax
-        jmp 0x2000:0x1000
+        jmp KERNEL_SEGMENT:0x1000
         
         pop ds
 

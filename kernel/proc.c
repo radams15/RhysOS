@@ -27,7 +27,6 @@ int memcmp(char* a, char* b, int n) {
 }
 
 typedef int (*prog_t)(int argc, char** argv, int in, int out, int err);
-
 int call_0x5000(int argc, char** argv, int in, int out, int err);
 int call_0x8000(int argc, char** argv, int in, int out, int err);
 
@@ -68,9 +67,9 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 
     prog_t prog;
     
-    if(header.segment == 0x5000)
+    if(header.segment == EXE_SEGMENT)
       prog = call_0x5000;
-    else if(header.segment == 0x8000)
+    else if(header.segment == SHELL_SEGMENT)
       prog = call_0x8000;
     else {
       print_string("Error, cannot find call segment!\n");

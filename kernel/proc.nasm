@@ -27,16 +27,26 @@ _makeInterrupt21:
 ;it will call your function:
 ;void handleInterrupt21 (int AX, int BX, int CX, int DX)
 _interrupt21ServiceRoutine:
+        push ds
 	push dx
 	push cx
 	push bx
 	push ax
-	sti
+	
+	cli
+	
+	mov ax, 0x3000 ; Restore KSEG
+	mov ds, ax
+	
 	call _handleInterrupt21
+	
+	sti
+
 	pop ax
 	pop bx
 	pop cx
 	pop dx
+	pop ds
 
 	iret
 
@@ -47,5 +57,5 @@ _call_%1:
         ret
 %endmacro
 
-far_call_func 0x5000, 0x1008
-far_call_func 0x8000, 0x1008
+far_call_func EXE_SEGMENT, 0x1008
+far_call_func SHELL_SEGMENT, 0x1008
