@@ -43,6 +43,7 @@ _tick_handler:
 	mov ds, ax
 	
 	call _tick
+	
 	pop ds
 	pop ax
 	pop bx

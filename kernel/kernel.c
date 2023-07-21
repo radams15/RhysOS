@@ -98,8 +98,6 @@ typedef struct SyscallArgs {
 
 int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
   SyscallArgs_t* args = ax;
-  //int ds = dx[0];
-  //print_string("DS: '"); printi(ds, 16); print_string("'\n");
   
   switch(*ax) {
     case 3:

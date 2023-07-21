@@ -25,7 +25,7 @@ _makeInterrupt21:
 
 ;this is called when interrupt 21 happens
 ;it will call your function:
-;void handleInterrupt21 (int AX, int BX, int CX, int DX, int DS)
+;void handleInterrupt21 (int AX, int BX, int CX, int DX)
 _interrupt21ServiceRoutine:
         push ds
 	push dx
@@ -54,6 +54,9 @@ _interrupt21ServiceRoutine:
 global _call_%1
 _call_%1:
         push ds
+        
+        mov ax, 0x3000
+        mov ds, ax
 
         call %1:%2
         
