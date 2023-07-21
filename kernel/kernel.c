@@ -90,41 +90,51 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 	return count;
 }
 
-int handleInterrupt21(int* ax, int bx, int cx, int* dx) { 
+typedef struct SyscallArgs {
+  int num; // Syscall number
+  int a, b, c, d, e, f;
+  int ds; // Data segment
+} SyscallArgs_t;
+
+int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
+  SyscallArgs_t* args = ax;
+  //int ds = dx[0];
+  //print_string("DS: '"); printi(ds, 16); print_string("'\n");
+  
   switch(*ax) {
     case 3:
-		*ax = exec(bx, cx, dx[0], dx[1], dx[2], dx[3]);
+		args->num = exec(args->a, args->b, args->c, args->d, args->e, args->f);
 		break;
 
     case 5:
-		*ax = list_directory(bx, cx);
+		args->num = list_directory(args->a, args->b);
 		break;
 
     case 6:
-		*ax = read((int) bx, (char*) cx, (int) dx[0]);
+		args->num = read(args->a, args->b, args->c);
 		break;
 	
     case 7:
-		*ax = write((int) bx, (char*) cx, (int) dx[0]);
+		args->num = write(args->a, args->b, args->c);
 		break;
 		
     case 8:
-		*ax = open((char*) bx);
+		args->num = open(args->a);
 		break;
 
     case 9:
-		close((char*) bx);
+		close(args->a);
 		break;
 		
     case 10:
-		seek((char*) bx, (int) cx);
+		seek(args->a, args->b);
 		break;
 
     default:
 		print_string("Unknown interrupt: ");
-		print_hex_4(*ax);
+		print_hex_4(args->a);
 		print_string("!\r\n");
-		*ax = -1;
+		args->num = -1;
 		break;
   }
 }

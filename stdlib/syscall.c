@@ -3,21 +3,24 @@
 extern int stdin, stdout, stderr;
 
 extern void biosprint();
+int ds();
 
-int syscall(int ax, int bx, int cx, int a, int b, int c, int d) {
-	int out;
-	
-	int extra[4];
-	extra[0] = a;
-	extra[1] = b;
-	extra[2] = c;
-	extra[3] = d;
-	
-	out = ax;
+typedef struct SyscallArgs {
+  int num; // Syscall number
+  int a, b, c, d, e, f;
+  int ds; // Data segment
+} SyscallArgs_t;
 
-	interrupt_21(&out, bx, cx, &extra);
+int syscall(int num, int a, int b, int c, int d, int e, int f) {
+        SyscallArgs_t out = {
+          num,
+          a, b,c,d,e,f,
+          ds(),
+        };
+
+	interrupt_21(&out, 0, 0, 0);
 	
-	return out;
+	return out.num;
 }
 
 int execa(char* file, int argc, char** argv, int in, int out, int err) {

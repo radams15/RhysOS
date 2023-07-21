@@ -25,7 +25,7 @@ _makeInterrupt21:
 
 ;this is called when interrupt 21 happens
 ;it will call your function:
-;void handleInterrupt21 (int AX, int BX, int CX, int DX)
+;void handleInterrupt21 (int AX, int BX, int CX, int DX, int DS)
 _interrupt21ServiceRoutine:
         push ds
 	push dx
@@ -53,9 +53,17 @@ _interrupt21ServiceRoutine:
 %macro far_call_func 2
 global _call_%1
 _call_%1:
+        push ds
+
         call %1:%2
+        
+        pop ds
         ret
 %endmacro
 
 far_call_func EXE_SEGMENT, 0x1008
 far_call_func SHELL_SEGMENT, 0x1008
+
+section .data
+
+SEG_STORE: db 0x1000
