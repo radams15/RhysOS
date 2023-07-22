@@ -100,31 +100,31 @@ int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
   SyscallArgs_t* args = ax;
   
   switch(*ax) {
-    case 3:
+    case 1:
 		args->num = exec(args->a, args->b, args->c, args->d, args->e, args->f);
 		break;
 
-    case 5:
+    case 2:
 		args->num = list_directory(args->a, args->b, args->c);
 		break;
 
-    case 6:
+    case 3:
 		args->num = read(args->a, args->b, args->c);
 		break;
 	
-    case 7:
+    case 4:
 		args->num = write(args->a, args->b, args->c);
 		break;
 		
-    case 8:
+    case 5:
 		args->num = open(args->a);
 		break;
 
-    case 9:
+    case 6:
 		close(args->a);
 		break;
 		
-    case 10:
+    case 7:
 		seek(args->a, args->b);
 		break;
 

@@ -24,31 +24,31 @@ int syscall(int num, int a, int b, int c, int d, int e, int f) {
 }
 
 int execa(char* file, int argc, char** argv, int in, int out, int err) {
-	return syscall(3, file, argc, argv, in, out, err);
+	return syscall(1, file, argc, argv, in, out, err);
 }
 
 int dir_list(char* dir_name, struct FsNode* buf, int max) {
-	return syscall(5, dir_name, buf, max, 0, 0, 0);
+	return syscall(2, dir_name, buf, max, 0, 0, 0);
 }
 
 int read(int fh, unsigned char* buffer, unsigned int size) {
-	return syscall(6, fh, buffer, size, 0, 0, 0);
+	return syscall(3, fh, buffer, size, 0, 0, 0);
 }
 
 int write(int fh, unsigned char* buffer, unsigned int size) {   
-        return syscall(7, fh, buffer, size, 0, 0, 0);
+        return syscall(4, fh, buffer, size, 0, 0, 0);
 }
 
 int open(char* name) {
-	return syscall(8, name, 0, 0, 0, 0, 0);
+	return syscall(5, name, 0, 0, 0, 0, 0);
 }
 
 void close(int fh) {
-	return syscall(9, fh, 0, 0, 0, 0, 0);
+	return syscall(6, fh, 0, 0, 0, 0, 0);
 }
 
 void seek(int fh, unsigned int location) {
-	return syscall(10, fh, location, 0, 0, 0, 0);
+	return syscall(7, fh, location, 0, 0, 0, 0);
 }
 
 
