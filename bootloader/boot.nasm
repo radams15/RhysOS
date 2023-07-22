@@ -48,6 +48,9 @@ boot:
 	mov ax, STACK_SEGMENT ; setup stack
 	mov sp, ax
 	mov bp, ax
+	
+	mov ax, 01h
+	int 10h
 
 	print boot_msg
 

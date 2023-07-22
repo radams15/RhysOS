@@ -3,41 +3,27 @@ bits 16
 global _interrupt
 global _read_sector
 global _call_kernel
+global _printc
 
-;int interrupt (int number, int AX, int BX, int CX, int DX)
-_interrupt:
+_printc:
 	push bp
 	mov bp,sp
-	push ds		;use self-modifying code to call the right interrupt
-	mov bx,cs
-	mov ds,bx
-	mov si,intr
-	mov ax,[bp+4]	;get the interrupt number in AL
-	mov [si+1],al	;change the 00 below to the contents of AL
-	pop ds
-	mov ax,[bp+6]	;get the other parameters AX, BX, CX, and DX
-	mov bx,[bp+8]
-	mov cx,[bp+10]
-	mov dx,[bp+12]
 
-intr:
-	int 0x00	;call the interrupt (00 will be changed above)
-
-	mov ah,0	;we only want AL returned
-	pop bp
-	ret
-	
-global _imod
-_imod:
-    push bp                 ; Save old base pointer
-    mov bp, sp              ; Set up new base pointer
-    mov ax, word [bp+4]     ; Load dividend (num) into AX
-    mov dx, 0               ; Clear DX for division
-    mov bx, word [bp+6]     ; Load divisor (base) into BX
-    div bx                  ; Divide AX by BX (quotient in AX, remainder in DX)
-    mov ax, dx              ; Move remainder from DX to AX
-    pop bp                  ; Restore old base pointer
-    ret                     ; Return with result in AX
+        mov al, [bp+4]
+        mov ah, 0Eh
+        
+        cmp al, 0Ah ; if print '\n', the print '\r\n' 
+        jne .print
+        
+        mov al, 0Dh
+        int 10h
+        mov al, 0Ah
+        
+.print
+        int 10h
+        
+        pop bp
+        ret
 
 ; void read_sector(int disk, int track, int head, int sector, int dst_addr, int dst_seg);
 _read_sector:
@@ -62,14 +48,6 @@ _read_sector:
 
 	pop bp
 	ret
-	
-printc:
-        push bx
-        mov ah, 0Eh
-        xor bx, bx
-        int 10h
-        pop bx
-        ret
 
 ; void call_kernel()
 _call_kernel:

@@ -153,6 +153,7 @@ void a20_init() {
 }
 
 int init(){		
+        cls();
 	FsNode_t* fs_dev;
 	
 	a20_init();
@@ -177,8 +178,6 @@ int init(){
 	stdin = open("/dev/stdin");
 	stdout = open("/dev/stdout");
 	stderr = open("/dev/stderr");
-	
-	cls();
 	
 	print_string("Welcome to RhysOS!\n\n");
 	

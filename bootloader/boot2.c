@@ -6,13 +6,15 @@ void entry() { main(); }
 
 #define FS_SECT 0
 
+#ifndef ENABLE_SPLASH
+#define ENABLE_SPLASH 1
+#endif
+
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
 void read_sector(int disk, int track, int head, int sector, int dst_addr, int dst_seg);
 
 void call_kernel();
-
-void printi(int num, int base);
 
 typedef union Tar {
         // Pre-POSIX.1-1988 format
@@ -46,56 +48,16 @@ typedef union Tar {
 } Tar_t;
 
 void read_sector_lba(int disk, int lba, int dst_addr, int dst_seg) {
-	int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
-	int track = (lba / (SECTORS_PER_TRACK * 2));
-	int sector = (lba % SECTORS_PER_TRACK + 1);
+  int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
+  int track = (lba / (SECTORS_PER_TRACK * 2));
+  int sector = (lba % SECTORS_PER_TRACK + 1);
 
-    read_sector(disk, track, head, sector, dst_addr, dst_seg);
-}
-
-void printc(char c) {
-    if(c == '\n')
-      printc('\r');
-    interrupt(0x10, 0x0E00 + c, 0, 0, 0);
+  read_sector(disk, track, head, sector, dst_addr, dst_seg);
 }
 
 void print(char* str) {
-    char* c;
-    for(c = str ; *c != 0 ; c++)
-        printc(*c);
-}
-
-void printi(int num, int base) {
-    char buffer[64];
-    char* ptr = &buffer[sizeof(buffer)-1];
-    int remainder;
-    
-    if(base == 0) {
-    	print("Cannot have a base of 0!\n");
-    	return;
-    }
-    
-    *ptr = '\0';
-
-    if (num == 0) {
-        printc('0');
-        return;
-    }
-
-    while (num != 0) {
-        remainder = imod(num, base);
-        
-        if (remainder < 10)
-            *--ptr = '0' + remainder;
-        else
-            *--ptr = 'A' + remainder - 10;
-        
-        num /= base;
-    }
-
-    while (*ptr != '\0') {
-        printc(*ptr++);
-    }
+    for(; *str != 0 ; str++)
+      printc(*str);
 }
 
 int oct2bin(unsigned char* str, int size) {
@@ -128,7 +90,9 @@ int load_segment(int disk, int sect_start, int sect_count, int dst_addr, int dst
     
     read_sector_lba(disk, sect, dst_addr, dst_seg);
     
-    print("=");
+#if ENABLE_SPLASH
+    printc('=');
+#endif
     
     dst_addr += BYTES_PER_SECTOR;
   }
@@ -143,9 +107,20 @@ int strncmp(char* a, char* b, int len) {
   return 0;
 }
 
+#if ENABLE_SPLASH
+void splash() {
+  print(" _____  _    ___     _______ \n|  __ \\| |  | \\ \\   / / ____|\n| |__) | |__| |\\ \\_/ / (___  \n|  _  /|  __  | \\   / \\___ \\ \n| | \\ \\| |  | |  | |  ____) |\n|_|  \\_\\_|  |_|  |_| |_____/ \n                                                 \n         ____   _____ \n        / __ \\ / ____|\n       | |  | | (___  \n       | |  | |\\___ \\ \n       | |__| |____) |\n        \\____/|_____/ \n");
+  print("\n\n");
+}
+#endif
+
 int main() {
     Tar_t header;
     int sect = FS_SECT;
+    
+#if ENABLE_SPLASH
+    splash();
+#endif
     
     while(1) {
       sect++;
@@ -156,20 +131,28 @@ int main() {
         int size_sectors = ceil_division(length, BYTES_PER_SECTOR);
         
         if(strncmp(header.old.name, "kernel.text", 11) == 0) {
+#if ENABLE_SPLASH
           print("Loading code: [");
+#endif
           load_segment(0, sect+1, size_sectors, 0x1000, KERNEL_SEGMENT);
+#if ENABLE_SPLASH
           print("]\n");
+#endif
         } else if(strncmp(header.old.name, "kernel.data", 11) == 0) {
+#if ENABLE_SPLASH
           print("Loading data: [");
+#endif
           load_segment(0, sect+1, size_sectors, 0x5000, DATA_SEGMENT);
+#if ENABLE_SPLASH
           print("]\n");
+#endif
         }
         
         sect += size_sectors;
       } else break;
     }
     
-    print("Kernel Loaded!\n");
+    print("\nKernel Loaded!\n");
 
     call_kernel();
     

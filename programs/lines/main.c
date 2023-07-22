@@ -70,8 +70,10 @@ int main(int argc, char** argv) {
     set_graphics_mode(GRAPHICS_CGA_320x200);
     
     mainloop();
+
+    getch();
     
-    //set_graphics_mode(before_mode);
+    set_graphics_mode(before_mode);
 	
 	return 0;
 }
