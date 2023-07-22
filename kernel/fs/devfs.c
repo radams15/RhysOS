@@ -113,14 +113,13 @@ void highmem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsign
 }
 
 void mem_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
-	int mem = lowmem() + highmem();
-	int2chars(mem, buffer);
+	int low = lowmem();
+	int high = highmem();
+	int2chars(low+high, buffer);
 }
 
 void fda_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, unsigned char* out_buffer) {
-	int mem = lowmem() + highmem();
-	
-	signed int start_sector;
+    signed int start_sector;
     unsigned int sector_offset;
     unsigned int sector_bytes;
     unsigned int bytes_read = 0;

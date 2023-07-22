@@ -32,9 +32,9 @@ int main(int argc, char** argv) {
 	int mem_high = highmem();
 	int mem_low = lowmem();
 
-	int mem_total = mem_high + mem_low;
+	//int mem_total = mem_low + mem_high;
 	
-	printf("Low (under 640k): %dk\nHigh (above 1M): %dk\nTotal: %dk\n", mem_low, mem_high, mem_total);
+	printf("Memory:\n\t- Low (under 640k): %dk\n\t- High (above 1M): %dk\n", mem_low, mem_high);
 
 	return 0;
 }

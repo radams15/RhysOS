@@ -49,7 +49,7 @@ boot:
 	mov sp, ax
 	mov bp, ax
 	
-	mov ax, 01h
+	mov ax, 01h ; Set 40 cols mono - minimum requirements to run
 	int 10h
 
 	print boot_msg
