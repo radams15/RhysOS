@@ -126,6 +126,10 @@ sub padding {
         (ceil($size/$to)*$to)-$size;
 }
 
+sub filesize {
+        (stat $_[0])[7];
+}
+
 sub programs {
 	my ($runtime, $stdlib) = @_;
 	
@@ -225,15 +229,28 @@ sub initrd {
 	"build/initrd.tar";
 }
 
+sub rootfs {
+        &run("rm -rf build/rootfs.img"); # https://github.com/cakehonolulu/atom/blob/main/stage2/fat/fat16.c
+        &run("dd if=/dev/zero of=build/rootfs.img bs=512k count=2");
+        &run("mkdosfs -F12 build/rootfs.img");
+        
+	&run("mcopy -i build/rootfs.img ".(join ' ', @_)." ::");
+	
+	"build/rootfs.img";
+}
+
 sub img {
-	my ($bootloader, $kernel, $programs, $extra_files) = @_;
+	my ($boot1, $boot2, $kernel, $extra_files) = @_;
 	
 	&run("dd if=/dev/zero of=build/system.img bs=512 count=2880");
 	
-	my $initrd = &initrd($kernel, @$programs, @$extra_files);
+	my $initrd = &initrd($boot2, @$kernel);
+	my $rootfs = &rootfs(@$extra_files);
+	my $rootfs_offset = ceil(&filesize($initrd)/512)-1;
 	
-	&run("dd if=$bootloader of=build/system.img bs=512 count=1 conv=notrunc");
+	&run("dd if=$boot1 of=build/system.img bs=512 count=1 conv=notrunc");
 	&run("dd if=$initrd of=build/system.img bs=512 seek=1 conv=notrunc");
+	&run("dd if=$rootfs of=build/system.img bs=512 seek=$rootfs_offset conv=notrunc");
 	
 	"build/system.img";
 }
@@ -248,7 +265,7 @@ sub build {
 	my $runtime = &runtime;
 	my $stdlib = &stdlib;
 	my @programs = &programs($runtime, $stdlib);
-	&img($boot1, $boot2, [@kernel, @programs], ['docs/syscalls.md', 'docs/fs_spec.md']);
+	&img($boot1, $boot2, \@kernel, [@programs, 'docs/syscalls.md', 'docs/fs_spec.md']);
 }
 
 sub clean {

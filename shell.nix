@@ -4,6 +4,7 @@ pkgs.mkShell {
   nativeBuildInputs = with pkgs.buildPackages; [
     qemu
     bochs
+    mtools
   ];
 }
 
