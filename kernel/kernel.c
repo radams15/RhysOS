@@ -64,7 +64,7 @@ int write_file(char* buf, int n, char* file_name) {
     return size;
 }
 
-int list_directory(char* dir_name, FsNode_t* buf) {
+int list_directory(char* dir_name, FsNode_t* buf, int max) {
 	int i = 0;
 	int count = 0;
 	DirEnt_t* node = NULL;
@@ -76,7 +76,7 @@ int list_directory(char* dir_name, FsNode_t* buf) {
 		return 0;
 	}
 	
-	while ( (node = fs_readdir(root, i)) != NULL) {
+	while ( (node = fs_readdir(root, i)) != NULL && count <= max) {
 		fsnode = fs_finddir(root, node->name);
 		if(fsnode != NULL) {
 			if(buf != NULL)
@@ -105,7 +105,7 @@ int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
 		break;
 
     case 5:
-		args->num = list_directory(args->a, args->b);
+		args->num = list_directory(args->a, args->b, args->c);
 		break;
 
     case 6:
@@ -149,28 +149,6 @@ void a20_init() {
 			print_string("A20 line successfully enabled\n");
 	} else {
 		print_string("A20 line is unavaiable\n");
-	}
-}
-
-void test() {
-	int i;
-	int len;
-	FsNode_t dir_buf[16];
-	FsNode_t* file;
-
-	for(i=0 ; i<16 ; i++) {
-		dir_buf[i].name[0] = 0;
-	}
-
-	len = list_directory("/dev", dir_buf);
-	
-	for(i=0 ; i<len ; i++) {		
-		file = &dir_buf[i];
-		
-		if(file == NULL)
-			break;
-
-		print_string("\t - "); print_string(file->name); print_string("\n");
 	}
 }
 

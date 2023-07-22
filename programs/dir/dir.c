@@ -15,7 +15,7 @@ void dir_listing(char* dir) {
 	}
 
 	printf("Files in directory '%s'\n", dir);
-	len = dir_list(dir, dir_buf);
+	len = dir_list(dir, dir_buf, MAX_FILES);
 	
 	for(i=0 ; i<len ; i++) {		
 		file = &dir_buf[i];

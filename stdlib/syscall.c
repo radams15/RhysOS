@@ -27,8 +27,8 @@ int execa(char* file, int argc, char** argv, int in, int out, int err) {
 	return syscall(3, file, argc, argv, in, out, err);
 }
 
-int dir_list(char* dir_name, struct File* buf) {
-	return syscall(5, dir_name, buf, 0, 0, 0, 0);
+int dir_list(char* dir_name, struct FsNode* buf, int max) {
+	return syscall(5, dir_name, buf, max, 0, 0, 0);
 }
 
 int read(int fh, unsigned char* buffer, unsigned int size) {
