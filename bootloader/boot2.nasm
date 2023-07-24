@@ -53,16 +53,19 @@ _read_sector:
 _call_kernel:
 	push bp
 	mov bp, sp
-
-        push ds
-
+	
+	mov dx, [bp+4]
+	
         mov ax, DATA_SEGMENT
         mov ds, ax
         mov ss, ax
         mov es, ax
+        
+        push 00 ; ??
+        push dx
+        push 00 ; ??
+        
         jmp KERNEL_SEGMENT:0x1000
         
-        pop ds
-
-	pop bp
-	ret
+        pop bp
+        ret

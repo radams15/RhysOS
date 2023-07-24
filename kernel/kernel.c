@@ -1,5 +1,5 @@
-void main();
-void entry(){main();}
+void main(int rootfs_start);
+void entry(int a){main(a);}
 
 #include "fs/fs.h"
 #include "tty.h"
@@ -8,6 +8,7 @@ void entry(){main();}
 
 #include "fs/ustar.h"
 #include "fs/devfs.h"
+#include "fs/fat.h"
 
 #include "graphics.h"
 #include "clock.h"
@@ -18,12 +19,12 @@ void entry(){main();}
 
 int stdin, stdout, stderr;
 
-int init();
+int init(int rootfs_start);
 
-void main() {
+void main(int rootfs_start) {
 	int err;
 
-	err = init();
+	err = init(rootfs_start);
 
 	if(err){
 		print_string("\r\nError in kernel, halting!\r\n");
@@ -152,7 +153,7 @@ void a20_init() {
 	}
 }
 
-int init(){		
+int init(int rootfs_start){		
         cls();
 	FsNode_t* fs_dev;
 	
@@ -181,9 +182,11 @@ int init(){
 	
 	print_string("Welcome to RhysOS!\n\n");
 	
-	exec("mem", 0, NULL, stdin, stdout, stderr);
+	fat_init(rootfs_start);
+	
+	/*exec("mem", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
-	exec("shell", 0, NULL, stdin, stdout, stderr);
+	exec("shell", 0, NULL, stdin, stdout, stderr);*/
 	
 	close(stdin);
 	close(stdout);

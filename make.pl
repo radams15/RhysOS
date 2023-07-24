@@ -250,7 +250,7 @@ sub img {
 	
 	&run("dd if=$boot1 of=build/system.img bs=512 count=1 conv=notrunc");
 	&run("dd if=$initrd of=build/system.img bs=512 seek=1 conv=notrunc");
-	&run("dd if=$rootfs of=build/system.img bs=512 seek=$rootfs_offset conv=notrunc");
+	&run("dd if=$rootfs of=build/system.img bs=512 seek=$rootfs_offset skip=1 conv=notrunc");
 	
 	"build/system.img";
 }

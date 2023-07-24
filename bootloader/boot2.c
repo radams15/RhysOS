@@ -14,7 +14,7 @@ int interrupt (int number, int AX, int BX, int CX, int DX);
 
 void read_sector(int disk, int track, int head, int sector, int dst_addr, int dst_seg);
 
-void call_kernel();
+void call_kernel(int rootfs_start);
 
 typedef union Tar {
         // Pre-POSIX.1-1988 format
@@ -117,6 +117,7 @@ void splash() {
 int main() {
     Tar_t header;
     int sect = FS_SECT;
+    int rootfs_start;
     
 #if ENABLE_SPLASH
     splash();
@@ -143,6 +144,7 @@ int main() {
           print("Loading data: [");
 #endif
           load_segment(0, sect+1, size_sectors, 0x5000, DATA_SEGMENT);
+          rootfs_start = sect+1+size_sectors;
 #if ENABLE_SPLASH
           print("]\n");
 #endif
@@ -154,7 +156,7 @@ int main() {
     
     print("\nKernel Loaded!\n");
 
-    call_kernel();
+    call_kernel(rootfs_start);
     
     for(;;) {}
 }
