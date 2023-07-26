@@ -86,10 +86,10 @@ sub kernel {
 	
 	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel.o ".(join ' ', @objs));
 
-	&run("objcopy -O binary --only-section=.text build/kernel.elf build/kernel.text");
-	&run("objcopy -O binary --only-section=.data build/kernel.elf build/kernel.data");
+	&run("objcopy -O binary --only-section=.text build/kernel.elf build/sys.txt");
+	&run("objcopy -O binary --only-section=.data build/kernel.elf build/sys.dat");
 
-	'build/kernel.text', 'build/kernel.data';
+	'build/sys.txt', 'build/sys.dat';
 }
 
 sub stdlib {	
@@ -224,33 +224,23 @@ sub programs {
 }
 
 sub initrd {
-	&run("tar --format=ustar --xform s:^.*/:: -cf build/initrd.tar ".(join ' ', @_));
-	
-	"build/initrd.tar";
-}
-
-sub rootfs {
-        &run("rm -rf build/rootfs.img"); # https://github.com/cakehonolulu/atom/blob/main/stage2/fat/fat16.c
-        &run("dd if=/dev/zero of=build/rootfs.img bs=512 count=2880");
-        &run("mkdosfs -F12 build/rootfs.img");
+        &run("dd if=/dev/zero of=build/initrd.img bs=1M count=1");
+        &run("mkdosfs -F12 build/initrd.img");
         
-	&run("mcopy -i build/rootfs.img ".(join ' ', @_)." ::");
+	&run("mcopy -i build/initrd.img ".(join ' ', @_)." ::");
 	
-	"build/rootfs.img";
+	"build/initrd.img";
 }
 
 sub img {
 	my ($boot1, $boot2, $kernel, $extra_files) = @_;
 	
 	&run("dd if=/dev/zero of=build/system.img bs=512 count=2880");
+        &run("mkdosfs -F12 build/system.img");
 	
-	my $initrd = &initrd($boot2, @$kernel);
-	my $rootfs = &rootfs(@$extra_files);
-	my $rootfs_offset = ceil(&filesize($initrd)/512)-1;
+	&run("mcopy -i build/system.img ".(join ' ', $boot2, @$kernel, @$extra_files)." ::");
 	
 	&run("dd if=$boot1 of=build/system.img bs=512 count=1 conv=notrunc");
-	&run("dd if=$initrd of=build/system.img bs=512 seek=1 conv=notrunc");
-	#&run("dd if=$rootfs of=build/system.img bs=512 seek=$rootfs_offset skip=1 conv=notrunc");
 	
 	"build/system.img";
 }

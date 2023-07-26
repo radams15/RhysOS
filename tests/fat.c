@@ -9,7 +9,7 @@
 
 #define FAT_ENTRIES 512
 
-const char* fname = "../build/rootfs.img";
+const char* fname = "../build/system.img";
 int fh;
 
 int* decodeFAT(int fp){
