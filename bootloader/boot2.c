@@ -10,6 +10,29 @@ void entry() { main(); }
 #define ENABLE_SPLASH 1
 #endif
 
+union BiosBlock {
+  struct {
+     unsigned char       bootjmp[3];
+     unsigned char       oem_name[8];
+     unsigned int            bytes_per_sector;
+     unsigned char      sectors_per_cluster;
+     unsigned int      reserved_sector_count;
+     unsigned char      table_count;
+     unsigned int      root_entry_count;
+     unsigned int      total_sectors_16;
+     unsigned char      media_type;
+     unsigned int      table_size_16;
+     unsigned int      sectors_per_track;
+     unsigned int      head_side_count;
+     unsigned int       hidden_sector_count;
+     unsigned int       total_sectors_32;
+  };
+  
+  char raw[512];
+} __attribute__ ((packed));
+
+union  BiosBlock bpb;
+
 struct DirectoryEntry {
         union {
           struct {
@@ -56,7 +79,9 @@ void print(char* str) {
 }
 
 int read_cluster(int disk, int cluster, int dst_addr, int dst_seg) {
-  int cluster_start = 33; // TODO: remove magic number 33 => the start cluster sector.
+  //  lba_addr = cluster_begin_lba + (cluster_number - 2) * sectors_per_cluster; 
+  // cluster_begin_lba = = (rsvd_secs + (num_fats * 32) + root_dir_sectors)
+  int cluster_start = 33; //bpb.reserved_sector_count + (bpb.table_count * bpb.table_size_16) + bpb.root_entry_count; // TODO fix with BPB
   int lba = cluster_start + (cluster-2) * 1;
   
   read_sector_lba(disk, lba, dst_addr, dst_seg);
@@ -100,11 +125,12 @@ void splash() {
 int main() {
     unsigned char fat_sector[512];
   
-    int sect = FS_SECT+1;
+    int sect = FS_SECT;
     int rootfs_start;
     
-    read_sector_lba(0, sect, &fat_sector, 0x50);
-    read_sector_lba(0, sect+18, &root_dir, 0x50);
+    read_sector_lba(0, sect, &bpb, 0x50);    
+    read_sector_lba(0, sect+1, &fat_sector, 0x50);
+    read_sector_lba(0, sect+19, &root_dir, 0x50);
     
     unsigned char frame[3];
     int i, f1, f2, curr;
@@ -129,7 +155,7 @@ int main() {
 
       curr += 3;
     }
-   
+    
 #if ENABLE_SPLASH
     splash();
 #endif
