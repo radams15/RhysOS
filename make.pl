@@ -231,7 +231,7 @@ sub initrd {
 
 sub rootfs {
         &run("rm -rf build/rootfs.img"); # https://github.com/cakehonolulu/atom/blob/main/stage2/fat/fat16.c
-        &run("dd if=/dev/zero of=build/rootfs.img bs=512k count=2");
+        &run("dd if=/dev/zero of=build/rootfs.img bs=512 count=2880");
         &run("mkdosfs -F12 build/rootfs.img");
         
 	&run("mcopy -i build/rootfs.img ".(join ' ', @_)." ::");
@@ -250,7 +250,7 @@ sub img {
 	
 	&run("dd if=$boot1 of=build/system.img bs=512 count=1 conv=notrunc");
 	&run("dd if=$initrd of=build/system.img bs=512 seek=1 conv=notrunc");
-	&run("dd if=$rootfs of=build/system.img bs=512 seek=$rootfs_offset skip=1 conv=notrunc");
+	#&run("dd if=$rootfs of=build/system.img bs=512 seek=$rootfs_offset skip=1 conv=notrunc");
 	
 	"build/system.img";
 }

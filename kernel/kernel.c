@@ -131,7 +131,7 @@ int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
 
     default:
 		print_string("Unknown interrupt: ");
-		print_hex_4(args->a);
+		printi(args->a, 16);
 		print_string("!\r\n");
 		args->num = -1;
 		break;

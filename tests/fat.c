@@ -12,30 +12,6 @@
 const char* fname = "../build/rootfs.img";
 int fh;
 
-int* decodeFAT2(int fp){
-   int * fat = (int*)malloc(FAT_ENTRIES * sizeof(int));
-   if(fat == NULL) exit(-1);
-
-   char frame[3]; // read 3 bytes at a time and decode
-   int i, f1, f2;
-   for(i = 0; i < FAT_ENTRIES; i+=2){
-      f1 = 0;
-      f2 = 0;
-      read(fp, &frame, 3);
-      f1 |= frame[0];
-      f1 &= 0x0FF;
-      f1 |= (frame[1] & 0x0F)<<8;
-      f2 = frame[2]<<4;
-      f2 |= (frame[1] & 0xF0)>>4;
-      f2 &= 0xFFF;
-      fat[i] = f1;
-      fat[i+1] = f2;
-   }
-
-   return fat;
-}
-
-
 int* decodeFAT(int fp){
     uint8_t raw[512];
     int * fat = (int*)malloc(FAT_ENTRIES * sizeof(int));
