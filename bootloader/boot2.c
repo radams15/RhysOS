@@ -10,42 +10,37 @@ void entry() { main(); }
 #define ENABLE_SPLASH 1
 #endif
 
+struct DirectoryEntry {
+        union {
+          struct {
+	    char name[8];
+	    char ext[3];
+	  };
+	  char fullname[11];
+	};
+	char attrib;
+	char userattrib;
+ 
+	char undelete;
+	int createtime;
+	int createdate;
+	int accessdate;
+	int clusterhigh;
+ 
+	int modifiedtime;
+	int modifieddate;
+	int cluster;
+	int filesize[2];
+} __attribute__ ((packed));
+
+unsigned int fat_table[512];
+struct DirectoryEntry root_dir[32];
+
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
 void read_sector(int disk, int track, int head, int sector, int dst_addr, int dst_seg);
 
 void call_kernel(int rootfs_start);
-
-typedef union Tar {
-        // Pre-POSIX.1-1988 format
-        struct {
-            char name[100];             // file name
-            char mode[8];               // permissions
-            char uid[8];                // user id (octal)
-            char gid[8];                // group id (octal)
-            char size[12];              // size (octal)
-            char mtime[12];             // modification time (octal)
-            char check[8];              // sum of unsigned characters in block, with spaces in the check field while calculation is done (octal)
-            char link;                  // link indicator
-            char link_name[100];        // name of linked file
-        } old;
-
-        // UStar format (POSIX IEEE P1003.1)
-        struct {
-            char old[156];              // first 156 octets of Pre-POSIX.1-1988 format
-            char type;                  // file type
-            char also_link_name[100];   // name of linked file
-            char ustar[8];              // ustar\000
-            char owner[32];             // user name (string)
-            char group[32];             // group name (string)
-            char major[8];              // device major number
-            char minor[8];              // device minor number
-            char prefix[155];
-            struct tar_t * next;
-        } new;
-        
-        char buffer[512];
-} Tar_t;
 
 void read_sector_lba(int disk, int lba, int dst_addr, int dst_seg) {
   int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
@@ -60,41 +55,31 @@ void print(char* str) {
       printc(*str);
 }
 
-int oct2bin(unsigned char* str, int size) {
-    int n = 0;
-    unsigned char *c = str;
-    while (size-- > 0) {
-        n *= 8;
-        n += *c - '0';
-        c++;
-    }
-    return n;
+int read_cluster(int disk, int cluster, int dst_addr, int dst_seg) {
+  int cluster_start = 33; // TODO: remove magic number 33 => the start cluster sector.
+  int lba = cluster_start + (cluster-2) * 1;
+  
+  read_sector_lba(disk, lba, dst_addr, dst_seg);
 }
 
-int ceil_division(int dividend, int divisor) {
-    int quotient = dividend / divisor;    // Perform the division
-
-    if (dividend % divisor != 0) {
-        quotient++;   // Increment the quotient if there is a remainder
-    }
-
-    return quotient;
-}
-
-int load_segment(int disk, int sect_start, int sect_count, int dst_addr, int dst_seg) {
+int load_segment(int disk, int sect_start, int dst_addr, int dst_seg) {
   int sect;
   int addr = dst_addr;
-  int percentage;
-  for(int i=0 ; i<sect_count ; i++) {
-    sect = sect_start + i;
-    
-    read_sector_lba(disk, sect, dst_addr, dst_seg);
+  int cluster = sect_start;
+  
+  while(1) {
+    if(cluster >= 0xFF8)
+      break;
+      
+    read_cluster(disk, cluster, dst_addr, dst_seg);
     
 #if ENABLE_SPLASH
     printc('=');
 #endif
     
     dst_addr += BYTES_PER_SECTOR;
+      
+    cluster = fat_table[cluster];
   }
 }
 
@@ -107,56 +92,73 @@ int strncmp(char* a, char* b, int len) {
   return 0;
 }
 
-#if ENABLE_SPLASH
 void splash() {
   print(" _____  _    ___     _______ \n|  __ \\| |  | \\ \\   / / ____|\n| |__) | |__| |\\ \\_/ / (___  \n|  _  /|  __  | \\   / \\___ \\ \n| | \\ \\| |  | |  | |  ____) |\n|_|  \\_\\_|  |_|  |_| |_____/ \n                                                 \n         ____   _____ \n        / __ \\ / ____|\n       | |  | | (___  \n       | |  | |\\___ \\ \n       | |__| |____) |\n        \\____/|_____/ \n");
   print("\n\n");
 }
-#endif
 
 int main() {
-    Tar_t header;
-    int sect = FS_SECT;
+    unsigned char fat_sector[512];
+  
+    int sect = FS_SECT+1;
     int rootfs_start;
     
+    read_sector_lba(0, sect, &fat_sector, 0x50);
+    read_sector_lba(0, sect+18, &root_dir, 0x50);
+    
+    unsigned char frame[3];
+    int i, f1, f2, curr;
+    curr = 0;
+    for(i=0 ; i<512 ; i+=2) {
+      frame[0] = fat_sector[curr];
+      frame[1] = fat_sector[curr+1];
+      frame[2] = fat_sector[curr+2];
+
+      f1 = 0;
+      f2 = 0;
+
+      f1 |= frame[0];
+      f1 &= 0x0FF;
+      f1 |= (frame[1] & 0x0F)<<8;
+      f2 = frame[2]<<4;
+      f2 |= (frame[1] & 0xF0)>>4;
+      f2 &= 0xFFF;
+
+      fat_table[i] = f1;
+      fat_table[i+1] = f2;
+
+      curr += 3;
+    }
+   
 #if ENABLE_SPLASH
     splash();
 #endif
     
-    while(1) {
-      sect++;
-      read_sector_lba(0, sect, &header, 0x50);
-      
-      if(strncmp(header.new.ustar, "ustar", 5) == 0) {
-        int length = oct2bin(header.old.size, 11);
-        int size_sectors = ceil_division(length, BYTES_PER_SECTOR);
+    for(int i=0 ; i<32 ; i++) {
+        struct DirectoryEntry* file = &root_dir[i];
         
-        if(strncmp(header.old.name, "kernel.text", 11) == 0) {
+        if(strncmp(file->fullname, "SYS     TXT", 11) == 0) {
 #if ENABLE_SPLASH
           print("Loading code: [");
 #endif
-          load_segment(0, sect+1, size_sectors, 0x1000, KERNEL_SEGMENT);
+          load_segment(0, file->cluster, 0x1000, KERNEL_SEGMENT);
 #if ENABLE_SPLASH
           print("]\n");
 #endif
-        } else if(strncmp(header.old.name, "kernel.data", 11) == 0) {
+        } else if(strncmp(file->fullname, "SYS     DAT", 11) == 0) {
 #if ENABLE_SPLASH
           print("Loading data: [");
 #endif
-          load_segment(0, sect+1, size_sectors, 0x5000, DATA_SEGMENT);
-          rootfs_start = sect+1+size_sectors;
+          load_segment(0, file->cluster, 0x5000, DATA_SEGMENT);
 #if ENABLE_SPLASH
           print("]\n");
 #endif
         }
-        
-        sect += size_sectors;
-      } else break;
     }
     
     print("\nKernel Loaded!\n");
 
-    call_kernel(rootfs_start);
+    call_kernel(sect);
     
     for(;;) {}
 }

@@ -84,5 +84,5 @@ void fat_init(int sector_start) {
   print_string(root_dir[0].name);
   print_string(" => ");
 
-  list_sectors(&root_dir[0]);
+  //list_sectors(&root_dir[0]);
 }
