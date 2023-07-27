@@ -171,9 +171,10 @@ int init(int rootfs_start){
 	serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 	print_string("/dev/COM1 enabled\n");
 
-	fs_root = ustar_init(1);
+	//fs_root = ustar_init(1);
+	fs_root = fat_init(rootfs_start);
 	fs_dev = devfs_init();
-	ustar_mount(fs_dev, "dev");
+	fat_mount(fs_dev, "dev");
 	print_string("Root filesystem mounted\n");
 			
 	stdin = open("/dev/stdin");
@@ -182,11 +183,9 @@ int init(int rootfs_start){
 	
 	print_string("Welcome to RhysOS!\n\n");
 	
-	fat_init(rootfs_start);
-	
-	/*exec("mem", 0, NULL, stdin, stdout, stderr);
+	//exec("MEM", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
-	exec("shell", 0, NULL, stdin, stdout, stderr);*/
+	//exec("shell", 0, NULL, stdin, stdout, stderr);
 	
 	close(stdin);
 	close(stdout);

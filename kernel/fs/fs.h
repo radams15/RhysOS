@@ -4,6 +4,7 @@
 #include "type.h"
 
 #define FILE_NAME_MAX 128
+#define SECTOR_SIZE 512
 
 #define FS_FILE        0x01
 #define FS_DIRECTORY   0x02
