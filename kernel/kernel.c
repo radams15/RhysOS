@@ -183,7 +183,7 @@ int init(int rootfs_start){
 	
 	print_string("Welcome to RhysOS!\n\n");
 	
-	//exec("MEM", 0, NULL, stdin, stdout, stderr);
+	exec("MEM", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
 	//exec("shell", 0, NULL, stdin, stdout, stderr);
 	

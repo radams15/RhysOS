@@ -65,8 +65,18 @@ unsigned int fat_read(FsNode_t* node, unsigned int byte_offset, unsigned int byt
     if (byte_size <= 0) {
         return 0;
     }
+    
+    cluster = node->start_sector;
+    
+    int cluster_offset = byte_offset / SECTOR_SIZE;
+    
+    for(int i=0 ; i<cluster_offset ; i++) {
+      if(cluster >= 0xFF8)
+          return 0;
+          
+      cluster = fat_table[cluster];
+    }
 
-    cluster = cluster + (byte_offset / SECTOR_SIZE);
     sector_offset = byte_offset % SECTOR_SIZE;
 
     while (bytes_read < byte_size) {
@@ -186,7 +196,7 @@ FsNode_t* fat_init(int sector_start) {
   
   read_lba_to_segment(0, sector_start, &fat_sector, DATA_SEGMENT);
   read_lba_to_segment(0, sector_start+18, &root_dir, DATA_SEGMENT);
-  //read_lba_to_segment(0, sector_start+19, &root_dir + 16, DATA_SEGMENT);
+  read_lba_to_segment(0, sector_start+19, &root_dir[16], DATA_SEGMENT);
   
   unsigned char frame[3];
   int i, f1, f2, curr;
@@ -228,8 +238,6 @@ FsNode_t* fat_init(int sector_start) {
   root_node.ref = 0;
 
   fat_load_root();
-  
-  FsNode_t* syscalls = fat_finddir(&root_node, "SYSCALLS.MD"); 
   
   return &root_node;
 }
