@@ -2,7 +2,7 @@
 #include <string.h>
 #include <syscall.h>
 
-#define MAX_FILES 30
+#define MAX_FILES 64
 
 void dir_listing(char* dir) {
 	int i;
@@ -20,8 +20,8 @@ void dir_listing(char* dir) {
 	for(i=0 ; i<len ; i++) {		
 		file = &dir_buf[i];
 		
-		if(file == NULL)
-			break;
+		if(file == NULL || file->name[0] == 0)
+			continue;
 
 		printf("\t - %s\n", file->name);
 	}

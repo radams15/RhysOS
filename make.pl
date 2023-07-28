@@ -86,10 +86,10 @@ sub kernel {
 	
 	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel.o ".(join ' ', @objs));
 
-	&run("objcopy -O binary --only-section=.text build/kernel.elf build/kernel.text");
-	&run("objcopy -O binary --only-section=.data build/kernel.elf build/kernel.data");
+	&run("objcopy -O binary --only-section=.text build/kernel.elf build/sys.txt");
+	&run("objcopy -O binary --only-section=.data build/kernel.elf build/sys.dat");
 
-	'build/kernel.text', 'build/kernel.data';
+	'build/sys.txt', 'build/sys.dat';
 }
 
 sub stdlib {	
@@ -124,6 +124,10 @@ sub padding {
         my ($size, $to) = @_;
         
         (ceil($size/$to)*$to)-$size;
+}
+
+sub filesize {
+        (stat $_[0])[7];
 }
 
 sub programs {
@@ -220,20 +224,23 @@ sub programs {
 }
 
 sub initrd {
-	&run("tar --format=ustar --xform s:^.*/:: -cf build/initrd.tar ".(join ' ', @_));
+        &run("dd if=/dev/zero of=build/initrd.img bs=1M count=1");
+        &run("mkdosfs -F12 build/initrd.img");
+        
+	&run("mcopy -i build/initrd.img ".(join ' ', @_)." ::");
 	
-	"build/initrd.tar";
+	"build/initrd.img";
 }
 
 sub img {
-	my ($bootloader, $kernel, $programs, $extra_files) = @_;
+	my ($boot1, $boot2, $kernel, $extra_files) = @_;
 	
 	&run("dd if=/dev/zero of=build/system.img bs=512 count=2880");
+        &run("mkdosfs -F12 build/system.img");
 	
-	my $initrd = &initrd($kernel, @$programs, @$extra_files);
+	&run("mcopy -i build/system.img ".(join ' ', $boot2, @$kernel, @$extra_files)." ::");
 	
-	&run("dd if=$bootloader of=build/system.img bs=512 count=1 conv=notrunc");
-	&run("dd if=$initrd of=build/system.img bs=512 seek=1 conv=notrunc");
+	&run("dd if=$boot1 of=build/system.img bs=512 count=1 conv=notrunc");
 	
 	"build/system.img";
 }
@@ -248,7 +255,7 @@ sub build {
 	my $runtime = &runtime;
 	my $stdlib = &stdlib;
 	my @programs = &programs($runtime, $stdlib);
-	&img($boot1, $boot2, [@kernel, @programs], ['docs/syscalls.md', 'docs/fs_spec.md']);
+	&img($boot1, $boot2, \@kernel, [@programs, 'docs/syscalls.md', 'docs/fs_spec.md', <root/*>]);
 }
 
 sub clean {

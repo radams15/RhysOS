@@ -10,16 +10,16 @@ extern _stderr
 extern _main
 
 _start:
-        mov bx, [bp+6]
-        mov cx, [bp+8]
+        mov bx, [bp+8]
+        mov cx, [bp+10]
 
-        mov al, [bp+10] ; set stdin, stdout, stderr from the stack
+        mov al, [bp+12] ; set stdin, stdout, stderr from the stack
         mov [_stdin], al
         
-        mov al, [bp+12]
+        mov al, [bp+14]
         mov [_stdout], al
         
-        mov al, [bp+14]
+        mov al, [bp+16]
         mov [_stderr], al
         
         push cx ; argv

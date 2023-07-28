@@ -70,24 +70,7 @@ void print_string(char* str) {
         print_char(*c);
 }
 
-void print_hex_1(unsigned int n) {
-    if (n < 10)
-        print_char(n + '0');
-    else
-        print_char(n - 10 + 'A');
-}
-
-void print_hex_2(unsigned int n) {
-    print_hex_1(n >> 4);
-    print_hex_1(n & 15);
-}
-
-void print_hex_4(unsigned int n) {
-    print_hex_2(n >> 8);
-    print_hex_2(n & 255);
-}
-
-void printi(int num, int base) {
+void printi(unsigned int num, int base) {
     char buffer[64];
     char* ptr = &buffer[sizeof(buffer)-1];
     int remainder;

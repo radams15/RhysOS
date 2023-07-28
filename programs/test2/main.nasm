@@ -25,6 +25,9 @@ print_str:
 _main:
 	push bp
 	mov bp, sp
+
+    mov si, test
+    call print_str
 	
 	push bx
 
@@ -44,7 +47,7 @@ _main:
 
 section .data
 
-test: db `Hello world!\r\n`
-test_len: dw $-test
+test: db `Hello world!\r\n`, 0
+test_len: dw $-test-1
 axp: dd 1
 stdout: db '/dev/stdout', 0
