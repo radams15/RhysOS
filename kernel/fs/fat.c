@@ -125,7 +125,7 @@ DirEnt_t* fat_readdir(FsNode_t* node, unsigned int index) {
 	if(index >= num_root_nodes+1) {
 		return NULL;
 	}
-	
+        
 	strcpy(dirent.name, root_nodes[index-1].name);
 	dirent.name[strlen(root_nodes[index-1].name)] = 0;
 	dirent.inode = root_nodes[index-1].inode;
@@ -153,6 +153,7 @@ void fat_mount(FsNode_t* node, char* name) {
 	
 	strcpy(root_nodes[i].name, name);
 	root_nodes[i].name[11] = 0;
+	
 	root_nodes[i].flags = FS_DIRECTORY | FS_MOUNTPOINT;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
@@ -194,7 +195,7 @@ void fat_load_root() {
         if(root_nodes[i].name[x] >= 65 && root_nodes[i].name[x] <= 90) // Convert uppercase => lowercase
           root_nodes[i].name[x] += 32;
       }
-				
+      
       root_nodes[i].flags = FS_FILE;
       root_nodes[i].inode = i;
       root_nodes[i].start_sector = entry->cluster;
@@ -223,7 +224,7 @@ FsNode_t* fat_init(int sector_start) {
   
   read_lba_to_segment(0, sector_start, &fat_sector, DATA_SEGMENT);
   read_lba_to_segment(0, sector_start+18, &root_dir, DATA_SEGMENT);
-  read_lba_to_segment(0, sector_start+19, &root_dir[17], DATA_SEGMENT);
+  read_lba_to_segment(0, sector_start+19, &root_dir[16], DATA_SEGMENT);
   
   unsigned char frame[3];
   int i, f1, f2, curr;

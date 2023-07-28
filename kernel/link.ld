@@ -10,7 +10,7 @@ SECTIONS
         *(.text);
     }
 
-    . = 0x6000;
+    . = 0x5000;
     .data :
     {
         *(.data);

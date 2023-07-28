@@ -175,7 +175,7 @@ int main() {
 #if ENABLE_SPLASH
           print("Loading data: [");
 #endif
-          load_segment(0, file->cluster, 0x6000, DATA_SEGMENT);
+          load_segment(0, file->cluster, 0x5000, DATA_SEGMENT);
 #if ENABLE_SPLASH
           print("]\n");
 #endif

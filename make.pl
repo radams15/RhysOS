@@ -22,7 +22,7 @@ my $KERNEL_SEGMENT = '0x2000';
 my $DATA_SEGMENT = '0x3000';
 
 my $SHELL_ADDR = '0x8000';
-my $EXE_ADDR = '0x7000';
+my $EXE_ADDR = '0x6000';
 my $SHELL_SEGMENT = '0x8000';
 my $EXE_SEGMENT = '0x5000';
 
