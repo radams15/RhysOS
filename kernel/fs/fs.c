@@ -64,7 +64,9 @@ int open(char* name) {
 		handle = create_file(name);
 		
 		if(handle == NULL) {
-			print_string("Could not find directory!\n");
+			print_string("Could not find directory: '");
+			print_string(name);
+			print_string("'\n");
 			return -1;
 		}
 	}

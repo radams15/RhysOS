@@ -2,6 +2,7 @@
 #include "util.h"
 
 #include "fs/fs.h"
+#include "fs/fat.h"
 
 #include "serial.h"
 
@@ -48,22 +49,34 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 		return 2;
 	}
 	
-	read_lba_to_segment(0, fs_node->start_sector, &header, 0x3000);
+	int cluster = fs_node->start_sector;
+	
+	read_lba_to_segment(0, cluster_to_lba(cluster), &header, DATA_SEGMENT);
+	
+	if(header.magic[0] != 'R' || header.magic[1] != 'Z') {
+	  print_string("Invalid header magic!\n");
+	  return 1;
+	}
 	
 	int addr = 0x1000;
-	int sec;
-	for(sec=fs_node->start_sector ; sec < fs_node->start_sector+header.text_size ; sec++) {
-		read_lba_to_segment(0, sec, addr, header.segment); // Code to segment:0x1000
+	int sectors_read = 0; // MEM starts @ sector 172
+	for(cluster=fs_node->start_sector ;  sectors_read < header.text_size && cluster < 0xFF8 ; cluster = fat_next_cluster(cluster)) {
+    		printi(cluster, 10); print_string("\n");
+    		
+		read_lba_to_segment(0, cluster_to_lba(cluster), addr, header.segment); // Code to segment:0x1000
 		addr += 512;
+		sectors_read++;
 	}
-	
-	int end_text = sec;
 	
 	addr = header.load_address;
-	for(sec=end_text ; sec < end_text+header.data_size ; sec++) {
-		read_lba_to_segment(0, sec, addr, 0x3000); // Data to 0x3000:0x7000
+	//cluster = fat_next_cluster(cluster);
+	for(; cluster < 0xFF8 ; cluster = fat_next_cluster(cluster)) {
+	        print_string("Load data\n"); 	printi(cluster, 10);
+		read_lba_to_segment(0, cluster_to_lba(cluster), addr, DATA_SEGMENT); // Data to 0x3000:data_address
 		addr += 512;
 	}
+	
+	print_string("Loaded data!\n");
 
     prog_t prog;
     
@@ -72,7 +85,9 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
     else if(header.segment == SHELL_SEGMENT)
       prog = call_0x8000;
     else {
-      print_string("Error, cannot find call segment!\n");
+      print_string("Error, cannot find call segment: ");
+      printi(header.segment, 16);
+      print_string("\n");
       return 3;
     }
 

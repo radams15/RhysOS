@@ -40,11 +40,35 @@ static FsNode_t root_nodes[MAX_FILES];
 static int num_root_nodes;
 static DirEnt_t dirent;
 
+
+//  lba_addr = cluster_begin_lba + (cluster_number - 2) * sectors_per_cluster; 
+// cluster_begin_lba = = (rsvd_secs + (num_fats * 32) + root_dir_sectors)
+int cluster_start = 33; //bpb.reserved_sector_count + (bpb.table_count * bpb.table_size_16) + bpb.root_entry_count; // TODO fix with BPB
+
 int cluster_to_lba(int cluster) {
-  //  lba_addr = cluster_begin_lba + (cluster_number - 2) * sectors_per_cluster; 
-  // cluster_begin_lba = = (rsvd_secs + (num_fats * 32) + root_dir_sectors)
-  int cluster_start = 33; //bpb.reserved_sector_count + (bpb.table_count * bpb.table_size_16) + bpb.root_entry_count; // TODO fix with BPB
-  return cluster_start + (cluster-2) * 1;
+  return cluster_start + ((cluster-2) * 1);
+}
+
+int lba_to_cluster(int lba) {
+  return ((lba-cluster_start)/1) + 2;
+}
+
+int fat_next_cluster(int prev_cluster) {
+  return fat_table[prev_cluster];
+}
+
+int fat_next_lba(int prev_lba) {
+  int cluster = lba_to_cluster(prev_lba);
+  if(prev_lba != cluster_to_lba(cluster)) {
+    print_string("ERROR LBA => CLUSTER CONVERSION");
+  }
+  
+  int next_cluster = fat_table[cluster];
+  
+  if(next_cluster >= 0xFF8)
+    return 0;
+    
+  return cluster_to_lba(next_cluster);
 }
 
 unsigned int fat_read(FsNode_t* node, unsigned int byte_offset, unsigned int byte_size, unsigned char* out_buffer) {
