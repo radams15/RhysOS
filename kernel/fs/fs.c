@@ -46,10 +46,6 @@ int create_file(char* name) {
 		previous_tok = tok;
 		tok = strtok(NULL, "/");
 	}
-	
-	
-	
-		
 
 	return NULL;
 }
@@ -121,7 +117,6 @@ void read_sector(int* buffer, int sector){
 
     // Call BIOS interrupt 13h
     interrupt(0x13, ax, bx, cx, dx);
-
 }
 
 unsigned int fs_read(FsNode_t* node, unsigned int offset, unsigned int size, unsigned char* buffer) {
@@ -171,37 +166,6 @@ FsNode_t* fs_finddir(FsNode_t* node, char* name) {
 	
 	return 0;
 }
-
-/*int fs_find_file(FsNode_t* root, char* name) {
-	int i;
-	int found;
-	struct DirEnt* node = NULL;
-	struct FsNode* fs_node;
-	
-	found = -1;
-	
-	while( (node = fs_readdir(root, i)) != NULL && found >= 0) {
-		print_string(node->name);
-		print_char('\n');
-		
-		fs_node = fs_finddir(root, node->name);
-		
-		if(fs_node == NULL) {
-			print_string("FAIL\n");
-		} else if ((fs_node->flags & 0x7) == FS_DIRECTORY) {
-			found = fs_find_file(fs_node, name); // Recursively search directory
-		} else {
-			if(strcmp(node->name, name) == 0) {
-				return i;
-			}
-		}
-		
-		i++;
-	}
-	
-	return -1;
-}*/
-
 
 void read_lba_to_segment(int disk, int lba, int dst_addr, int dst_seg) {
 	int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;

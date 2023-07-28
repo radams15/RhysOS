@@ -60,23 +60,17 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 	
 	int addr = 0x1000;
 	int sectors_read = 0; // MEM starts @ sector 172
-	for(cluster=fs_node->start_sector ;  sectors_read < header.text_size && cluster < 0xFF8 ; cluster = fat_next_cluster(cluster)) {
-    		printi(cluster, 10); print_string("\n");
-    		
+	for(cluster=fs_node->start_sector ;  sectors_read < header.text_size && cluster < 0xFF8 ; cluster = fat_next_cluster(cluster)) {    		
 		read_lba_to_segment(0, cluster_to_lba(cluster), addr, header.segment); // Code to segment:0x1000
 		addr += 512;
 		sectors_read++;
 	}
 	
 	addr = header.load_address;
-	//cluster = fat_next_cluster(cluster);
 	for(; cluster < 0xFF8 ; cluster = fat_next_cluster(cluster)) {
-	        print_string("Load data\n"); 	printi(cluster, 10);
 		read_lba_to_segment(0, cluster_to_lba(cluster), addr, DATA_SEGMENT); // Data to 0x3000:data_address
 		addr += 512;
 	}
-	
-	print_string("Loaded data!\n");
 
     prog_t prog;
     

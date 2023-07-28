@@ -152,6 +152,7 @@ void fat_mount(FsNode_t* node, char* name) {
 	int i = num_root_nodes;
 	
 	strcpy(root_nodes[i].name, name);
+	root_nodes[i].name[11] = 0;
 	root_nodes[i].flags = FS_DIRECTORY | FS_MOUNTPOINT;
 	root_nodes[i].inode = i;
 	root_nodes[i].length = 1;
@@ -167,30 +168,32 @@ void fat_mount(FsNode_t* node, char* name) {
 	num_root_nodes++;
 }
 
-int list_sectors(struct DirectoryEntry* file) { // https://github.com/nathanhi/pyfatfs/blob/master/pyfatfs/PyFat.py#L810
-  unsigned int cluster = file->cluster;
-  
-  while(1) {
-    if(cluster >= 0xFF8)
-      break;
-    
-    printi(cluster, 16);
-    print_char(' ');
-    
-    cluster = fat_table[cluster];
-  }
-  
-  print_string("\n");
-}
-
 void fat_load_root() {
   for(int i=0 ; i<MAX_FILES ; i++) {
     struct DirectoryEntry* entry = &root_dir[i];
     
     if(entry->name[0] != NULL) {
-      print_string(entry->name); print_string("\n");
+      memcpy(root_nodes[i].name, entry->name, 8);
       
-      strcpy(root_nodes[i].name, entry->fullname);
+      int x;
+      
+      if(entry->ext[0] != ' ') {
+        for(x=0 ; x<8 ; x++) {
+          if(root_nodes[i].name[x] == ' ') {
+            break;
+          }
+        }
+        root_nodes[i].name[x] = '.';
+        
+        memcpy(root_nodes[i].name+x+1, entry->ext, 3);
+      }
+      
+      root_nodes[i].name[x+4] = 0;
+      
+      for(int x=0 ; x<11 ; x++) {
+        if(root_nodes[i].name[x] >= 65 && root_nodes[i].name[x] <= 90) // Convert uppercase => lowercase
+          root_nodes[i].name[x] += 32;
+      }
 				
       root_nodes[i].flags = FS_FILE;
       root_nodes[i].inode = i;
@@ -220,7 +223,7 @@ FsNode_t* fat_init(int sector_start) {
   
   read_lba_to_segment(0, sector_start, &fat_sector, DATA_SEGMENT);
   read_lba_to_segment(0, sector_start+18, &root_dir, DATA_SEGMENT);
-  read_lba_to_segment(0, sector_start+19, &root_dir[16], DATA_SEGMENT);
+  read_lba_to_segment(0, sector_start+19, &root_dir[17], DATA_SEGMENT);
   
   unsigned char frame[3];
   int i, f1, f2, curr;

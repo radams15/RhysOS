@@ -33,38 +33,6 @@ void main(int rootfs_start) {
 	for(;;){}
 }
 
-int read_file(char* buf, int n, char* file_name) {
-	struct FsNode* fs_node;
-	int size;
-	
-	fs_node = get_dir(file_name);
-	
-	if(fs_node == NULL) {
-		print_string("Failed to find file!\n");
-		return -1;
-	}
-	
-	size = fs_read(fs_node, 0, n, buf);
-    
-    return size;
-}
-
-int write_file(char* buf, int n, char* file_name) {
-	struct FsNode* fs_node;
-	int size;
-	
-	fs_node = get_dir(file_name);
-	
-	if(fs_node == NULL) {
-		print_string("Failed to find file!\n");
-		return -1;
-	}
-	
-	size = fs_write(fs_node, 0, n, buf);
-    
-    return size;
-}
-
 int list_directory(char* dir_name, FsNode_t* buf, int max) {
 	int i = 0;
 	int count = 0;
@@ -100,7 +68,7 @@ typedef struct SyscallArgs {
 int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
   SyscallArgs_t* args = ax;
   
-  switch(*ax) {
+  switch(args->num) {
     case 1:
 		args->num = exec(args->a, args->b, args->c, args->d, args->e, args->f);
 		break;
@@ -112,7 +80,7 @@ int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
     case 3:
 		args->num = read(args->a, args->b, args->c);
 		break;
-	
+
     case 4:
 		args->num = write(args->a, args->b, args->c);
 		break;
@@ -176,16 +144,16 @@ int init(int rootfs_start){
 	fs_dev = devfs_init();
 	fat_mount(fs_dev, "dev");
 	print_string("Root filesystem mounted\n");
-			
+	
 	stdin = open("/dev/stdin");
 	stdout = open("/dev/stdout");
 	stderr = open("/dev/stderr");
 	
 	print_string("Welcome to RhysOS!\n\n");
 	
-	exec("MEM", 0, NULL, stdin, stdout, stderr);
+	exec("mem", 0, NULL, stdin, stdout, stderr);
 	print_string("\n");
-	//exec("shell", 0, NULL, stdin, stdout, stderr);
+	exec("shell", 0, NULL, stdin, stdout, stderr);
 	
 	close(stdin);
 	close(stdout);

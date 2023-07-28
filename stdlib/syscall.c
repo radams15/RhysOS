@@ -35,7 +35,7 @@ int read(int fh, unsigned char* buffer, unsigned int size) {
 	return syscall(3, fh, buffer, size, 0, 0, 0);
 }
 
-int write(int fh, unsigned char* buffer, unsigned int size) {   
+int write(int fh, unsigned char* buffer, unsigned int size) {
         return syscall(4, fh, buffer, size, 0, 0, 0);
 }
 
