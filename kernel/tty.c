@@ -8,7 +8,7 @@ char text_fg = 0x0;
 int interrupt (int number, int AX, int BX, int CX, int DX);
 
 void set_cursor(char row, char col) {
-	interrupt(0x10, 0x02<<4, 0, 0, (row<<4) | col);
+	interrupt(0x10, 0x0200, 0, 0, (row*0x10) + col);
 }
 
 void set_bg(char colour) {
@@ -47,11 +47,12 @@ void print_char_colour(int c, char fg, char bg) {
 		return;
 	}
 	
-	if(c == '\x2') { // Cursor back
+	/*if(c == '\x2') { // Cursor back - Just use 0x8 => bios backspace
 		char col = get_cursor_col();
-		set_cursor(get_cursor_row(), col>0? col-1 : col);
+		//set_cursor(get_cursor_row(), col>0? col-1 : col);
+		set_cursor(79, 24);
 		return;
-	}
+	}*/
 
 
 	if(c == '\n')
@@ -60,8 +61,7 @@ void print_char_colour(int c, char fg, char bg) {
     if(c > 13) // Only chars above 13 need colour
     	interrupt(0x10, 0x0900 + c, colour, 1, 0);
 	
-	interrupt(0x10, 0x0E00 + c, 0, 0, 0);
-	//set_cursor(get_cursor_row(), get_cursor_col());
+    interrupt(0x10, 0x0E00 + c, 0, 0, 0);
 }
 
 void print_string(char* str) {

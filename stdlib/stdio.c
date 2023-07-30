@@ -114,7 +114,7 @@ int readline(char* buffer) {
 			*(buffer--) = ' ';
 			
 			putc(' '); // Overwrite with space
-			putc('\x2'); // Move cursor back
+			putc(0x8); // Move cursor back
 		} else {
 		        len++;
 			*(buffer++) = c;
