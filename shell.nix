@@ -5,6 +5,7 @@ pkgs.mkShell {
     qemu
     bochs
     mtools
+    clang-tools
   ];
 }
 

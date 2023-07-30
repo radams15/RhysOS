@@ -3,9 +3,9 @@
 
 typedef struct TimeDelta {
     int tick;
-	int sec;
-	int min;
-	int hr;
+    int sec;
+    int min;
+    int hr;
 } TimeDelta_t;
 
 void memset(int* buf, int val, int n);

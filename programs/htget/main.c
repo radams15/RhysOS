@@ -8,15 +8,15 @@ int comfd;
 
 int connect_com() {
     char buf[512];
-	comfd = open("/dev/com1");
-	write(comfd, "AT", 2);
-	
-	read(comfd, buf, 2);
-	if(strncmp(buf, "AT", 2) != 0) {
-	    return 1;
-	}
-	
-	return 0;
+    comfd = open("/dev/com1");
+    write(comfd, "AT", 2);
+
+    read(comfd, buf, 2);
+    if (strncmp(buf, "AT", 2) != 0) {
+        return 1;
+    }
+
+    return 0;
 }
 
 int get(char* domain, char* page) {
@@ -29,14 +29,14 @@ int get(char* domain, char* page) {
 }
 
 int main(int argc, char** argv) {
-    if(connect_com()) {
+    if (connect_com()) {
         fprintf(stderr, "Failed to open COM1!\n");
         return 1;
     }
-    
+
     get("google.com:80", "/");
-	
-	close(comfd);
-	
-	return 0;
+
+    close(comfd);
+
+    return 0;
 }

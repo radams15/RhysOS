@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <errno.h>
@@ -12,44 +12,45 @@
 const char* fname = "../build/system.img";
 int fh;
 
-int* decodeFAT(int fp){
+int* decodeFAT(int fp) {
     uint8_t raw[512];
-    int * fat = (int*)malloc(FAT_ENTRIES * sizeof(int));
-    if(fat == NULL) exit(-1);
+    int* fat = (int*)malloc(FAT_ENTRIES * sizeof(int));
+    if (fat == NULL)
+        exit(-1);
 
     read(fh, &raw, 512);
 
     uint8_t frame[3];
     int i, f1, f2;
     int curr = 0;
-    for(i = 0; i < FAT_ENTRIES; i+=2){
+    for (i = 0; i < FAT_ENTRIES; i += 2) {
         frame[0] = raw[curr];
-        frame[1] = raw[curr+1];
-        frame[2] = raw[curr+2];
+        frame[1] = raw[curr + 1];
+        frame[2] = raw[curr + 2];
 
         f1 = 0;
         f2 = 0;
 
         f1 |= frame[0];
         f1 &= 0x0FF;
-        f1 |= (frame[1] & 0x0F)<<8;
-        f2 = frame[2]<<4;
-        f2 |= (frame[1] & 0xF0)>>4;
+        f1 |= (frame[1] & 0x0F) << 8;
+        f2 = frame[2] << 4;
+        f2 |= (frame[1] & 0xF0) >> 4;
         f2 &= 0xFFF;
 
         fat[i] = f1;
-        fat[i+1] = f2;
+        fat[i + 1] = f2;
         curr += 3;
     }
 
-   return fat;
+    return fat;
 }
 
 void fat_test(int sector_start) {
-    lseek(fh, 512*1, SEEK_SET);
+    lseek(fh, 512 * 1, SEEK_SET);
     int* fat = decodeFAT(fh);
 
-    for(int i=0 ; i < 64 ; i++) {
+    for (int i = 0; i < 64; i++) {
         printf("%03x ", fat[i]);
     }
 
@@ -59,7 +60,7 @@ void fat_test(int sector_start) {
 int main() {
     fh = open(fname, O_RDONLY);
 
-    if(fh == -1)
+    if (fh == -1)
         return 1;
 
     fat_test(1);

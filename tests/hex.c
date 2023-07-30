@@ -3,23 +3,23 @@
 char hex_chars[] = "0123456789ABCDEF";
 
 void print_hex(int n, int len) {
-	int index;
-	int shift = len*4;
-	int and = 0xF<<(len*4);
-	printf("0x");
+    int index;
+    int shift = len * 4;
+    int and = 0xF << (len * 4);
+    printf("0x");
 
-	while(shift > 0) {
-		and >>= 4;
-		shift -= 4;
+    while (shift > 0) {
+        and >>= 4;
+        shift -= 4;
 
-		index = hex_chars[(n&and)>>shift];
+        index = hex_chars[(n & and) >> shift];
 
-		printf("%c", index);
-	}
+        printf("%c", index);
+    }
 
-	printf("\n");
+    printf("\n");
 }
 
 int main() {
-	print_hex(0xabcdef, 6);
+    print_hex(0xabcdef, 6);
 }
