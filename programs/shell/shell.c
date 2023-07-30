@@ -4,7 +4,7 @@
 
 #define MAX_PARAMS 16
 
-static char* prompt = "> ";
+static char* prompt = "A:/ ";
 
 static int run_batch(char* path) {
     int fh;
