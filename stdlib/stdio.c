@@ -83,9 +83,9 @@ char fgetch(int fh) {
     char out[1];
 
     int len = read(fh, &out, 1);
-    
-    if(len == 0)
-      return 0;
+
+    if (len == 0)
+        return 0;
 
     return out[0];
 }
