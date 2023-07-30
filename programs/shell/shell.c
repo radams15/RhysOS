@@ -106,7 +106,7 @@ int run_line(char* line, int length) {
 
     exe = tok;
 
-    if (strcmp(exe, "ctty") == 0) {
+    if (strcmp(exe, "tty") == 0) {
         int fh;
 
         fh = open(line + strlen(exe) + 1);
@@ -124,7 +124,7 @@ int run_line(char* line, int length) {
 int loop() {
     char line[1024];
 
-    memset(&line, 0, 1024 / 8);
+    memset(&line, 0, 1024/8);
 
     printf(prompt);
     int len = readline(line);

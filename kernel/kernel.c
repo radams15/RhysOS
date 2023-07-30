@@ -50,8 +50,6 @@ int list_directory(char* dir_name, FsNode_t* buf, int max) {
     while ((node = fs_readdir(root, i)) != NULL && count <= max) {
         fsnode = fs_finddir(root, node->name);
         if (fsnode != NULL) {
-            // print_string("- '");print_string(node->name);
-            // print_string("'\n");
             if (buf != NULL)
                 memcpy(buf++, fsnode, sizeof(FsNode_t));
             count++;
