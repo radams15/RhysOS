@@ -255,7 +255,7 @@ sub build {
 	my $runtime = &runtime;
 	my $stdlib = &stdlib;
 	my @programs = &programs($runtime, $stdlib);
-	&img($boot1, $boot2, \@kernel, [@programs, 'docs/syscalls.md', 'docs/fs_spec.md', <root/*>]);
+	&img($boot1, $boot2, \@kernel, [@programs, 'docs/syscalls.md', <root/*>]);
 }
 
 sub clean {
