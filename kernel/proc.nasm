@@ -27,7 +27,7 @@ _makeInterrupt21:
 ;it will call your function:
 ;void handleInterrupt21 (int AX, int BX, int CX, int DX)
 _interrupt21ServiceRoutine:
-        push ds
+    push ds
 	push dx
 	push cx
 	push bx

@@ -12,4 +12,6 @@ int fat_next_cluster(int prev_cluster);
 int cluster_to_lba(int cluster);
 int lba_to_cluster(int lba);
 
+FsNode_t* fat_create(char* name);
+
 #endif

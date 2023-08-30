@@ -392,37 +392,37 @@ void devfs_setup() {
     root_nodes[i].ref = 0;
     num_root_nodes++;
 
-    /*i++;
-
-    strcpyz(root_nodes[i].name, "ttybg");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = tty_bg_write;
-    root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-    num_root_nodes++;
-
-    i++;
-
-    strcpyz(root_nodes[i].name, "ttyfg");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = tty_fg_write;
-    root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-    num_root_nodes++;*/
+    // i++; 
+//  
+    // strcpyz(root_nodes[i].name, "ttybg"); 
+    // root_nodes[i].flags = FS_FILE; 
+    // root_nodes[i].inode = i; 
+    // root_nodes[i].length = 1; 
+    // root_nodes[i].offset = 0; 
+    // root_nodes[i].read = tty_bg_write; 
+    // root_nodes[i].write = 0; 
+    // root_nodes[i].open = 0; 
+    // root_nodes[i].close = 0; 
+    // root_nodes[i].readdir = 0; 
+    // root_nodes[i].finddir = 0; 
+    // root_nodes[i].ref = 0; 
+    // num_root_nodes++; 
+//  
+    // i++; 
+//  
+    // strcpyz(root_nodes[i].name, "ttyfg"); 
+    // root_nodes[i].flags = FS_FILE; 
+    // root_nodes[i].inode = i; 
+    // root_nodes[i].length = 1; 
+    // root_nodes[i].offset = 0; 
+    // root_nodes[i].read = tty_fg_write; 
+    // root_nodes[i].write = 0; 
+    // root_nodes[i].open = 0; 
+    // root_nodes[i].close = 0; 
+    // root_nodes[i].readdir = 0; 
+    // root_nodes[i].finddir = 0; 
+    // root_nodes[i].ref = 0; 
+    // num_root_nodes++; 
 }
 
 FsNode_t* devfs_init() {

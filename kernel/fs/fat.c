@@ -150,6 +150,51 @@ FsNode_t* fat_finddir(FsNode_t* node, char* name) {
     return NULL;
 }
 
+FsNode_t* fat_create(char* name) {
+  int start_cluster;
+  for(int i=0 ; i<512 ; i++) {
+    if(fat_table[i] == 0) {
+      fat_table[i] = 0xFF8;
+      start_cluster = i;
+      break;
+    }
+  }
+  
+  int inode;
+  FsNode_t* out = NULL;
+  for(int i=0 ; i<MAX_FILES ; i++) {
+    if(root_nodes[i].name[0] == 0) {
+      printi(i, 10);
+      out = &root_nodes[i];
+      inode = i;
+      break;
+    }
+  }
+  
+  if(out == NULL) {
+    print_string("Failed to create file!\n");
+    return NULL;
+  }
+  
+  strcpy(out->name, name);
+  out->start_sector = start_cluster;
+  out->inode = inode;
+  out->flags = FS_FILE;
+  out->length = 0;
+  out->offset = 0;
+  out->read = fat_read;
+  out->write = 0;
+  out->open = 0;
+  out->close = 0;
+  out->readdir = 0;
+  out->finddir = 0;
+  out->ref = 0;
+  
+  num_root_nodes++;
+    
+  return out;
+}
+
 void fat_mount(FsNode_t* node, char* name) {
     int i = num_root_nodes;
 
@@ -224,6 +269,7 @@ FsNode_t* fat_init(int sector_start) {
 
     for (int i = 0; i < MAX_FILES; i++) {
         root_dir[i].name[0] = NULL;
+        root_nodes[i].name[0] = NULL;
     }
 
     read_lba_to_segment(0, sector_start, &fat_sector, DATA_SEGMENT);

@@ -2,3 +2,4 @@ peda-session*
 build/
 .gdb_history
 diff.txt
+*.swp

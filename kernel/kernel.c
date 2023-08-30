@@ -152,6 +152,8 @@ int init(int rootfs_start) {
     stderr = open("/dev/stderr");
 
     print_string("Welcome to RhysOS!\n\n");
+    
+    fat_create("out.txt");
 
     exec("mem", 0, NULL, stdin, stdout, stderr);
     print_string("\n");
