@@ -18,7 +18,7 @@ int syscall(int num, int a, int b, int c, int d, int e, int f) {
         num, a, b, c, d, e, f, cs(), ds(),
     };
 
-    interrupt_21(&out, ss(), 0, 0);
+    interrupt_21(&out, 0, 0, 0);
 
     return out.num;
 }

@@ -14,16 +14,20 @@ extern _printf
 _start:
 	times 8 nop
 	
-        mov bx, [bp]
-        mov cx, [bp+2]
+        mov bx, [bp-10]
+        mov cx, [bp-8]
+        
+        xor ax, ax
+        
+	xchg bx, bx
 
-        mov al, [bp+4] ; set stdin, stdout, stderr from the stack
+        mov al, [bp-6] ; set stdin, stdout, stderr from the stack
         mov [_stdin], al
         
-        mov al, [bp+6]
-        mov [_stdout], al
+        mov ax, [bp-4]
+        mov [_stdout], ax
         
-        mov al, [bp+8]
+        mov al, [bp-2]
         mov [_stderr], al
         
         push cx ; argv

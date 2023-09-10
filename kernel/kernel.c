@@ -75,17 +75,11 @@ typedef struct SyscallArgs {
 int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
 
 int handleInterrupt21(int* ax, int ss, int cx, int dx) {
-    debug("SS: ", ss);
-
     SyscallArgs_t arg_data;
     seg_copy(ax, &arg_data, sizeof(SyscallArgs_t), ss, DATA_SEGMENT);
     
     SyscallArgs_t* args = &arg_data;
-    
-    debug("SC: ", args->num);
-    debug("CS: ", args->cs);
-    debug("DS: ", args->ds);
-    
+
     switch (args->num) {
         case 1:
             args->num =
@@ -100,8 +94,11 @@ int handleInterrupt21(int* ax, int ss, int cx, int dx) {
             args->num = read(args->a, args->b, args->c);
             break;
 
-        case 4:
-            args->num = write(args->a, args->b, args->c);
+        case 4: {
+	            char text[128];
+		    seg_copy(args->b, text, sizeof(text), args->ds, DATA_SEGMENT);
+            	    args->num = write(args->a, text, args->c);
+            }
             break;
 
         case 5: {
@@ -175,9 +172,9 @@ int init(int rootfs_start) {
     
     //fat_create("out.txt");
 
-    exec("test", 0, NULL, stdin, stdout, stderr);
-    print_string("Next\n");
-    exec("shell", 0, NULL, stdin, stdout, stderr);
+    exec("ctest", 0, NULL, stdin, stdout, stderr);
+    print_string("\n");
+    //exec("shell", 0, NULL, stdin, stdout, stderr);
 
     close(stdin);
     close(stdout);
