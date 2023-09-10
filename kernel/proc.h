@@ -10,4 +10,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err);
 
 ProcFunc_t run_exe(char* buf, unsigned int size);
 
+void cli();
+void sti();
+
 #endif

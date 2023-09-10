@@ -1,3 +1,5 @@
+bits 16
+
 global _div
 _div:
     PUSH BP         ; save the base pointer
@@ -74,6 +76,42 @@ _inb:
 	in ax, dx
 	
 	pop bx
+	
+	pop bp
+	ret
+	
+;int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
+global _seg_copy
+_seg_copy:
+	push bp
+	mov bp, sp
+	
+	push ds
+	push es
+	push si
+	push cx
+	push di
+	
+	xchg bx, bx
+	
+	mov ax, [bp+10]
+	mov ds, ax ; ds => start seg
+	
+	mov si, [bp+4] ; si => src address
+	
+	mov ax, [bp+12]
+	mov es, ax ; es => dest seg
+	
+	mov di, [bp+6] ; di => dest address
+	mov cx, [bp+8] ; cx => length
+	
+	rep movsb
+	
+	pop di
+	pop cx
+	pop si
+	pop es
+	pop ds
 	
 	pop bp
 	ret

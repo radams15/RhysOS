@@ -12,7 +12,6 @@ void entry(int a) {
 #include "fs/fat.h"
 
 #include "clock.h"
-#include "graphics.h"
 #include "serial.h"
 
 #define EXE_SIZE 8192
@@ -61,15 +60,27 @@ int list_directory(char* dir_name, FsNode_t* buf, int max) {
     return count;
 }
 
+void debug(const char* label, int data) {
+	print_string(label);
+	printi(data, 16);
+	print_string("\n");
+}
+
 typedef struct SyscallArgs {
     int num;  // Syscall number
     int a, b, c, d, e, f;
     int cs, ds;  // Data segment
 } SyscallArgs_t;
 
+int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
+
 int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
     SyscallArgs_t* args = ax;
-
+    
+    debug("SC: ", args->num);
+    debug("CS: ", args->cs);
+    debug("DS: ", args->ds);
+    
     switch (args->num) {
         case 1:
             args->num =
@@ -88,8 +99,12 @@ int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
             args->num = write(args->a, args->b, args->c);
             break;
 
-        case 5:
-            args->num = open(args->a);
+        case 5: {
+	            char name[128];
+		    seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
+		    print_string(name);
+		    args->num = open(args->a);
+            }
             break;
 
         case 6:
@@ -109,7 +124,7 @@ int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
     }
 }
 
-void a20_init() {
+/*void a20_init() {
     if (a20_available()) {
         int enable_fail;
         print_string("A20 line is available\n");
@@ -122,13 +137,13 @@ void a20_init() {
     } else {
         print_string("A20 line is unavaiable\n");
     }
-}
+}*/
 
 int init(int rootfs_start) {
     cls();
     FsNode_t* fs_dev;
 
-    a20_init();
+    //a20_init();
 
     memmgr_init();
     print_string("Memory manager enabled\n");
@@ -136,8 +151,8 @@ int init(int rootfs_start) {
     makeInterrupt21();
     print_string("Int 21h enabled\n");
 
-    rtc_init();
-    print_string("RTC enabled\n");
+    /*rtc_init();
+    print_string("RTC enabled\n");*/
 
     serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
     print_string("/dev/COM1 enabled\n");

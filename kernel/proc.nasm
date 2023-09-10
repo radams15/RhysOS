@@ -55,16 +55,19 @@ _call_far:
 	
         push ds
         
-        xor ax, ax
-        mov ax, [bp+14]
+        mov bx, [bp+14]
         
-        mov WORD [call_addr], 0x1008
-        mov WORD [call_cs], ax
-        
-        mov ax, 0x3000
+        mov ax, [bp+16]
         mov ds, ax
         
-        call far [call_addr]
+	push cs
+	push .ret
+	push bx
+	push 0x1008
+	retf 
+        
+.ret:
+	xchg bx, bx
 
         pop ds
         
