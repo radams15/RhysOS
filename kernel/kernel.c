@@ -74,30 +74,24 @@ typedef struct SyscallArgs {
 
 int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
 
-int handleInterrupt21(int* ax, int ss, int cx, int dx) {
-    SyscallArgs_t arg_data;
-    seg_copy(ax, &arg_data, sizeof(SyscallArgs_t), ss, DATA_SEGMENT);
-    
-    SyscallArgs_t* args = &arg_data;
-
+int i21_handler(SyscallArgs_t* args) {
     switch (args->num) {
         case 1:
-            args->num =
-                exec(args->a, args->b, args->c, args->d, args->e, args->f);
+            return exec(args->a, args->b, args->c, args->d, args->e, args->f);
             break;
 
         case 2:
-            args->num = list_directory(args->a, args->b, args->c);
+            return list_directory(args->a, args->b, args->c);
             break;
 
         case 3:
-            args->num = read(args->a, args->b, args->c);
+            return read(args->a, args->b, args->c);
             break;
 
         case 4: {
 	            char text[128];
 		    seg_copy(args->b, text, sizeof(text), args->ds, DATA_SEGMENT);
-            	    args->num = write(args->a, text, args->c);
+            	    return write(args->a, text, args->c);
             }
             break;
 
@@ -105,7 +99,7 @@ int handleInterrupt21(int* ax, int ss, int cx, int dx) {
 	            char name[128];
 		    seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
 		    print_string(name);
-		    args->num = open(args->a);
+		    return open(args->a);
             }
             break;
 
@@ -121,9 +115,20 @@ int handleInterrupt21(int* ax, int ss, int cx, int dx) {
             print_string("Unknown interrupt: ");
             printi(args->a, 16);
             print_string("!\r\n");
-            args->num = -1;
+            return -1;
             break;
     }
+    
+    return 0;
+}
+
+int handleInterrupt21(int* ax, int ss, int cx, int dx) { 
+    SyscallArgs_t arg_data;
+    seg_copy(ax, &arg_data, sizeof(SyscallArgs_t), ss, DATA_SEGMENT);
+    
+    arg_data.num = i21_handler(&arg_data);
+    
+    seg_copy(&arg_data, ax, sizeof(SyscallArgs_t), DATA_SEGMENT, ss);
 }
 
 /*void a20_init() {
