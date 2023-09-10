@@ -92,8 +92,6 @@ _seg_copy:
 	push cx
 	push di
 	
-	xchg bx, bx
-	
 	mov ax, [bp+10]
 	mov ds, ax ; ds => start seg
 	

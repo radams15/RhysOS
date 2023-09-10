@@ -3,6 +3,7 @@ bits 16
 global _interrupt
 global _ds
 global _cs
+global _ss
 
 _ds:
         mov ax, ds
@@ -10,6 +11,11 @@ _ds:
 _cs:
 	mov ax, cs
 	ret
+	
+_ss:
+	mov ax, ss
+	ret
+
 
 %macro interrupt_func 1
 global _interrupt_%1

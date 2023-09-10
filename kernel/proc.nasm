@@ -53,28 +53,36 @@ _call_far:
 	push bp
 	mov bp, sp
 	
-        push ds
+	xchg bx, bx
+        mov ax, ss
+        mov [stackseg], ax
         
-        mov bx, [bp+14]
+        mov bx, [bp+14] ; bx => segment
         
-        mov ax, [bp+16]
+        mov ax, [bp+16] ; ax => new ds
         mov ds, ax
+        mov ss, ax
         
 	push cs
 	push .ret
 	push bx
 	push 0x1008
-	retf 
+	
+	retf ; call function
         
 .ret:
 	xchg bx, bx
 
-        pop ds
-        
+        mov ax, DATA_SEGMENT
+        mov ds, ax
+	
+        mov ax, [stackseg]
+        mov ss, ax
+
         pop bp
-        
         ret
 
 align 16
 call_addr: dw 0
 call_cs: db 0
+stackseg: dw 0

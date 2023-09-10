@@ -74,8 +74,13 @@ typedef struct SyscallArgs {
 
 int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
 
-int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
-    SyscallArgs_t* args = ax;
+int handleInterrupt21(int* ax, int ss, int cx, int dx) {
+    debug("SS: ", ss);
+
+    SyscallArgs_t arg_data;
+    seg_copy(ax, &arg_data, sizeof(SyscallArgs_t), ss, DATA_SEGMENT);
+    
+    SyscallArgs_t* args = &arg_data;
     
     debug("SC: ", args->num);
     debug("CS: ", args->cs);
@@ -170,8 +175,8 @@ int init(int rootfs_start) {
     
     //fat_create("out.txt");
 
-    exec("mem", 0, NULL, stdin, stdout, stderr);
-    print_string("\n");
+    exec("test", 0, NULL, stdin, stdout, stderr);
+    print_string("Next\n");
     exec("shell", 0, NULL, stdin, stdout, stderr);
 
     close(stdin);
