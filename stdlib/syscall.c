@@ -8,12 +8,12 @@ int ds();
 typedef struct SyscallArgs {
     int num;  // Syscall number
     int a, b, c, d, e, f;
-    int ds;  // Data segment
+    int cs, ds;  // Data segment
 } SyscallArgs_t;
 
 int syscall(int num, int a, int b, int c, int d, int e, int f) {
     SyscallArgs_t out = {
-        num, a, b, c, d, e, f, ds(),
+        num, a, b, c, d, e, f, cs(), ds(),
     };
 
     interrupt_21(&out, 0, 0, 0);

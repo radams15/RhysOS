@@ -28,9 +28,12 @@ int memcmp(char* a, char* b, int n) {
     return 0;  // Are the same
 }
 
+int segment_top = 0x5000;
+
 typedef int (*prog_t)(int argc, char** argv, int in, int out, int err);
 int call_0x5000(int argc, char** argv, int in, int out, int err);
 int call_0x8000(int argc, char** argv, int in, int out, int err);
+int call_far(int argc, char** argv, int in, int out, int err, int cs);
 
 int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
     struct FsNode* fs_node;
@@ -59,6 +62,9 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
         print_string("Invalid header magic!\n");
         return 1;
     }
+    
+    int segment = segment_top;
+    segment_top += 0x1000;
 
     int addr = 0x1000;
     int sectors_read = 0;  // MEM starts @ sector 172
@@ -66,7 +72,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
          sectors_read < header.text_size && cluster < 0xFF8;
          cluster = fat_next_cluster(cluster)) {
         read_lba_to_segment(0, cluster_to_lba(cluster), addr,
-                            header.segment);  // Code to segment:0x1000
+                            segment);  // Code to segment:0x1000
         addr += 512;
         sectors_read++;
     }
@@ -78,7 +84,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
         addr += 512;
     }
 
-    prog_t prog;
+    /*prog_t prog;
 
     if (header.segment == EXE_SEGMENT)
         prog = call_0x5000;
@@ -91,5 +97,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
         return 3;
     }
 
-    return prog(argc, argv, in, out, err);
+    return prog(argc, argv, in, out, err);*/
+    return call_far(argc, argv, in, out, err, segment);
+    
 }

@@ -9,17 +9,21 @@ extern _stdout
 extern _stderr
 extern _main
 
-_start:
-        mov bx, [bp+8]
-        mov cx, [bp+10]
+extern _printf
 
-        mov al, [bp+12] ; set stdin, stdout, stderr from the stack
+_start:
+	times 8 nop
+	
+        mov bx, [bp+4]
+        mov cx, [bp+6]
+
+        mov al, [bp+8] ; set stdin, stdout, stderr from the stack
         mov [_stdin], al
         
-        mov al, [bp+14]
+        mov al, [bp+10]
         mov [_stdout], al
         
-        mov al, [bp+16]
+        mov al, [bp+12]
         mov [_stderr], al
         
         push cx ; argv

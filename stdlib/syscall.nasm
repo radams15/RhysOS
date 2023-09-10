@@ -2,10 +2,14 @@ bits 16
 
 global _interrupt
 global _ds
+global _cs
 
 _ds:
         mov ax, ds
         ret
+_cs:
+	mov ax, cs
+	ret
 
 print_str:
 	mov ah, 0Eh

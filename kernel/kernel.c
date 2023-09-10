@@ -64,7 +64,7 @@ int list_directory(char* dir_name, FsNode_t* buf, int max) {
 typedef struct SyscallArgs {
     int num;  // Syscall number
     int a, b, c, d, e, f;
-    int ds;  // Data segment
+    int cs, ds;  // Data segment
 } SyscallArgs_t;
 
 int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
@@ -153,7 +153,7 @@ int init(int rootfs_start) {
 
     print_string("Welcome to RhysOS!\n\n");
     
-    fat_create("out.txt");
+    //fat_create("out.txt");
 
     exec("mem", 0, NULL, stdin, stdout, stderr);
     print_string("\n");
