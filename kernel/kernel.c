@@ -75,6 +75,8 @@ typedef struct SyscallArgs {
 int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
 
 int i21_handler(SyscallArgs_t* args) {
+    //debug("SC: ", args->num);
+
     switch (args->num) {
         case 1:
             return exec(args->a, args->b, args->c, args->d, args->e, args->f);
@@ -84,22 +86,27 @@ int i21_handler(SyscallArgs_t* args) {
             return list_directory(args->a, args->b, args->c);
             break;
 
-        case 3:
-            return read(args->a, args->b, args->c);
+        case 3: {
+                char buf[128];
+                int ret = read(args->a, &buf, args->c);
+                
+                seg_copy(&buf, args->b, args->c, DATA_SEGMENT, args->ds);
+                
+                return ret;
+            }
             break;
 
         case 4: {
 	            char text[128];
-		    seg_copy(args->b, text, sizeof(text), args->ds, DATA_SEGMENT);
-            	    return write(args->a, text, args->c);
+		        seg_copy(args->b, text, sizeof(text), args->ds, DATA_SEGMENT);
+        	    return write(args->a, text, args->c);
             }
             break;
 
         case 5: {
 	            char name[128];
-		    seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
-		    print_string(name);
-		    return open(args->a);
+		        seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
+		        return open(name);
             }
             break;
 
@@ -177,8 +184,8 @@ int init(int rootfs_start) {
     
     //fat_create("out.txt");
 
-    exec("ctest", 0, NULL, stdin, stdout, stderr);
-    print_string("\n");
+    exec("mem", 0, NULL, stdin, stdout, stderr);
+    print_string("\nNext\n");
     //exec("shell", 0, NULL, stdin, stdout, stderr);
 
     close(stdin);
