@@ -79,8 +79,12 @@ int i21_handler(SyscallArgs_t* args) {
     //debug("SC: ", args->num);
 
     switch (args->num) {
-        case 1:
-            return exec(args->a, args->b, args->c, args->d, args->e, args->f);
+        case 1: {
+                //int execa(char* file, int argc, char** argv, int in, int out, int err) {
+                char name[64];
+		        seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
+                return exec(name, args->b, args->c, args->d, args->e, args->f);
+            }
             break;
 
         case 2:
@@ -200,7 +204,7 @@ int init(int rootfs_start) {
 
     exec("mem", 0, NULL, stdin, stdout, stderr);
     print_string("\nNext\n");
-    //exec("shell", 0, NULL, stdin, stdout, stderr);
+    exec("shell", 0, NULL, stdin, stdout, stderr);
 
     close(stdin);
     close(stdout);
