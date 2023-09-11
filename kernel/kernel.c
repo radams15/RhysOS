@@ -156,7 +156,7 @@ int handleInterrupt21(int* ax, int ss, int cx, int dx) {
     seg_copy(&arg_data, ax, sizeof(SyscallArgs_t), DATA_SEGMENT, ss);
 }
 
-/*void a20_init() {
+void a20_init() {
     if (a20_available()) {
         int enable_fail;
         print_string("A20 line is available\n");
@@ -169,13 +169,13 @@ int handleInterrupt21(int* ax, int ss, int cx, int dx) {
     } else {
         print_string("A20 line is unavaiable\n");
     }
-}*/
+}
 
 int init(int rootfs_start) {
     cls();
     FsNode_t* fs_dev;
 
-    //a20_init();
+    a20_init();
 
     memmgr_init();
     print_string("Memory manager enabled\n");
@@ -183,8 +183,8 @@ int init(int rootfs_start) {
     makeInterrupt21();
     print_string("Int 21h enabled\n");
 
-    /*rtc_init();
-    print_string("RTC enabled\n");*/
+    rtc_init();
+    print_string("RTC enabled\n");
 
     serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
     print_string("/dev/COM1 enabled\n");

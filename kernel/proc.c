@@ -74,7 +74,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
         return 1;
     }
     
-    cli(); // Disable interrupts
+    cli(); // Disable interrupts as atomic
     int segment_index = get_segment();
     if(segment_index == -1) {
     	print_string("Segment allocation error in `exec`\n");
@@ -102,23 +102,9 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
         addr += 512;
     }
 
-    /*prog_t prog;
-
-    if (header.segment == EXE_SEGMENT)
-        prog = call_0x5000;
-    else if (header.segment == SHELL_SEGMENT)
-        prog = call_0x8000;
-    else {
-        print_string("Error, cannot find call segment: ");
-        printi(header.segment, 16);
-        print_string("\n");
-        return 3;
-    }
-
-    return prog(argc, argv, in, out, err);*/
     ret = call_far(argc, argv, in, out, err, segment, segment);
     
-    cli();
+    cli(); // Atomic again
     segments[segment_index] = 0;
     sti();
     
