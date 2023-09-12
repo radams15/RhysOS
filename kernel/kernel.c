@@ -76,14 +76,27 @@ typedef struct SyscallArgs {
 int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
 
 int i21_handler(SyscallArgs_t* args) {
-    //debug("SC: ", args->num);
-
     switch (args->num) {
         case 1: {
-                //int execa(char* file, int argc, char** argv, int in, int out, int err) {
                 char name[64];
+                
+                char** argv_in;
+                char argv[64][64]; // @ E772 in .data
+                
+                char* test1[] = {"hello", "test_1"}; // @ F772 on stack
+                
+		        seg_copy(args->c, argv_in, args->b*sizeof(char*), args->ds, DATA_SEGMENT);
+                
+                for(int i=0 ; i<args->b ; i++) {
+    		        seg_copy(argv_in[i], argv[i], 64, args->ds, DATA_SEGMENT);
+                }
+                
+                for(int i=0 ; i<args->b ; i++) {
+                    print_string(argv[i]);
+                }
+                
 		        seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
-                return exec(name, args->b, args->c, args->d, args->e, args->f);
+                return exec(name, args->b, argv, args->d, args->e, args->f);
             }
             break;
 
@@ -201,10 +214,12 @@ int init(int rootfs_start) {
     print_string("Welcome to RhysOS!\n\n");
     
     //fat_create("out.txt");
+    
+    char* test[] = {"hello", "world"};
 
-    exec("mem", 0, NULL, stdin, stdout, stderr);
+    exec("mem", 2, test, stdin, stdout, stderr);
     print_string("\nNext\n");
-    exec("shell", 0, NULL, stdin, stdout, stderr);
+    exec("shell", 2, test, stdin, stdout, stderr);
 
     close(stdin);
     close(stdout);

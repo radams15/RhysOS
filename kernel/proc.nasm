@@ -75,24 +75,23 @@ _call_far:
 	mov ax, [bp+12]
 	mov [stderr], ax
 	
-        mov ax, ss
-        mov [stackseg], ax
-        
-        mov bx, [bp+14] ; bx => segment
-        
-        mov ax, [bp+16] ; ax => new ds
-        mov ss, ax
+    mov ax, ss
+    mov [stackseg], ax
+    
+    mov bx, [bp+14] ; bx => segment
+    
+    mov ax, [bp+16] ; ax => new ds
+    mov ss, ax
         
 	push bp ; new program stack frame
 	mov bp, sp
         
-	xchg bx, bx
 	push WORD [stderr]
-        push WORD [stdout]
-        push WORD [stdin]
-        push WORD [argc]
-        push WORD [argv]
-        mov ds, ax
+    push WORD [stdout]
+    push WORD [stdin]
+    push WORD [argc]
+    push WORD [argv]
+    mov ds, ax
         
 	push cs
 	push .ret
