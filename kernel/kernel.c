@@ -16,7 +16,7 @@ void entry(int a) {
 
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
-#define SYSCALL_BUF_SIZ 64
+#define SYSCALL_BUF_SIZ 16
 
 int stdin, stdout, stderr;
 
@@ -119,18 +119,24 @@ int i21_handler(SyscallArgs_t* args) {
                 char* dst = args->b;
                 
                 int ret = 0;
+                int len;
                 
-                while(read_len > SYSCALL_BUF_SIZ) {
+                while(read_len >= SYSCALL_BUF_SIZ) {
                     read_len -= SYSCALL_BUF_SIZ;
                     
-                    ret += read(args->a, &buf, SYSCALL_BUF_SIZ);
-                    seg_copy(&buf, dst, SYSCALL_BUF_SIZ, DATA_SEGMENT, args->ds);
+                    len = read(args->a, buf, SYSCALL_BUF_SIZ);
+                    ret += len;
+                    
+                    seg_copy(buf, dst, len, DATA_SEGMENT, args->ds);
                     
                     dst += ret;
                 }
                 
-                ret += read(args->a, &buf, read_len);
-                seg_copy(&buf, dst, read_len, DATA_SEGMENT, args->ds);
+                if(read_len) {
+                    len = read(args->a, buf, read_len);
+                    ret += len;
+                    seg_copy(buf, dst, len, DATA_SEGMENT, args->ds);
+                }
                 
                 return ret;
             }
