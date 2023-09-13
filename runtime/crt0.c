@@ -4,20 +4,27 @@ extern int main(int argc, char** argv);
 
 extern int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
 
+void memmgr_init();
+
 extern int stdout;
 
-char argv[64][64];
+const int argv_item_size = 128;
 
 int start(int argc, char** argv_ext) {
     char** argv_in;
+    
+    memmgr_init();
+    
+    char** argv = malloc(argc * sizeof(char));
+    printf("Argv: %x\n", argv);
 
     seg_copy(argv_ext, argv_in, argc*sizeof(char*), KERNEL_DATA, ds());
     
     for(int i=0 ; i<argc ; i++) {
-        seg_copy(argv_in[i], argv[i], 64, KERNEL_DATA, ds());
+        argv[i] = malloc(argv_item_size * sizeof(char));
+        seg_copy(argv_in[i], argv[i], argv_item_size, KERNEL_DATA, ds());
     }
     
-    printf("Argv: %x\n", argv);
     for(int i=0 ; i<argc ; i++) {
         printf("%s, ", argv[i]);
     }
