@@ -1,6 +1,7 @@
 bits 16
 
 global _makeInterrupt21
+extern _seg_copy
 extern _handleInterrupt21
 
 _makeInterrupt21:
@@ -23,50 +24,101 @@ _makeInterrupt21:
 	pop dx
 	ret
 
-;this is called when interrupt 21 happens
-;it will call your function:
 ;void handleInterrupt21 (int AX, int BX, int CX, int DX)
 _interrupt21ServiceRoutine:
-    push ds
+	cli
+	
+	push ds ; push regs into program stack
 	push dx
 	push cx
 	push bx
 	push ax
 	
-	cli
+	mov cx, ss ; program ss in cx
 	
-	mov ax, 0x3000 ; Restore KSEG
-	mov ds, ax
+        mov bx, DATA_SEGMENT ; restore kernel ds, ss
+        mov ds, bx
+        mov bx, [stackseg]
+        mov ss, bx
+	
+	push cx ; push ss in cx
+	push ax ; push ax as argument for function
 	
 	call _handleInterrupt21
 	
-	sti
-
 	pop ax
+	pop ss ; restore program stack from kernel stack
+
+	pop ax ; restore program registers from program stack
 	pop bx
 	pop cx
 	pop dx
 	pop ds
+	
+	sti
 
 	iret
 
-%macro far_call_func 2
-global _call_%1
-_call_%1:
-        push ds
+global _call_far
+_call_far:
+	push bp
+	mov bp, sp
+	
+	mov ax, [bp+4]
+	mov [argc], ax
+	mov ax, [bp+6]
+	mov [argv], ax
+	mov ax, [bp+8]
+	mov [stdin], ax
+	mov ax, [bp+10]
+	mov [stdout], ax
+	mov ax, [bp+12]
+	mov [stderr], ax
+	
+    mov ax, ss
+    mov [stackseg], ax
+    
+    mov bx, [bp+14] ; bx => segment
+    
+    mov ax, [bp+16] ; ax => new ds
+    mov ss, ax
         
-        mov ax, 0x3000
+	push bp ; new program stack frame
+	mov bp, sp
+        
+	push WORD [stderr]
+    push WORD [stdout]
+    push WORD [stdin]
+    push WORD [argc]
+    push WORD [argv]
+    mov ds, ax
+        
+	push cs
+	push .ret
+	push bx
+	push 0x1008
+	
+	retf ; call function
+.ret:
+	add sp, 10 ; pop all of the program args
+	pop bp ; restore stack frame for call_far
+	
+        mov ax, DATA_SEGMENT ; restore kernel data segment
         mov ds, ax
+	
+        mov ax, [stackseg] ; restore kernel stack
+        mov ss, ax
 
-        call %1:%2
-        
-        pop ds
+        pop bp
         ret
-%endmacro
 
-far_call_func EXE_SEGMENT, 0x1008
-far_call_func SHELL_SEGMENT, 0x1008
+align 16
+call_addr: dw 0
+call_cs: db 0
+stackseg: dw 0
 
-section .data
-
-SEG_STORE: db 0x1000
+stdin: dw 0
+stdout: dw 0
+stderr: dw 0
+argc: dw 0
+argv: dw 0
