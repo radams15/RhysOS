@@ -16,7 +16,6 @@ int start(int argc, char** argv_ext) {
     memmgr_init();
     
     char** argv = malloc(argc * sizeof(char));
-    printf("Argv: %x\n", argv);
 
     seg_copy(argv_ext, argv_in, argc*sizeof(char*), KERNEL_DATA, ds());
     
@@ -25,10 +24,6 @@ int start(int argc, char** argv_ext) {
         seg_copy(argv_in[i], argv[i], argv_item_size, KERNEL_DATA, ds());
     }
     
-    for(int i=0 ; i<argc ; i++) {
-        printf("%s, ", argv[i]);
-    }
-
     int ret = main(argc, argv);
     
     return ret;

@@ -35,7 +35,7 @@ void main(int rootfs_start) {
     }
 }
 
-int list_directory(char* dir_name, FsNode_t* buf, int max) {
+int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
     int i = 0;
     int count = 0;
     DirEnt_t* node = NULL;
@@ -50,8 +50,12 @@ int list_directory(char* dir_name, FsNode_t* buf, int max) {
     while ((node = fs_readdir(root, i)) != NULL && count <= max) {
         fsnode = fs_finddir(root, node->name);
         if (fsnode != NULL) {
-            if (buf != NULL)
-                memcpy(buf++, fsnode, sizeof(FsNode_t));
+            if (buf != NULL) {
+                buf++;
+                seg_copy(fsnode, buf, sizeof(FsNode_t), DATA_SEGMENT, ds);
+                seg_copy(fsnode->name, buf->name, FILE_NAME_MAX*sizeof(char), DATA_SEGMENT, ds);
+                //print_string(fsnode->name);
+            }
             count++;
         }
 
@@ -102,9 +106,12 @@ int i21_handler(SyscallArgs_t* args) {
             }
             break;
 
-        case 2:
-            return list_directory(args->a, args->b, args->c);
-            break;
+        case 2: {
+            char name[128];
+	        seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
+        
+            return list_directory(name, args->b, args->c, args->ds);
+        }
 
         case 3: {
                 int read_len = args->c;
@@ -127,21 +134,18 @@ int i21_handler(SyscallArgs_t* args) {
                 
                 return ret;
             }
-            break;
 
         case 4: {
 	            char text[SYSCALL_BUF_SIZ];
 		        seg_copy(args->b, text, sizeof(text), args->ds, DATA_SEGMENT);
         	    return write(args->a, text, args->c);
             }
-            break;
 
         case 5: {
 	            char name[SYSCALL_BUF_SIZ];
 		        seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
 		        return open(name);
             }
-            break;
 
         case 6:
             close(args->a);
