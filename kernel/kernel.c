@@ -16,7 +16,7 @@ void entry(int a) {
 
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
-#define SYSCALL_BUF_SIZ 16
+#define SYSCALL_BUF_SIZ 1024
 
 int stdin, stdout, stderr;
 
