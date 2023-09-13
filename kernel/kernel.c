@@ -76,27 +76,29 @@ typedef struct SyscallArgs {
 int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
 
 int i21_handler(SyscallArgs_t* args) {
+    const int argv_item_size = 64; // 64 chars per arg
+
     switch (args->num) {
         case 1: {
-                char name[64];
+                char name[128];
                 
                 char** argv_in;
-                char argv[64][64]; // @ E772 in .data
-                
-                char* test1[] = {"hello", "test_1"}; // @ F772 on stack
+                char** argv = malloc(args->b * sizeof(char));
                 
 		        seg_copy(args->c, argv_in, args->b*sizeof(char*), args->ds, DATA_SEGMENT);
                 
                 for(int i=0 ; i<args->b ; i++) {
-    		        seg_copy(argv_in[i], argv[i], 64, args->ds, DATA_SEGMENT);
-                }
-                
-                for(int i=0 ; i<args->b ; i++) {
-                    print_string(argv[i]);
+                    argv[i] = malloc(argv_item_size * sizeof(char));
+    		        seg_copy(argv_in[i], argv[i], argv_item_size, args->ds, DATA_SEGMENT);
                 }
                 
 		        seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
-                return exec(name, args->b, argv, args->d, args->e, args->f);
+                int ret = exec(name, args->b, argv, args->d, args->e, args->f);
+                
+                for(int i=0 ; i<args->b ; i++) {
+                    free(argv[i]);
+                }
+                free(argv);
             }
             break;
 

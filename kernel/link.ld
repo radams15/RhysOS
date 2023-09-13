@@ -21,4 +21,6 @@ SECTIONS
     {
         *(.comment);
     }
+    
+    _heap_begin = .;
 }

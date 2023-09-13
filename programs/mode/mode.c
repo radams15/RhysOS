@@ -25,6 +25,14 @@ void set_graphics_mode(int mode) {
 }
 
 int main(int argc, char** argv) {
+    printf("Argv: %x\n", argv);
+
+    for(int i=0 ; i<argc ; i++) {
+        printf("Arg %d = %s\n", i, argv[i]);
+    }
+    return 0;
+    
+
     if (argc == 1) {
         printf("Current mode: %d\n", get_graphics_mode());
     } else if (argc == 2) {
@@ -33,7 +41,7 @@ int main(int argc, char** argv) {
         } else if (STREQ("cga", argv[1])) {
             set_graphics_mode(GRAPHICS_CGA_320x200);
         } else {
-            set_graphics_mode(GRAPHICS_MONO_80x25);
+            printf("Unknown graphics mode: %s\n", argv[1]);
         }
     } else {
         printf("Usage: %s [MODE]\n", argv[0]);

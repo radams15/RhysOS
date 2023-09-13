@@ -2,7 +2,7 @@
 
 #include "sysinfo.h"
 
-static int heap_top;
+extern int heap_begin;
 static int heap;
 
 #define HEAP_MAGIC 0xCAFE
@@ -22,8 +22,7 @@ void memmgr_init() {
             heap = mem_low * 1000;
     }*/
 
-    heap_top = HEAP_ADDRESS;
-    heap = heap_top;
+    heap = heap_begin;
 }
 
 /*void* malloc(unsigned int size) {
