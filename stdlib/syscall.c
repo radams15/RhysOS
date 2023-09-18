@@ -4,18 +4,16 @@ extern int stdin, stdout, stderr;
 
 extern void biosprint();
 int ds();
-int cs();
-int ss();
 
 typedef struct SyscallArgs {
     int num;  // Syscall number
     int a, b, c, d, e, f;
-    int cs, ds;  // Data segment
+    int ds;  // Data segment
 } SyscallArgs_t;
 
 int syscall(int num, int a, int b, int c, int d, int e, int f) {
     SyscallArgs_t out = {
-        num, a, b, c, d, e, f, cs(), ds(),
+        num, a, b, c, d, e, f, ds(),
     };
 
     interrupt_21(&out, 0, 0, 0);

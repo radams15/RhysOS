@@ -28,6 +28,4 @@ char* strtok(register char* s, register char* delim);
 
 void outb(int port, char data);
 
-int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
-
 #endif

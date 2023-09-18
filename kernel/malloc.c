@@ -2,8 +2,7 @@
 
 #include "sysinfo.h"
 
-extern int heap_begin;
-extern int heap_end;
+static int heap_top;
 static int heap;
 
 #define HEAP_MAGIC 0xCAFE
@@ -14,18 +13,36 @@ typedef struct BlkHeader {
 } BlkHeader_t;
 
 void memmgr_init() {
-    heap = &heap_begin;
+    /*int mem_low = lowmem();
+    int mem_high = highmem();*/
+
+    /*if(mem_high != 0) {
+            heap = mem_high * 1000;
+    } else {
+            heap = mem_low * 1000;
+    }*/
+
+    heap_top = HEAP_ADDRESS;
+    heap = heap_top;
 }
+
+/*void* malloc(unsigned int size) {
+        heap -= size;
+
+        return heap;
+}*/
 
 void* malloc(unsigned int size) {
     BlkHeader_t* out = heap;
 
-    if (heap + size > &heap_end) {
+    if (heap + size > lowmem() * 1000) {
         print_string("Cannot allocate more memory!\n");
         return 0;
     }
 
     heap += size + sizeof(BlkHeader_t) + 8;
+
+    clear(out, heap - (int)out);
 
     out->magic = HEAP_MAGIC;
     out->length = size;
