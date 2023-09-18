@@ -21,9 +21,8 @@ my $LD = 'ia16-elf-ld';
 my $KERNEL_SEGMENT = '0x2000';
 my $DATA_SEGMENT = '0x3000';
 
-my $SHELL_ADDR = '0x7000';
-my $EXE_ADDR = '0x7000';
-
+my $SHELL_ADDR = '0x8000';
+my $EXE_ADDR = '0x6000';
 my $SHELL_SEGMENT = '0x8000';
 my $EXE_SEGMENT = '0x5000';
 
@@ -116,11 +115,9 @@ sub stdlib {
 }
 
 sub runtime {
-	&run("$ASM -felf runtime/crt0.nasm -Istdlib/ -o build/crt0_nasm.o");
+	&run("$ASM -felf runtime/crt0.nasm -Istdlib/ -o build/crt0.o");
 	
-	&run("$CC -c runtime/crt0.c -Istdlib/ -o build/crt0.o");
-	
-	"build/crt0_nasm.o", "build/crt0.o";
+	"build/crt0.o";
 }
 
 sub padding {
@@ -184,7 +181,7 @@ sub programs {
 		
 		my $out = "$folder/".$conf->param('name');
 		
-		&run("$LD -o $out.elf -d -T$load_script ".($conf->param('stdlib')? " @$runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
+		&run("$LD -o $out.elf -d -T$load_script ".($conf->param('stdlib')? " $runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
 		
                 &run("objcopy -O binary --only-section=.text $out.elf $out.text");
                 &run("objcopy -O binary --only-section=.data $out.elf $out.data");
@@ -255,9 +252,9 @@ sub qemu {
 sub build {
 	my ($boot1, $boot2) = &bootloader;
 	my @kernel = &kernel;
-	my @runtime = &runtime;
+	my $runtime = &runtime;
 	my $stdlib = &stdlib;
-	my @programs = &programs(\@runtime, $stdlib);
+	my @programs = &programs($runtime, $stdlib);
 	&img($boot1, $boot2, \@kernel, [@programs, 'docs/syscalls.md', <root/*>]);
 }
 

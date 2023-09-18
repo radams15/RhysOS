@@ -1,6 +1,6 @@
 OUTPUT_FORMAT("elf32-i386");
 
-ENTRY(_crt0);
+ENTRY(_start);
 
 SECTIONS
 {
@@ -9,7 +9,7 @@ SECTIONS
     {
         *(.text);
     }
-    . = 0x7000;
+    . = ADDRESS;
     .data :
     {
         *(.data);
@@ -20,7 +20,4 @@ SECTIONS
     {
         *(.comment);
     }
-
-    _heap_begin = 0x8000;
-    _heap_end = _heap_begin + 0x1000;
 }
