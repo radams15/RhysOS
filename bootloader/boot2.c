@@ -74,6 +74,8 @@ unsigned int fat_table[512];
 struct DirectoryEntry root_dir[32];
 
 int interrupt(int number, int AX, int BX, int CX, int DX);
+int highmem();
+int lowmem();
 
 void read_sector(int disk,
                  int track,
@@ -214,8 +216,8 @@ int main() {
     
     union SystemInfo info;
     info.rootfs_start = sect;
-    info.highmem = 5678;
-    info.lowmem = 1234;
+    info.highmem = highmem();
+    info.lowmem = lowmem();
 
     call_kernel(ds(), &info);
 

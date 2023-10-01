@@ -15,5 +15,8 @@ _lowmem:
 
 section .data
 
-__highmem: dw 0x5678
-__lowmem: dw 0x1234
+global __highmem;
+global __lowmem;
+
+__highmem: dw 0
+__lowmem: dw 0

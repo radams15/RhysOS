@@ -213,8 +213,8 @@ void a20_init() {
 }
 
 int init(union SystemInfo* info) {
-    /*_lowmem = info->lowmem;
-    _highmem = info->highmem;*/
+    _lowmem = info->lowmem;
+    _highmem = info->highmem;
 
     cls();
     FsNode_t* fs_dev;

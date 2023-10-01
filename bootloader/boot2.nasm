@@ -5,6 +5,8 @@ global _read_sector
 global _call_kernel
 global _printc
 global _ds
+global _lowmem
+global _highmem
 
 _printc:
 	push bp
@@ -29,6 +31,17 @@ _printc:
 _ds:
     mov ax, ds
     ret
+    
+_lowmem:
+	clc
+	int 12h
+	ret
+
+_highmem:
+	clc
+	mov ah, 88h
+	int 15h
+	ret
 
 ; void read_sector(int disk, int track, int head, int sector, int dst_addr, int dst_seg);
 _read_sector:
