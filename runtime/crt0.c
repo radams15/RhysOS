@@ -13,21 +13,21 @@ const int argv_item_size = 128;
 int start(int argc, char** argv_ext) {
     char** argv_in;
     
+    int my_ds = ds();
+    
     memmgr_init();
     
     char** argv = malloc(argc * sizeof(char));
     if(argc != 0) {
-        seg_copy(argv_ext, argv_in, argc*sizeof(char*), KERNEL_DATA, ds());
+        seg_copy(argv_ext, argv_in, argc*sizeof(char*), KERNEL_DATA, my_ds);
         
         for(int i=0 ; i<argc ; i++) {
             argv[i] = malloc(argv_item_size * sizeof(char));
-            seg_copy(argv_in[i], argv[i], argv_item_size, KERNEL_DATA, ds());
+            seg_copy(argv_in[i], argv[i], argv_item_size, KERNEL_DATA, my_ds);
         }
     }
     
     int ret = main(argc, argv);
-    
-    // free(argv); // Everything free'd at end of program anyway, may as well not do it again.
     
     return ret;
 }

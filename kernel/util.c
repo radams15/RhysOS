@@ -8,8 +8,8 @@ void memset(int* dest, int val, int len) {
 }
 
 void memcpy(char* dest, char* src, unsigned int n) {
-    while (n--)
-        *(dest++) = *(src++);
+    for(int i=0 ; i<n ; i++)
+        dest[i] = src[i];
 }
 
 void clear(int* ptr, unsigned int n) {

@@ -9,7 +9,7 @@ SECTIONS
     {
         *(.text);
     }
-    . = 0x6000;
+    
     .data :
     {
         *(.data);
@@ -22,5 +22,5 @@ SECTIONS
     }
 
     _heap_begin = 0x7000;
-    _heap_end = _heap_begin + 0x1000;
+    _heap_end = 0x8000;
 }

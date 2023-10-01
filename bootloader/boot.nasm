@@ -77,7 +77,7 @@ boot:
     clc
         
     ; boot2 @ sector 33 = CHS(0, 1, 16)
-        
+    
 	mov     cl,16      ;cl holds sector number, +1 as 1-indexed
 	mov     dh,1     ;dh holds head number - 0
 	mov     ch,0     ;ch holds track number - 0
@@ -104,20 +104,20 @@ boot:
 	jc .err
 .done:
 	print kernel_read_msg
-
-        jmp BOOT2_SEG:BOOT2_ADDR
+	
+    jmp BOOT2_SEG:BOOT2_ADDR
+    
+    jmp .end
+    
+.err:
+	print err_msg
 .end:
 	jmp $
 
-.err:
-	print err_msg
-	jmp $
 
-boot_msg: db 'Booting RhysOS...', 0xa, 0xd, 0
+boot_msg: db 'Reading RhysOS...', 0xa, 0xd, 0
 kernel_read_msg: db 'Kernel read complete!', 0xa, 0xd, 0
 err_msg: db 'Disk read error!', 0xa, 0xd, 0
-
-buf times 64 db 0
 
 times 510-($-$$) db 0
 

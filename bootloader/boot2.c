@@ -9,7 +9,7 @@ void entry() {
 #define FS_SECT 0
 
 #ifndef ENABLE_SPLASH
-#define ENABLE_SPLASH 0
+#define ENABLE_SPLASH 1
 #endif
 
 struct SystemInfo {
@@ -162,6 +162,8 @@ int strcpy(char* dst, char* src) {
 }
 
 int main() {
+    print("Bootloader stage 2\n");
+    
     unsigned char fat_sector[512];
 
     int sect = FS_SECT;
@@ -201,20 +203,12 @@ int main() {
 
     for (int i = 0; i < 32; i++) {
         struct DirectoryEntry* file = &root_dir[i];
-
-        if (strncmp(file->fullname, "SYS     TXT", 11) == 0) {
+        
+        if (strncmp(file->fullname, "KERNEL  BIN", 11) == 0) {
 #if ENABLE_SPLASH
-            print("Loading code: [");
+            print("Loading kernel: [");
 #endif
-            load_segment(0, file->cluster, 0x1000, KERNEL_SEGMENT);
-#if ENABLE_SPLASH
-            print("]\n");
-#endif
-        } else if (strncmp(file->fullname, "SYS     DAT", 11) == 0) {
-#if ENABLE_SPLASH
-            print("Loading data: [");
-#endif
-            load_segment(0, file->cluster, 0x6000, DATA_SEGMENT);
+            load_segment(0, file->cluster, 0x1000, DATA_SEGMENT);
 #if ENABLE_SPLASH
             print("]\n");
 #endif

@@ -9,12 +9,15 @@ global _lowmem
 global _highmem
 
 _printc:
+    push bp
+    mov bp, sp
+
     mov al, [bp+4]
     mov ah, 0Eh
-    
-    cmp al, 0Ah ; if print '\n', the print '\r\n' 
 .print:
     int 10h
+    
+    pop bp
     ret
         
 _ds:
@@ -74,7 +77,7 @@ _call_kernel:
     push dx
     push 00 ; ??
     
-    jmp KERNEL_SEGMENT:0x1000
+    jmp DATA_SEGMENT:0x1000
     
     pop bp
     ret
