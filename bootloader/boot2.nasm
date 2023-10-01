@@ -4,26 +4,33 @@ global _interrupt
 global _read_sector
 global _call_kernel
 global _printc
+global _ds
+global _lowmem
+global _highmem
 
 _printc:
-	push bp
-	mov bp,sp
+    mov al, [bp+4]
+    mov ah, 0Eh
+    
+    cmp al, 0Ah ; if print '\n', the print '\r\n' 
+.print:
+    int 10h
+    ret
+        
+_ds:
+    mov ax, ds
+    ret
+    
+_lowmem:
+	clc
+	int 12h
+	ret
 
-        mov al, [bp+4]
-        mov ah, 0Eh
-        
-        cmp al, 0Ah ; if print '\n', the print '\r\n' 
-        jne .print
-        
-        mov al, 0Dh
-        int 10h
-        mov al, 0Ah
-        
-.print
-        int 10h
-        
-        pop bp
-        ret
+_highmem:
+	clc
+	mov ah, 88h
+	int 15h
+	ret
 
 ; void read_sector(int disk, int track, int head, int sector, int dst_addr, int dst_seg);
 _read_sector:
@@ -49,23 +56,25 @@ _read_sector:
 	pop bp
 	ret
 
-; void call_kernel()
+; void call_kernel(int ds, union SystemInfo* info)
 _call_kernel:
 	push bp
 	mov bp, sp
 	
+	mov cx, [bp+6]
 	mov dx, [bp+4]
 	
-        mov ax, DATA_SEGMENT
-        mov ds, ax
-        mov ss, ax
-        mov es, ax
-        
-        push 00 ; ??
-        push dx
-        push 00 ; ??
-        
-        jmp KERNEL_SEGMENT:0x1000
-        
-        pop bp
-        ret
+    mov ax, DATA_SEGMENT
+    mov ds, ax
+    mov ss, ax
+    mov es, ax
+    
+    push 00 ; ??
+    push cx
+    push dx
+    push 00 ; ??
+    
+    jmp KERNEL_SEGMENT:0x1000
+    
+    pop bp
+    ret

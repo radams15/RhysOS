@@ -9,8 +9,17 @@ void entry() {
 #define FS_SECT 0
 
 #ifndef ENABLE_SPLASH
-#define ENABLE_SPLASH 1
+#define ENABLE_SPLASH 0
 #endif
+
+struct SystemInfo {
+    int rootfs_start;
+    int highmem;
+    int lowmem;
+    char cmdline[256];
+};
+
+extern int ds();
 
 union BiosBlock {
     struct {
@@ -62,6 +71,8 @@ unsigned int fat_table[512];
 struct DirectoryEntry root_dir[32];
 
 int interrupt(int number, int AX, int BX, int CX, int DX);
+int highmem();
+int lowmem();
 
 void read_sector(int disk,
                  int track,
@@ -70,7 +81,7 @@ void read_sector(int disk,
                  int dst_addr,
                  int dst_seg);
 
-void call_kernel(int rootfs_start);
+void call_kernel(int ds, struct SystemInfo* info);
 
 void read_sector_lba(int disk, int lba, int dst_addr, int dst_seg) {
     int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
@@ -81,8 +92,11 @@ void read_sector_lba(int disk, int lba, int dst_addr, int dst_seg) {
 }
 
 void print(char* str) {
-    for (; *str != 0; str++)
+    for (; *str != 0; str++) {
+        if(*str == '\n')
+            printc('\r');
         printc(*str);
+    }
 }
 
 int read_cluster(int disk, int cluster, int dst_addr, int dst_seg) {
@@ -138,6 +152,15 @@ void splash() {
     print("\n\n");
 }
 
+int strcpy(char* dst, char* src) {
+    int len;
+    for(len = 0 ; src[len] != 0 ; len++) {
+        dst[len] = src[len];
+    }
+    
+    return len;
+}
+
 int main() {
     unsigned char fat_sector[512];
 
@@ -191,7 +214,7 @@ int main() {
 #if ENABLE_SPLASH
             print("Loading data: [");
 #endif
-            load_segment(0, file->cluster, 0x5000, DATA_SEGMENT);
+            load_segment(0, file->cluster, 0x6000, DATA_SEGMENT);
 #if ENABLE_SPLASH
             print("]\n");
 #endif
@@ -199,8 +222,16 @@ int main() {
     }
 
     print("\nKernel Loaded!\n");
+    
+    const char* cmdline = ""; // Kernel command line passed to kernel.
+    
+    struct SystemInfo info;
+    info.rootfs_start = sect;
+    info.highmem = highmem();
+    info.lowmem = lowmem();
+    strcpy(info.cmdline, cmdline);
 
-    call_kernel(sect);
+    call_kernel(ds(), &info);
 
     for (;;) {
     }

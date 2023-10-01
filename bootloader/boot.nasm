@@ -3,7 +3,6 @@ org 7c00h
 
 BOOT2_SEG	equ 0x0050
 BOOT2_ADDR	equ	0 ; address to place kernel in
-BOOT2_SIZ	equ	3 ; sectors in kernel
 SECT_PER_TRACK equ 18
 
 jmp short boot
@@ -75,15 +74,29 @@ boot:
 
 	; Read 18 sectors of head 0
 
-        clc
+    clc
         
-        ; boot2 @ sector 33 = CHS(0, 1, 16)
+    ; boot2 @ sector 33 = CHS(0, 1, 16)
         
 	mov     cl,16      ;cl holds sector number, +1 as 1-indexed
 	mov     dh,1     ;dh holds head number - 0
 	mov     ch,0     ;ch holds track number - 0
-	mov     al, BOOT2_SIZ        ;read up to 18 sectors
+	mov     al, 3        ;read up to 18 sectors
 	mov     bx, BOOT2_ADDR		;read into 0 (in the segment)
+	mov     dl,0            ;read from floppy disk A
+	mov     ah,2            ;absolute disk read
+	int     13h	;call BIOS disk read function
+	
+	jc .err
+	
+	; Read further 1 sector (needs repeat on 286s and below as goes past a cylinder boundary).
+	; Sector 36 = CHS(1, 0, 1);
+	
+	mov     cl,1      ;cl holds sector number, +1 as 1-indexed
+	mov     dh,0     ;dh holds head number - 0
+	mov     ch,1     ;ch holds track number - 0
+	mov     al, 1        ;read up to 18 sectors
+	mov     bx, BOOT2_ADDR+(3*512)		;read into 0 (in the segment)
 	mov     dl,0            ;read from floppy disk A
 	mov     ah,2            ;absolute disk read
 	int     13h	;call BIOS disk read function

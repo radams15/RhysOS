@@ -26,8 +26,8 @@ _main:
 	push bp
 	mov bp, sp
 
-    mov si, test
-    call print_str
+	mov si, test
+	call print_str
 	
 	push bx
 

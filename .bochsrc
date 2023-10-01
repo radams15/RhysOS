@@ -3,4 +3,3 @@ boot: floppy
 magic_break: enabled=1
 romimage: file=$BXSHARE/BIOS-bochs-legacy
 memory: guest=3, host=5
-sound: waveoutdrv=dummy

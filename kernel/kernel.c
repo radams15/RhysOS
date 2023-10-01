@@ -1,31 +1,44 @@
-void main(int rootfs_start);
-void entry(int a) {
-    main(a);
+void main(int src_ds, void* boot_ptr);
+void entry(int src_ds, void* boot_ptr) {
+    main(src_ds, boot_ptr);
 }
 
 #include "fs/fs.h"
 #include "malloc.h"
 #include "proc.h"
 #include "tty.h"
+#include "util.h"
+#include "sysinfo.h"
 
 #include "fs/devfs.h"
 #include "fs/fat.h"
 
 #include "clock.h"
-#include "graphics.h"
 #include "serial.h"
 
 #define EXE_SIZE 8192
 #define SHELL_SIZE EXE_SIZE
+#define SYSCALL_BUF_SIZ 1024
+
+struct SystemInfo {
+    int rootfs_start;
+    int highmem;
+    int lowmem;
+    char cmdline[256];
+};
 
 int stdin, stdout, stderr;
 
-int init(int rootfs_start);
+int init(struct SystemInfo* info);
 
-void main(int rootfs_start) {
+void main(int src_ds, void* boot_ptr) {
     int err;
+    
+    struct SystemInfo info;
+    
+    seg_copy(boot_ptr, &info, sizeof(struct SystemInfo), src_ds, DATA_SEGMENT);
 
-    err = init(rootfs_start);
+    err = init(&info);
 
     if (err) {
         print_string("\r\nError in kernel, halting!\r\n");
@@ -35,7 +48,7 @@ void main(int rootfs_start) {
     }
 }
 
-int list_directory(char* dir_name, FsNode_t* buf, int max) {
+int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
     int i = 0;
     int count = 0;
     DirEnt_t* node = NULL;
@@ -50,8 +63,12 @@ int list_directory(char* dir_name, FsNode_t* buf, int max) {
     while ((node = fs_readdir(root, i)) != NULL && count <= max) {
         fsnode = fs_finddir(root, node->name);
         if (fsnode != NULL) {
-            if (buf != NULL)
-                memcpy(buf++, fsnode, sizeof(FsNode_t));
+            if (buf != NULL) {
+                buf++;
+                seg_copy(fsnode, buf, sizeof(FsNode_t), DATA_SEGMENT, ds);
+                seg_copy(fsnode->name, buf->name, FILE_NAME_MAX*sizeof(char), DATA_SEGMENT, ds);
+                //print_string(fsnode->name);
+            }
             count++;
         }
 
@@ -61,36 +78,93 @@ int list_directory(char* dir_name, FsNode_t* buf, int max) {
     return count;
 }
 
+void debug(const char* label, int data) {
+	print_string(label);
+	printi(data, 16);
+	print_string("\n");
+}
+
 typedef struct SyscallArgs {
     int num;  // Syscall number
     int a, b, c, d, e, f;
-    int ds;  // Data segment
+    int cs, ds;  // Data segment
 } SyscallArgs_t;
 
-int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
-    SyscallArgs_t* args = ax;
+int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
+
+int i21_handler(SyscallArgs_t* args) {
+    const int argv_item_size = 64; // 64 chars per arg
 
     switch (args->num) {
-        case 1:
-            args->num =
-                exec(args->a, args->b, args->c, args->d, args->e, args->f);
+        case 1: {
+                char name[128];
+                
+                char** argv_in;
+                char** argv = malloc(args->b * sizeof(char));
+                
+		        seg_copy(args->c, argv_in, args->b*sizeof(char*), args->ds, DATA_SEGMENT);
+                
+                for(int i=0 ; i<args->b ; i++) {
+                    argv[i] = malloc(argv_item_size * sizeof(char));
+    		        seg_copy(argv_in[i], argv[i], argv_item_size, args->ds, DATA_SEGMENT);
+                }
+                
+		        seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
+                int ret = exec(name, args->b, argv, args->d, args->e, args->f);
+                
+                for(int i=0 ; i<args->b ; i++) {
+                    free(argv[i]);
+                }
+                free(argv);
+            }
             break;
 
-        case 2:
-            args->num = list_directory(args->a, args->b, args->c);
-            break;
+        case 2: {
+            char name[128];
+	        seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
+        
+            return list_directory(name, args->b, args->c, args->ds);
+        }
 
-        case 3:
-            args->num = read(args->a, args->b, args->c);
-            break;
+        case 3: {
+                int read_len = args->c;
+                char buf[SYSCALL_BUF_SIZ];
+                char* dst = args->b;
+                
+                int ret = 0;
+                int len;
+                
+                while(read_len >= SYSCALL_BUF_SIZ) {
+                    read_len -= SYSCALL_BUF_SIZ;
+                    
+                    len = read(args->a, buf, SYSCALL_BUF_SIZ);
+                    ret += len;
+                    
+                    seg_copy(buf, dst, len, DATA_SEGMENT, args->ds);
+                    
+                    dst += ret;
+                }
+                
+                if(read_len) {
+                    len = read(args->a, buf, read_len);
+                    ret += len;
+                    seg_copy(buf, dst, read_len, DATA_SEGMENT, args->ds);
+                }
+                
+                return ret;
+            }
 
-        case 4:
-            args->num = write(args->a, args->b, args->c);
-            break;
+        case 4: {
+	            char text[SYSCALL_BUF_SIZ];
+		        seg_copy(args->b, text, sizeof(text), args->ds, DATA_SEGMENT);
+        	    return write(args->a, text, args->c);
+            }
 
-        case 5:
-            args->num = open(args->a);
-            break;
+        case 5: {
+	            char name[SYSCALL_BUF_SIZ];
+		        seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
+		        return open(name);
+            }
 
         case 6:
             close(args->a);
@@ -104,9 +178,20 @@ int handleInterrupt21(int* ax, int bx, int cx, int* dx) {
             print_string("Unknown interrupt: ");
             printi(args->a, 16);
             print_string("!\r\n");
-            args->num = -1;
+            return -1;
             break;
     }
+    
+    return 0;
+}
+
+int handleInterrupt21(int* ax, int ss, int cx, int dx) { 
+    SyscallArgs_t arg_data;
+    seg_copy(ax, &arg_data, sizeof(SyscallArgs_t), ss, DATA_SEGMENT);
+    
+    arg_data.num = i21_handler(&arg_data);
+    
+    seg_copy(&arg_data, ax, sizeof(SyscallArgs_t), DATA_SEGMENT, ss);
 }
 
 void a20_init() {
@@ -124,10 +209,12 @@ void a20_init() {
     }
 }
 
-int init(int rootfs_start) {
+int init(struct SystemInfo* info) {
     cls();
-    FsNode_t* fs_dev;
-
+    
+    _lowmem = info->lowmem;
+    _highmem = info->highmem;
+    
     a20_init();
 
     memmgr_init();
@@ -142,8 +229,8 @@ int init(int rootfs_start) {
     serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
     print_string("/dev/COM1 enabled\n");
 
-    fs_root = fat_init(rootfs_start);
-    fs_dev = devfs_init();
+    fs_root = fat_init(info->rootfs_start);
+    FsNode_t* fs_dev = devfs_init();
     fat_mount(fs_dev, "dev");
     print_string("Root filesystem mounted\n");
 
@@ -152,8 +239,6 @@ int init(int rootfs_start) {
     stderr = open("/dev/stderr");
 
     print_string("Welcome to RhysOS!\n\n");
-    
-    fat_create("out.txt");
 
     exec("mem", 0, NULL, stdin, stdout, stderr);
     print_string("\n");

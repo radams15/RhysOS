@@ -30,10 +30,12 @@ int main(int argc, char** argv) {
     } else if (argc == 2) {
         if (STREQ("40", argv[1])) {
             set_graphics_mode(GRAPHICS_MONO_40x25);
+        } else if (STREQ("80", argv[1])) {
+            set_graphics_mode(GRAPHICS_MONO_80x25);
         } else if (STREQ("cga", argv[1])) {
             set_graphics_mode(GRAPHICS_CGA_320x200);
         } else {
-            set_graphics_mode(GRAPHICS_MONO_80x25);
+            printf("Unknown graphics mode: %s\n", argv[1]);
         }
     } else {
         printf("Usage: %s [MODE]\n", argv[0]);
