@@ -87,7 +87,7 @@ FsNode_t* get_dir(char* name) {
     char* tok;
 
     char buf[256];
-    memcpy(&buf, name, 100);
+    memcpy(&buf, name, strlen(name));
     buf[strlen(name)] = 0;
 
     tok = strtok(buf, "/");

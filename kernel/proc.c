@@ -71,10 +71,6 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
 
     read_lba_to_segment(0, cluster_to_lba(cluster), &header, DATA_SEGMENT);
 
-    print_string(file_name);
-    printi(cluster, 10);
-    print_string(header.buf);
-
     if (header.magic[0] != 'R' || header.magic[1] != 'Z') {
         print_string("Invalid header magic!\n");
         return 1;
