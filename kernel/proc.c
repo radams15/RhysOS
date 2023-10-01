@@ -8,13 +8,15 @@
 
 int segments[3] = {0}; // bitmap of the segments to use in parallel
 
-typedef struct ExeHeader {
-    char magic[2];
-    short load_address;
-    short segment;
-    short text_size;
-    short data_size;
-    char _buf[512];
+typedef union ExeHeader {
+    struct {
+        char magic[2];
+        short load_address;
+        short segment;
+        short text_size;
+        short data_size;
+    };
+    char buf[512];
 } ExeHeader_t;
 
 int memcmp(char* a, char* b, int n) {
@@ -68,6 +70,10 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
     int cluster = fs_node->start_sector;
 
     read_lba_to_segment(0, cluster_to_lba(cluster), &header, DATA_SEGMENT);
+
+    print_string(file_name);
+    printi(cluster, 10);
+    print_string(header.buf);
 
     if (header.magic[0] != 'R' || header.magic[1] != 'Z') {
         print_string("Invalid header magic!\n");
