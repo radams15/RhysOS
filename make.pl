@@ -189,9 +189,6 @@ sub programs {
 
         &run("objcopy -O binary $out.elf $out.bin");
 
-        my $textsize = ceil((stat "$out.text")[7]);
-        my $datasize = ceil((stat "$out.data")[7]);
-
 		open FH, '<', "$out.bin";
 		binmode FH;
 		my $text = join '', <FH>;
@@ -208,7 +205,7 @@ sub programs {
 		}
 =cut
 		
-		my $header = pack('A2SSSS', 'RZ', eval($load_addr), eval($segment), ceil($textsize/512), ceil($datasize/512));
+		my $header = pack('A2SSSS', 'RZ', eval($load_addr), eval($segment), 0, 0);
 		print FH $header;
 		print FH $text;
 		close FH;
