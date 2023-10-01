@@ -41,7 +41,7 @@ sub run {
 	print "$cmd\n";
 	my $ret = system($cmd);
 
-	die if $ret;
+	die $ret if $ret;
 
 	$ret;
 }
@@ -87,10 +87,12 @@ sub kernel {
 	
 	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel.o ".(join ' ', @objs));
 
-	&run("objcopy -O binary --only-section=.text build/kernel.elf build/sys.txt");
-	&run("objcopy -O binary --only-section=.data build/kernel.elf build/sys.dat");
+	#&run("objcopy -O binary --only-section=.text build/kernel.elf build/sys.txt");
+	#&run("objcopy -O binary --only-section=.data build/kernel.elf build/sys.dat");
+	
+	&run("objcopy -O binary build/kernel.elf build/kernel.bin");
 
-	'build/sys.txt', 'build/sys.dat';
+	'build/kernel.bin';
 }
 
 sub stdlib {	
@@ -241,7 +243,7 @@ sub img {
 	&run("dd if=/dev/zero of=build/system.img bs=512 count=2880");
         &run("mkdosfs -F12 build/system.img");
 	
-	&run("mcopy -i build/system.img ".(join ' ', $boot2, @$kernel, @$extra_files)." ::");
+	&run("mcopy -i build/system.img ".(join ' ', $boot2, $kernel, @$extra_files)." ::");
 	
 	&run("dd if=$boot1 of=build/system.img bs=512 count=1 conv=notrunc");
 	
@@ -254,11 +256,11 @@ sub qemu {
 
 sub build {
 	my ($boot1, $boot2) = &bootloader;
-	my @kernel = &kernel;
+	my $kernel = &kernel;
 	my @runtime = &runtime;
 	my $stdlib = &stdlib;
 	my @programs = &programs(\@runtime, $stdlib);
-	&img($boot1, $boot2, \@kernel, [@programs, 'docs/syscalls.md', <root/*>]);
+	&img($boot1, $boot2, $kernel, [@programs, 'docs/syscalls.md', <root/*>]);
 }
 
 sub clean {

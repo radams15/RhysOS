@@ -5,12 +5,12 @@ ENTRY(_main);
 SECTIONS
 {
     . = 0x1000;
+    
     .text :
     {
         *(.text);
     }
 
-    . = 0x6000;
     .data :
     {
         *(.data);
