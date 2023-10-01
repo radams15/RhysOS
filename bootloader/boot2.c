@@ -92,8 +92,11 @@ void read_sector_lba(int disk, int lba, int dst_addr, int dst_seg) {
 }
 
 void print(char* str) {
-    for (; *str != 0; str++)
+    for (; *str != 0; str++) {
+        if(*str == '\n')
+            printc('\r');
         printc(*str);
+    }
 }
 
 int read_cluster(int disk, int cluster, int dst_addr, int dst_seg) {
