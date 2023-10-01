@@ -12,14 +12,11 @@ void entry() {
 #define ENABLE_SPLASH 0
 #endif
 
-union SystemInfo {
-    struct {
-        int rootfs_start;
-        int highmem;
-        int lowmem;
-    };
-    
-    char raw[512]; // make whole block 512 bytes long to ease copying
+struct SystemInfo {
+    int rootfs_start;
+    int highmem;
+    int lowmem;
+    char cmdline[256];
 };
 
 extern int ds();
@@ -84,7 +81,7 @@ void read_sector(int disk,
                  int dst_addr,
                  int dst_seg);
 
-void call_kernel(int ds, union SystemInfo* info);
+void call_kernel(int ds, struct SystemInfo* info);
 
 void read_sector_lba(int disk, int lba, int dst_addr, int dst_seg) {
     int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
@@ -152,6 +149,15 @@ void splash() {
     print("\n\n");
 }
 
+int strcpy(char* dst, char* src) {
+    int len;
+    for(len = 0 ; src[len] != 0 ; len++) {
+        dst[len] = src[len];
+    }
+    
+    return len;
+}
+
 int main() {
     unsigned char fat_sector[512];
 
@@ -214,10 +220,13 @@ int main() {
 
     print("\nKernel Loaded!\n");
     
-    union SystemInfo info;
+    const char* cmdline = ""; // Kernel command line passed to kernel.
+    
+    struct SystemInfo info;
     info.rootfs_start = sect;
     info.highmem = highmem();
     info.lowmem = lowmem();
+    strcpy(info.cmdline, cmdline);
 
     call_kernel(ds(), &info);
 

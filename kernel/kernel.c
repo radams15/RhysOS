@@ -20,26 +20,23 @@ void entry(int src_ds, void* boot_ptr) {
 #define SHELL_SIZE EXE_SIZE
 #define SYSCALL_BUF_SIZ 1024
 
-union SystemInfo {
-    struct {
-        int rootfs_start;
-        int highmem;
-        int lowmem;
-    };
-    
-    char raw[512]; // make whole block 512 bytes long to ease copying
+struct SystemInfo {
+    int rootfs_start;
+    int highmem;
+    int lowmem;
+    char cmdline[256];
 };
 
 int stdin, stdout, stderr;
 
-int init(union SystemInfo* info);
+int init(struct SystemInfo* info);
 
 void main(int src_ds, void* boot_ptr) {
     int err;
     
-    union SystemInfo info;
+    struct SystemInfo info;
     
-    seg_copy(boot_ptr, &info, sizeof(union SystemInfo), src_ds, DATA_SEGMENT);
+    seg_copy(boot_ptr, &info, sizeof(struct SystemInfo), src_ds, DATA_SEGMENT);
 
     err = init(&info);
 
@@ -212,13 +209,12 @@ void a20_init() {
     }
 }
 
-int init(union SystemInfo* info) {
+int init(struct SystemInfo* info) {
+    cls();
+    
     _lowmem = info->lowmem;
     _highmem = info->highmem;
-
-    cls();
-    FsNode_t* fs_dev;
-
+    
     a20_init();
 
     memmgr_init();
@@ -234,7 +230,7 @@ int init(union SystemInfo* info) {
     print_string("/dev/COM1 enabled\n");
 
     fs_root = fat_init(info->rootfs_start);
-    fs_dev = devfs_init();
+    FsNode_t* fs_dev = devfs_init();
     fat_mount(fs_dev, "dev");
     print_string("Root filesystem mounted\n");
 
