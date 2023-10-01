@@ -9,8 +9,20 @@ void entry() {
 #define FS_SECT 0
 
 #ifndef ENABLE_SPLASH
-#define ENABLE_SPLASH 1
+#define ENABLE_SPLASH 0
 #endif
+
+union SystemInfo {
+    struct {
+        int rootfs_start;
+        int highmem;
+        int lowmem;
+    };
+    
+    char raw[512]; // make whole block 512 bytes long to ease copying
+};
+
+extern int ds();
 
 union BiosBlock {
     struct {
@@ -70,7 +82,7 @@ void read_sector(int disk,
                  int dst_addr,
                  int dst_seg);
 
-void call_kernel(int rootfs_start);
+void call_kernel(int ds, union SystemInfo* info);
 
 void read_sector_lba(int disk, int lba, int dst_addr, int dst_seg) {
     int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
@@ -199,8 +211,13 @@ int main() {
     }
 
     print("\nKernel Loaded!\n");
+    
+    union SystemInfo info;
+    info.rootfs_start = sect;
+    info.highmem = 5678;
+    info.lowmem = 1234;
 
-    call_kernel(sect);
+    call_kernel(ds(), &info);
 
     for (;;) {
     }

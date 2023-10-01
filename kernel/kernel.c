@@ -1,12 +1,14 @@
-void main(int rootfs_start);
-void entry(int a) {
-    main(a);
+void main(int src_ds, void* boot_ptr);
+void entry(int src_ds, void* boot_ptr) {
+    main(src_ds, boot_ptr);
 }
 
 #include "fs/fs.h"
 #include "malloc.h"
 #include "proc.h"
 #include "tty.h"
+#include "util.h"
+#include "sysinfo.h"
 
 #include "fs/devfs.h"
 #include "fs/fat.h"
@@ -18,14 +20,28 @@ void entry(int a) {
 #define SHELL_SIZE EXE_SIZE
 #define SYSCALL_BUF_SIZ 1024
 
+union SystemInfo {
+    struct {
+        int rootfs_start;
+        int highmem;
+        int lowmem;
+    };
+    
+    char raw[512]; // make whole block 512 bytes long to ease copying
+};
+
 int stdin, stdout, stderr;
 
-int init(int rootfs_start);
+int init(union SystemInfo* info);
 
-void main(int rootfs_start) {
+void main(int src_ds, void* boot_ptr) {
     int err;
+    
+    union SystemInfo info;
+    
+    seg_copy(boot_ptr, &info, sizeof(union SystemInfo), src_ds, DATA_SEGMENT);
 
-    err = init(rootfs_start);
+    err = init(&info);
 
     if (err) {
         print_string("\r\nError in kernel, halting!\r\n");
@@ -135,7 +151,7 @@ int i21_handler(SyscallArgs_t* args) {
                 if(read_len) {
                     len = read(args->a, buf, read_len);
                     ret += len;
-                    seg_copy(buf, dst, len, DATA_SEGMENT, args->ds);
+                    seg_copy(buf, dst, read_len, DATA_SEGMENT, args->ds);
                 }
                 
                 return ret;
@@ -196,7 +212,10 @@ void a20_init() {
     }
 }
 
-int init(int rootfs_start) {
+int init(union SystemInfo* info) {
+    /*_lowmem = info->lowmem;
+    _highmem = info->highmem;*/
+
     cls();
     FsNode_t* fs_dev;
 
@@ -214,7 +233,7 @@ int init(int rootfs_start) {
     serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
     print_string("/dev/COM1 enabled\n");
 
-    fs_root = fat_init(rootfs_start);
+    fs_root = fat_init(info->rootfs_start);
     fs_dev = devfs_init();
     fat_mount(fs_dev, "dev");
     print_string("Root filesystem mounted\n");
@@ -224,14 +243,10 @@ int init(int rootfs_start) {
     stderr = open("/dev/stderr");
 
     print_string("Welcome to RhysOS!\n\n");
-    
-    //fat_create("out.txt");
-    
-    char* test[] = {"hello", "world"};
 
-    exec("mem", 2, test, stdin, stdout, stderr);
-    print_string("\nNext\n");
-    exec("shell", 2, test, stdin, stdout, stderr);
+    exec("mem", 0, NULL, stdin, stdout, stderr);
+    print_string("\n");
+    exec("shell", 0, NULL, stdin, stdout, stderr);
 
     close(stdin);
     close(stdout);

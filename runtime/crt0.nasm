@@ -29,7 +29,6 @@ _crt0:
     
     push DWORD bx ; argc
     push DWORD cx ; argv
-    xchg bx, bx
     call _start
     add sp, 4
     retf

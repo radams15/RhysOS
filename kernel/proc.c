@@ -6,7 +6,7 @@
 
 #include "serial.h"
 
-int segments[5] = {0}; // bitmap of the segments to use in parallel
+int segments[3] = {0}; // bitmap of the segments to use in parallel
 
 typedef struct ExeHeader {
     char magic[2];
@@ -30,7 +30,7 @@ int memcmp(char* a, char* b, int n) {
     return 0;  // Are the same
 }
 
-int segment_top = 0x5000;
+int segment_top = 0x4000;
 
 typedef int (*prog_t)(int argc, char** argv, int in, int out, int err);
 int call_0x5000(int argc, char** argv, int in, int out, int err);
@@ -90,7 +90,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
          sectors_read < header.text_size && cluster < 0xFF8;
          cluster = fat_next_cluster(cluster)) {
         read_lba_to_segment(0, cluster_to_lba(cluster), addr,
-                            segment);  // Code to segment:0x1000
+                            segment);  // Code to segment:text
         addr += 512;
         sectors_read++;
     }
@@ -98,7 +98,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
     addr = header.load_address;
     for (; cluster < 0xFF8; cluster = fat_next_cluster(cluster)) {
         read_lba_to_segment(0, cluster_to_lba(cluster), addr,
-                            segment);  // Data to 0x3000:data_address
+                            segment);  // Data to segment:data
         addr += 512;
     }
 

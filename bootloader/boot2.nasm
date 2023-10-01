@@ -4,6 +4,7 @@ global _interrupt
 global _read_sector
 global _call_kernel
 global _printc
+global _ds
 
 _printc:
 	push bp
@@ -19,11 +20,15 @@ _printc:
         int 10h
         mov al, 0Ah
         
-.print
+.print:
         int 10h
         
         pop bp
         ret
+        
+_ds:
+    mov ax, ds
+    ret
 
 ; void read_sector(int disk, int track, int head, int sector, int dst_addr, int dst_seg);
 _read_sector:
@@ -49,11 +54,12 @@ _read_sector:
 	pop bp
 	ret
 
-; void call_kernel()
+; void call_kernel(int ds, union SystemInfo* info)
 _call_kernel:
 	push bp
 	mov bp, sp
 	
+	mov cx, [bp+6]
 	mov dx, [bp+4]
 	
         mov ax, DATA_SEGMENT
@@ -62,6 +68,7 @@ _call_kernel:
         mov es, ax
         
         push 00 ; ??
+        push cx
         push dx
         push 00 ; ??
         

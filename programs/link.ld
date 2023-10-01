@@ -9,7 +9,7 @@ SECTIONS
     {
         *(.text);
     }
-    . = 0x7000;
+    . = 0x6000;
     .data :
     {
         *(.data);
@@ -21,6 +21,6 @@ SECTIONS
         *(.comment);
     }
 
-    _heap_begin = 0x8000;
+    _heap_begin = 0x7000;
     _heap_end = _heap_begin + 0x1000;
 }

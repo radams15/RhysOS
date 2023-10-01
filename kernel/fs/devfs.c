@@ -60,32 +60,20 @@ void stderr_write(FsNode_t* node,
     }
 }
 
-void stdin_read(FsNode_t* node,
+int stdin_read(FsNode_t* node,
                 unsigned int offset,
                 unsigned int size,
                 unsigned char* buffer) {
-    // unsigned char* top;
     int i;
 
     for (i = 0; i < size; i++) {
         buffer[i] = getch();
     }
-    /*char c;
-
-    while(buffer < top+size) {
-            c = getch();
-
-            if(c == 0x8) { // backspace
-                    *(buffer--) = ' ';
-            } else {
-                    *(buffer++) = c;
-            }
-    }
-
-    *(buffer++) = 0; // null-terminate*/
+    
+    return size;
 }
 
-void com1_read(FsNode_t* node,
+int com1_read(FsNode_t* node,
                unsigned int offset,
                unsigned int size,
                unsigned char* buffer) {
@@ -94,6 +82,8 @@ void com1_read(FsNode_t* node,
     for (i = 0; i < size; i++) {
         buffer[i] = serial_getc(COM1);
     }
+    
+    return size;
 }
 
 void com1_write(FsNode_t* node,
@@ -116,74 +106,31 @@ int chars2int(unsigned char* buffer) {
     return (buffer[1] << 8) | buffer[0];
 }
 
-void lowmem_read(FsNode_t* node,
+int lowmem_read(FsNode_t* node,
                  unsigned int offset,
                  unsigned int size,
                  unsigned char* buffer) {
-    unsigned int mem = lowmem();
+    int mem = lowmem();
     int2chars(mem, buffer);
+    return 2;
 }
 
-void highmem_read(FsNode_t* node,
+int highmem_read(FsNode_t* node,
                   unsigned int offset,
                   unsigned int size,
                   unsigned char* buffer) {
     int mem = highmem();
     int2chars(mem, buffer);
+    return 2;
 }
 
-void mem_read(FsNode_t* node,
-              unsigned int offset,
-              unsigned int size,
-              unsigned char* buffer) {
-    int low = lowmem();
-    int high = highmem();
-    int2chars(low + high, buffer);
-}
-
-void fda_read(FsNode_t* node,
-              unsigned int byte_offset,
-              unsigned int byte_size,
-              unsigned char* out_buffer) {
-    signed int start_sector;
-    unsigned int sector_offset;
-    unsigned int sector_bytes;
-    unsigned int bytes_read = 0;
-    unsigned int end_byte_offset;
-    unsigned char temp_buffer[SECTOR_SIZE];
-    int i;
-
-    end_byte_offset = byte_offset + byte_size;
-
-    if (byte_size <= 0) {
-        return;
-    }
-
-    start_sector = byte_offset / SECTOR_SIZE;
-    sector_offset = byte_offset % SECTOR_SIZE;
-
-    while (bytes_read < byte_size) {
-        read_sector(&temp_buffer, start_sector);
-
-        sector_bytes = MIN(SECTOR_SIZE - sector_offset, byte_size - bytes_read);
-
-        memcpy(out_buffer + bytes_read, temp_buffer + sector_offset,
-               sector_bytes);
-
-        bytes_read += sector_bytes;
-        start_sector++;
-        sector_offset = 0;
-    }
-
-    out_buffer[bytes_read] = 0;  // Null terminate, just in case it's a string.
-}
-
-void graphics_mode_read(FsNode_t* node,
+int graphics_mode_read(FsNode_t* node,
                         unsigned int byte_offset,
                         unsigned int byte_size,
                         unsigned char* out_buffer) {
     int mode = get_graphics_mode();
     int2chars(mode, out_buffer);
+    return 2;
 }
 
 void graphics_mode_write(FsNode_t* node,
@@ -194,11 +141,12 @@ void graphics_mode_write(FsNode_t* node,
     set_graphics_mode(mode);
 }
 
-void time_read(FsNode_t* node,
+int time_read(FsNode_t* node,
                unsigned int byte_offset,
                unsigned int byte_size,
                unsigned char* out_buffer) {
     time(out_buffer);
+    return 2;
 }
 
 void tty_fg_write(FsNode_t* node,
@@ -304,38 +252,6 @@ void devfs_setup() {
     root_nodes[i].length = 2;
     root_nodes[i].offset = 0;
     root_nodes[i].read = lowmem_read;
-    root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-    num_root_nodes++;
-
-    i++;
-
-    strcpyz(root_nodes[i].name, "mem");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 2;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = mem_read;
-    root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-    num_root_nodes++;
-
-    i++;
-
-    strcpyz(root_nodes[i].name, "fda");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = fda_read;
     root_nodes[i].write = 0;
     root_nodes[i].open = 0;
     root_nodes[i].close = 0;

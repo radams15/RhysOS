@@ -82,10 +82,10 @@ _call_far:
     
     mov ax, [bp+16] ; ax => new ds
     mov ss, ax
-        
+    
 	push bp ; new program stack frame
 	mov bp, sp
-        
+	
 	push WORD [stderr]
     push WORD [stdout]
     push WORD [stdin]
@@ -116,6 +116,8 @@ align 16
 call_addr: dw 0
 call_cs: db 0
 stackseg: dw 0
+sp_bak: dw 0
+bp_bak: dw 0
 
 stdin: dw 0
 stdout: dw 0
