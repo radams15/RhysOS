@@ -12,6 +12,7 @@ jobs:
       
       - name: Release
         uses: "marvinpinto/action-automatic-releases@latest"
+        if: github.ref == 'refs/heads/master'
         with:
           repo_token: "${{ secrets.GH_TOKEN }}"
           automatic_release_tag: "latest"
