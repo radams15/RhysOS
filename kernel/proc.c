@@ -87,20 +87,11 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
     sti(); // Enable interrupts
 
     int addr = 0x1000;
-    int sectors_read = 0;  // MEM starts @ sector 172
-    for (cluster = fs_node->start_sector;
-         sectors_read < header.text_size && cluster < 0xFF8;
+    addr -= 10; // Remove the header.
+    for (cluster = fs_node->start_sector; cluster < 0xFF8;
          cluster = fat_next_cluster(cluster)) {
         read_lba_to_segment(0, cluster_to_lba(cluster), addr,
                             segment);  // Code to segment:text
-        addr += 512;
-        sectors_read++;
-    }
-
-    addr = header.load_address;
-    for (; cluster < 0xFF8; cluster = fat_next_cluster(cluster)) {
-        read_lba_to_segment(0, cluster_to_lba(cluster), addr,
-                            segment);  // Data to segment:data
         addr += 512;
     }
 

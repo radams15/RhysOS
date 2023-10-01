@@ -186,23 +186,17 @@ sub programs {
 		my $out = "$folder/".$conf->param('name');
 		
 		&run("$LD -o $out.elf -d -T$load_script ".($conf->param('stdlib')? " @$runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
-		
-                &run("objcopy -O binary --only-section=.text $out.elf $out.text");
-                &run("objcopy -O binary --only-section=.data $out.elf $out.data");
 
-                my $textsize = ceil((stat "$out.text")[7]);
-                my $datasize = ceil((stat "$out.data")[7]);
+        &run("objcopy -O binary $out.elf $out.bin");
 
-		open FH, '<', "$out.text";
+        my $textsize = ceil((stat "$out.text")[7]);
+        my $datasize = ceil((stat "$out.data")[7]);
+
+		open FH, '<', "$out.bin";
 		binmode FH;
 		my $text = join '', <FH>;
 		close FH;
-		
-		open FH, '<', "$out.data";
-		binmode FH;
-		my $data = join '', <FH>;
-		close FH;
-		
+
 		open FH, '>', $out;
 		
 =pod
@@ -217,8 +211,6 @@ sub programs {
 		my $header = pack('A2SSSS', 'RZ', eval($load_addr), eval($segment), ceil($textsize/512), ceil($datasize/512));
 		print FH $header;
 		print FH $text;
-		print FH "\x0" x &padding($textsize+length($header), 512);
-		print FH $data;
 		close FH;
 		
 		push @programs, $out;

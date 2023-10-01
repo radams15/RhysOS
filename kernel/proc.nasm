@@ -92,11 +92,11 @@ _call_far:
     push WORD [argc]
     push WORD [argv]
     mov ds, ax
-        
+    
 	push cs
 	push .ret
 	push bx
-	push 0x1008
+	push 0x1000
 	
 	retf ; call function
 .ret:
