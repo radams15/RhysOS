@@ -25,12 +25,11 @@ typedef enum StopBits { STOPBITS_ONE = 0, STOPBITS_TWO = 1 } StopBits_t;
 
 typedef enum DataBits { DATABITS_7 = 2, DATABITS_8 = 3 } DataBits_t;
 
-void serial_init(Port_t port,
+int serial_init(Port_t port,
                  Baud_t baud,
                  Parity_t parity,
                  StopBits_t stop_bits,
                  DataBits_t data_bits);
-void serial_init_code(Port_t port, int code);
 
 void serial_putc(Port_t port, char c);
 char serial_getc(Port_t port);

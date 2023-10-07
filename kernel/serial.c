@@ -12,7 +12,7 @@ int interrupt(int number, int AX, int BX, int CX, int DX);
 
 #if BIOS_SERIAL
 
-void serial_init(Port_t port,
+int serial_init(Port_t port,
                  Baud_t baud,
                  Parity_t parity,
                  StopBits_t stop_bits,
@@ -21,6 +21,8 @@ void serial_init(Port_t port,
     code = (baud << 4) + (parity << 2) + (stop_bits << 1) + (data_bits);
 
     interrupt(0x14, (0x00 << 8) + code, 0, 0, port);
+    
+    return 0;
 }
 
 void serial_putc(Port_t port, char c) {
@@ -48,7 +50,7 @@ char serial_getc(Port_t port) {
 
 char port_map[] = {0x3F8, 0x2F8};
 
-void serial_init(Port_t port,
+int serial_init(Port_t port,
                  Baud_t baud,
                  Parity_t parity,
                  StopBits_t stop_bits,
@@ -63,6 +65,8 @@ void serial_init(Port_t port,
     outb(port_map[port] + 4, 0x1E);
 
     outb(port_map[port] + 4, 0x0F);
+    
+    return 0;
 }
 
 void serial_putc(Port_t port, char c) {

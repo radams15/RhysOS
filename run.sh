@@ -1,6 +1,6 @@
 #!/bin/sh
 
-command="qemu-system-i386 -machine pc -fda build/system.img -boot a -m 1M"
+command="qemu-system-i386 -machine pc -fda build/system.img -boot a -m 1M -rtc base=localtime"
 
 if [ "$1" == "bochs" ]
 then

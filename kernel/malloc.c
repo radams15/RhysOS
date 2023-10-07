@@ -13,8 +13,9 @@ typedef struct BlkHeader {
     unsigned int length;  // Length of the block
 } BlkHeader_t;
 
-void memmgr_init() {
+int memmgr_init() {
     heap = &heap_begin;
+    return 0;
 }
 
 void* malloc(unsigned int size) {

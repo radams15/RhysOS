@@ -150,11 +150,8 @@ int main() {
     char name[32];
     int ret = 0;
 
-    while (!ret) {
+    while (!ret)
         ret = loop();
-    }
-
-    printf("Shell exited! Program exit code %x\n", ret);
 
     return 0;
 }

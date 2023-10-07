@@ -91,6 +91,7 @@ typedef struct SyscallArgs {
 } SyscallArgs_t;
 
 int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
+extern void make_break_interrupt();
 
 int i21_handler(SyscallArgs_t* args) {
     const int argv_item_size = 64; // 64 chars per arg
@@ -194,19 +195,27 @@ int handleInterrupt21(int* ax, int ss, int cx, int dx) {
     seg_copy(&arg_data, ax, sizeof(SyscallArgs_t), DATA_SEGMENT, ss);
 }
 
-void a20_init() {
+#define MUST_COMPLETE(method, success, error, ...) if(method(__VA_ARGS__)) { print_string(error) ; return 1; } else print_string(success)
+
+void ctrl_break() {
+    print_string("Break");
+}
+
+void task() {
+    
+}
+
+int a20_init() {
     if (a20_available()) {
         int enable_fail;
         print_string("A20 line is available\n");
-        enable_fail = a20_enable();
-
-        if (enable_fail)
-            print_string("A20 line failed to enable\n");
-        else
-            print_string("A20 line successfully enabled\n");
+        
+        MUST_COMPLETE(a20_enable, "A20 line successfully enabled\n", "A20 line failed to enable\n");
     } else {
         print_string("A20 line is unavaiable\n");
     }
+    
+    return 0;
 }
 
 int init(struct SystemInfo* info) {
@@ -217,17 +226,18 @@ int init(struct SystemInfo* info) {
     
     a20_init();
 
-    memmgr_init();
-    print_string("Memory manager enabled\n");
+    MUST_COMPLETE(memmgr_init, "Memory manager enabled\n", "Memory manager failed to initialise\n");
+    
+    make_break_interrupt();
 
     makeInterrupt21();
     print_string("Int 21h enabled\n");
+    
+    MUST_COMPLETE(rtc_init, "RTC enabled\n", "Failed to initialise rtc\n");
 
-    rtc_init();
-    print_string("RTC enabled\n");
-
-    serial_init(COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
-    print_string("/dev/COM1 enabled\n");
+    MUST_COMPLETE(serial_init, "Enabled /dev/com1\n", "Failed to initialise /dev/com1\n", COM1, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
+    
+    MUST_COMPLETE(serial_init, "Enabled /dev/com2\n", "Failed to initialise /dev/com2\n", COM2, BAUD_9600, PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 
     fs_root = fat_init(info->rootfs_start);
     FsNode_t* fs_dev = devfs_init();
@@ -239,7 +249,7 @@ int init(struct SystemInfo* info) {
     stderr = open("/dev/stderr");
 
     print_string("Welcome to RhysOS!\n\n");
-
+    
     exec("mem", 0, NULL, stdin, stdout, stderr);
     print_string("\n");
     exec("shell", 0, NULL, stdin, stdout, stderr);
@@ -248,7 +258,7 @@ int init(struct SystemInfo* info) {
     close(stdout);
     close(stderr);
 
-    print_string("\n\nDone.");
+    print_string("\n\nTerminated.");
 
     return 0;
 }
