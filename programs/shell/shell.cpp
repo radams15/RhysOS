@@ -1,10 +1,18 @@
+#include "string.hpp"
+
+extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include <syscall.h>
+}
 
 #define MAX_PARAMS 16
 
 static char* prompt = "A:/ ";
+
+int run_line(char* line, int length);
+
+string line(1024);
 
 static int run_batch(char* path) {
     int fh;
@@ -57,13 +65,13 @@ static int run_external(char* exe, char* rest) {
     argc = 1;
     argv[0] = exe;
 
-    tok = strtok(rest, " ");
+    tok = (char*) strtok(rest, " ");
 
     while (tok != NULL) {
         *(tok - 1) = 0;  // null terminate section (replacing space)
 
         if (strcmp(tok, ">") == 0) {  // redirection?
-            tok = strtok(NULL, ">");
+            tok = (char*) strtok(NULL, ">");
             dest = tok;
             *(tok - 1) = 0;
             out_fh = open(dest);
@@ -76,7 +84,7 @@ static int run_external(char* exe, char* rest) {
         }
 
         if (strcmp(tok, "<") == 0) {  // redirection?
-            tok = strtok(NULL, "<");
+            tok = (char*) strtok(NULL, "<");
             dest = tok;
             *(tok - 1) = 0;
             in_fh = open(dest);
@@ -123,20 +131,18 @@ int run_line(char* line, int length) {
     }
 }
 
-int loop() {
-    char line[1024];
-
-    memset(&line, 0, 1024 / 8);
-
-    printf(prompt);
-    int len = readline(line);
+int loop() {    
+    line.clear();
+    
+    printf("%s", prompt);
+    int len = readline(line.rbuf);
 
     printf("\n");
 
     if (len == 0)
         return 0;
 
-    int ret = run_line(line, sizeof(line));
+    int ret = run_line((char*) line.c_copy(), strlen(line.rbuf));
     
     if(ret == -1)
         return 1;

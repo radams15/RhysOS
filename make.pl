@@ -15,6 +15,7 @@ use Config::Simple;
 
 my $ASM = 'nasm';
 my $CC = 'ia16-elf-gcc -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore';
+my $CXX = 'ia16-elf-g++ -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore';
 my $LD = 'ia16-elf-ld';
 
 # Must be strings for some reason
@@ -85,9 +86,6 @@ sub kernel {
 	}
 	
 	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel.o ".(join ' ', @objs));
-
-	#&run("objcopy -O binary --only-section=.text build/kernel.elf build/sys.txt");
-	#&run("objcopy -O binary --only-section=.data build/kernel.elf build/sys.dat");
 	
 	&run("objcopy -O binary build/kernel.elf build/kernel.bin");
 
@@ -101,6 +99,13 @@ sub stdlib {
 	for my $c_file (&find('stdlib/*.c')) {		
 		(my $out = $c_file) =~ s:stdlib/(.*)\.c:build/stdlib/$1.o:;
 		&run("$CC -c $c_file -Istdlib/ -o $out");
+		
+		push @objs, $out;
+	}
+	
+	for my $c_file (&find('stdlib/*.cpp')) {		
+		(my $out = $c_file) =~ s:stdlib/(.*)\.cpp:build/stdlib/$1.mm.o:;
+		&run("$CXX -c $c_file -Istdlib/ -o $out");
 		
 		push @objs, $out;
 	}
@@ -169,6 +174,13 @@ sub programs {
 			if ($file =~ /\.c$/) {
 				(my $out_obj = $file) =~ s:(.*)\.c:$folder/$1.o:;
 				&run("$CC -c $program/$file -I$program/ -Istdlib -o $out_obj");
+				
+				push @objs, $out_obj;
+			}
+			
+			if ($file =~ /\.cpp$/) {
+				(my $out_obj = $file) =~ s:(.*)\.cpp:$folder/$1.o:;
+				&run("$CXX -c $program/$file -I$program/ -Istdlib -o $out_obj");
 				
 				push @objs, $out_obj;
 			}

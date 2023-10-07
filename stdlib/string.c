@@ -45,6 +45,14 @@ int endswith(char* a, char* suffix) {
     return 1;
 }
 
+int strcpy(char* dst, char* src, int length) {
+    for(int i=0 ; i<length ; i++) {
+        dst[i] = src[i];
+    }
+    
+    return length;
+}
+
 char* strtok(register char* s, register char* delim) {
     register char* spanp;
     register int c, sc;
