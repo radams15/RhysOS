@@ -43,8 +43,12 @@ void printi(int fh, int num, int base) {
     }
 }
 
+int fprint(int fh, char* str) {
+    return write(fh, str, strlen(str));
+}
+
 int print(char* str) {
-    return write(stdout, str, strlen(str));
+    return fprint(stdout, str);
 }
 
 int fputc(int fh, char c) {
@@ -149,7 +153,7 @@ void vfprintf(int fh, register char* text, register va_list args) {
                     break;
 
                 case 's':  // string
-                    print(va_arg(args, char*));
+                    fprint(fh, va_arg(args, char*));
                     break;
 
                 case 'x':  // hex int
@@ -157,7 +161,7 @@ void vfprintf(int fh, register char* text, register va_list args) {
                     break;
 
                 case FORMAT_MARK:
-                    putc(FORMAT_MARK);
+                    fputc(fh, FORMAT_MARK);
                     break;
 
                 default:
@@ -166,7 +170,7 @@ void vfprintf(int fh, register char* text, register va_list args) {
 
             skip_next = TRUE;
         } else {
-            putc(text[i]);
+            fputc(fh, text[i]);
         }
     }
 }
