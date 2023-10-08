@@ -84,8 +84,8 @@ void read_sector(int disk,
 void call_kernel(int ds, struct SystemInfo* info);
 
 void read_sector_lba(int disk, int lba, int dst_addr, int dst_seg) {
-    int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
-    int track = (lba / (SECTORS_PER_TRACK * 2));
+    int head   = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
+    int track  = (lba / (SECTORS_PER_TRACK * 2));
     int sector = (lba % SECTORS_PER_TRACK + 1);
 
     read_sector(disk, track, head, sector, dst_addr, dst_seg);
@@ -93,7 +93,7 @@ void read_sector_lba(int disk, int lba, int dst_addr, int dst_seg) {
 
 void print(char* str) {
     for (; *str != 0; str++) {
-        if(*str == '\n')
+        if (*str == '\n')
             printc('\r');
         printc(*str);
     }
@@ -113,7 +113,7 @@ int read_cluster(int disk, int cluster, int dst_addr, int dst_seg) {
 
 int load_segment(int disk, int sect_start, int dst_addr, int dst_seg) {
     int sect;
-    int addr = dst_addr;
+    int addr    = dst_addr;
     int cluster = sect_start;
 
     while (1) {
@@ -154,16 +154,16 @@ void splash() {
 
 int strcpy(char* dst, char* src) {
     int len;
-    for(len = 0 ; src[len] != 0 ; len++) {
+    for (len = 0; src[len] != 0; len++) {
         dst[len] = src[len];
     }
-    
+
     return len;
 }
 
 int main() {
     print("Bootloader stage 2\n");
-    
+
     unsigned char fat_sector[512];
 
     int sect = FS_SECT;
@@ -191,7 +191,7 @@ int main() {
         f2 |= (frame[1] & 0xF0) >> 4;
         f2 &= 0xFFF;
 
-        fat_table[i] = f1;
+        fat_table[i]     = f1;
         fat_table[i + 1] = f2;
 
         curr += 3;
@@ -203,7 +203,7 @@ int main() {
 
     for (int i = 0; i < 32; i++) {
         struct DirectoryEntry* file = &root_dir[i];
-        
+
         if (strncmp(file->fullname, "KERNEL  BIN", 11) == 0) {
 #if ENABLE_SPLASH
             print("Loading kernel: [");
@@ -216,13 +216,13 @@ int main() {
     }
 
     print("\nKernel Loaded!\n");
-    
-    const char* cmdline = ""; // Kernel command line passed to kernel.
-    
+
+    const char* cmdline = "";  // Kernel command line passed to kernel.
+
     struct SystemInfo info;
     info.rootfs_start = sect;
-    info.highmem = highmem();
-    info.lowmem = lowmem();
+    info.highmem      = highmem();
+    info.lowmem       = lowmem();
     strcpy(info.cmdline, cmdline);
 
     call_kernel(ds(), &info);

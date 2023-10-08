@@ -29,7 +29,7 @@ static int run_batch(char* path) {
     }
 
     totalread = 0;
-    len = 0;
+    len       = 0;
 
     while ((c = fgetch(fh)) != 0) {  // Each line
         linebuf[len] = c;
@@ -60,22 +60,22 @@ static int run_external(char* exe, char* rest) {
 
     int err_fh = stderr;
     int out_fh = stdout;
-    int in_fh = stdin;
+    int in_fh  = stdin;
 
-    argc = 1;
+    argc    = 1;
     argv[0] = exe;
-    
-    if(rest != NULL) {
-        tok = (char*) strtok(rest, " ");
+
+    if (rest != NULL) {
+        tok = (char*)strtok(rest, " ");
 
         while (tok != NULL) {
             *(tok - 1) = 0;  // null terminate section (replacing space)
 
             if (strcmp(tok, ">") == 0) {  // redirection?
-                tok = (char*) strtok(NULL, ">");
-                dest = tok;
+                tok        = (char*)strtok(NULL, ">");
+                dest       = tok;
                 *(tok - 1) = 0;
-                out_fh = open(dest);
+                out_fh     = open(dest);
 
                 if (out_fh == -1)
                     out_fh = stdout;
@@ -85,10 +85,10 @@ static int run_external(char* exe, char* rest) {
             }
 
             if (strcmp(tok, "<") == 0) {  // redirection?
-                tok = (char*) strtok(NULL, "<");
-                dest = tok;
+                tok        = (char*)strtok(NULL, "<");
+                dest       = tok;
                 *(tok - 1) = 0;
-                in_fh = open(dest);
+                in_fh      = open(dest);
 
                 if (in_fh == -1)
                     in_fh = stdin;
@@ -97,7 +97,7 @@ static int run_external(char* exe, char* rest) {
             }
 
             argv[argc++] = tok;
-            tok = strtok(NULL, " ");
+            tok          = strtok(NULL, " ");
         }
     }
 
@@ -126,16 +126,16 @@ int run_line(char* line, int length) {
                    line + strlen(exe) + 1);
         else
             stdout = stdin = stderr = fh;
-    } else if(strcmp(exe, "exit") == 0) {
+    } else if (strcmp(exe, "exit") == 0) {
         return -1;
     } else {
         run_external(exe, line + strlen(exe) + 1);
     }
 }
 
-int loop() {    
+int loop() {
     line.clear();
-    
+
     printf("%s", prompt);
     int len = readline(line.rbuf);
 
@@ -144,9 +144,9 @@ int loop() {
     if (len == 0)
         return 0;
 
-    int ret = run_line((char*) line.c_copy(), strlen(line.rbuf));
-    
-    if(ret == -1)
+    int ret = run_line((char*)line.c_copy(), strlen(line.rbuf));
+
+    if (ret == -1)
         return 1;
 
     printf("\n");
@@ -155,8 +155,8 @@ int loop() {
 }
 
 int main(int argc, char** argv) {
-    if(argc > 1) {
-        for(int i=1 ; i<argc ; i++) {
+    if (argc > 1) {
+        for (int i = 1; i < argc; i++) {
             run_external(argv[i], NULL);
         }
     } else {

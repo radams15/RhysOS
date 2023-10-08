@@ -28,7 +28,7 @@ void* malloc(unsigned int size) {
 
     heap += size + sizeof(BlkHeader_t) + 8;
 
-    out->magic = HEAP_MAGIC;
+    out->magic  = HEAP_MAGIC;
     out->length = size;
 
     return (int*)out + sizeof(BlkHeader_t);

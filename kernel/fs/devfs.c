@@ -61,28 +61,28 @@ void stderr_write(FsNode_t* node,
 }
 
 int stdin_read(FsNode_t* node,
-                unsigned int offset,
-                unsigned int size,
-                unsigned char* buffer) {
-    int i;
-
-    for (i = 0; i < size; i++) {
-        buffer[i] = getch();
-    }
-    
-    return size;
-}
-
-int com1_read(FsNode_t* node,
                unsigned int offset,
                unsigned int size,
                unsigned char* buffer) {
     int i;
 
     for (i = 0; i < size; i++) {
+        buffer[i] = getch();
+    }
+
+    return size;
+}
+
+int com1_read(FsNode_t* node,
+              unsigned int offset,
+              unsigned int size,
+              unsigned char* buffer) {
+    int i;
+
+    for (i = 0; i < size; i++) {
         buffer[i] = serial_getc(COM1);
     }
-    
+
     return size;
 }
 
@@ -98,15 +98,15 @@ void com1_write(FsNode_t* node,
 }
 
 int com2_read(FsNode_t* node,
-               unsigned int offset,
-               unsigned int size,
-               unsigned char* buffer) {
+              unsigned int offset,
+              unsigned int size,
+              unsigned char* buffer) {
     int i;
 
     for (i = 0; i < size; i++) {
         buffer[i] = serial_getc(COM2);
     }
-    
+
     return size;
 }
 
@@ -131,27 +131,27 @@ int chars2int(unsigned char* buffer) {
 }
 
 int lowmem_read(FsNode_t* node,
-                 unsigned int offset,
-                 unsigned int size,
-                 unsigned char* buffer) {
+                unsigned int offset,
+                unsigned int size,
+                unsigned char* buffer) {
     int mem = lowmem();
     int2chars(mem, buffer);
     return 2;
 }
 
 int highmem_read(FsNode_t* node,
-                  unsigned int offset,
-                  unsigned int size,
-                  unsigned char* buffer) {
+                 unsigned int offset,
+                 unsigned int size,
+                 unsigned char* buffer) {
     int mem = highmem();
     int2chars(mem, buffer);
     return 2;
 }
 
 int graphics_mode_read(FsNode_t* node,
-                        unsigned int byte_offset,
-                        unsigned int byte_size,
-                        unsigned char* out_buffer) {
+                       unsigned int byte_offset,
+                       unsigned int byte_size,
+                       unsigned char* out_buffer) {
     int mode = get_graphics_mode();
     int2chars(mode, out_buffer);
     return 2;
@@ -166,9 +166,9 @@ void graphics_mode_write(FsNode_t* node,
 }
 
 int time_read(FsNode_t* node,
-               unsigned int byte_offset,
-               unsigned int byte_size,
-               unsigned char* out_buffer) {
+              unsigned int byte_offset,
+              unsigned int byte_size,
+              unsigned char* out_buffer) {
     time(out_buffer);
     return 2;
 }
@@ -191,209 +191,209 @@ void devfs_setup() {
     int i = 0;
 
     strcpyz(root_nodes[i].name, "stdout");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = 0;
-    root_nodes[i].write = stdout_write;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 1;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = 0;
+    root_nodes[i].write   = stdout_write;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
+    root_nodes[i].ref     = 0;
     num_root_nodes++;
 
     i++;
 
     strcpyz(root_nodes[i].name, "stdin");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = stdin_read;
-    root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 1;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = stdin_read;
+    root_nodes[i].write   = 0;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
+    root_nodes[i].ref     = 0;
     num_root_nodes++;
 
     i++;
 
     strcpyz(root_nodes[i].name, "stderr");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = 0;
-    root_nodes[i].write = stderr_write;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 1;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = 0;
+    root_nodes[i].write   = stderr_write;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
+    root_nodes[i].ref     = 0;
     num_root_nodes++;
 
     i++;
 
     strcpyz(root_nodes[i].name, "con");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = stdin_read;
-    root_nodes[i].write = stdout_write;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 1;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = stdin_read;
+    root_nodes[i].write   = stdout_write;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
+    root_nodes[i].ref     = 0;
     num_root_nodes++;
 
     i++;
 
     strcpyz(root_nodes[i].name, "highmem");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 2;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = highmem_read;
-    root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 2;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = highmem_read;
+    root_nodes[i].write   = 0;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
+    root_nodes[i].ref     = 0;
     num_root_nodes++;
 
     i++;
 
     strcpyz(root_nodes[i].name, "lowmem");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 2;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = lowmem_read;
-    root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 2;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = lowmem_read;
+    root_nodes[i].write   = 0;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
+    root_nodes[i].ref     = 0;
     num_root_nodes++;
 
     i++;
 
     strcpyz(root_nodes[i].name, "graphmode");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = graphics_mode_read;
-    root_nodes[i].write = graphics_mode_write;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 1;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = graphics_mode_read;
+    root_nodes[i].write   = graphics_mode_write;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
+    root_nodes[i].ref     = 0;
     num_root_nodes++;
 
     i++;
 
     strcpyz(root_nodes[i].name, "com1");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = com1_read;
-    root_nodes[i].write = com1_write;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 1;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = com1_read;
+    root_nodes[i].write   = com1_write;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
+    root_nodes[i].ref     = 0;
     num_root_nodes++;
-    
+
     i++;
 
     strcpyz(root_nodes[i].name, "com2");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = com2_read;
-    root_nodes[i].write = com2_write;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 1;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = com2_read;
+    root_nodes[i].write   = com2_write;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
+    root_nodes[i].ref     = 0;
     num_root_nodes++;
 
     i++;
 
     strcpyz(root_nodes[i].name, "time");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = time_read;
-    root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
-    root_nodes[i].close = 0;
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 1;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = time_read;
+    root_nodes[i].write   = 0;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
+    root_nodes[i].ref     = 0;
     num_root_nodes++;
 
-    i++; 
- 
-    strcpyz(root_nodes[i].name, "ttybg"); 
-    root_nodes[i].flags = FS_FILE; 
-    root_nodes[i].inode = i; 
-    root_nodes[i].length = 1; 
-    root_nodes[i].offset = 0; 
-    root_nodes[i].read = tty_bg_write; 
-    root_nodes[i].write = 0; 
-    root_nodes[i].open = 0; 
-    root_nodes[i].close = 0; 
-    root_nodes[i].readdir = 0; 
-    root_nodes[i].finddir = 0; 
-    root_nodes[i].ref = 0; 
-    num_root_nodes++; 
- 
-    i++; 
- 
-    strcpyz(root_nodes[i].name, "ttyfg"); 
-    root_nodes[i].flags = FS_FILE; 
-    root_nodes[i].inode = i; 
-    root_nodes[i].length = 1; 
-    root_nodes[i].offset = 0; 
-    root_nodes[i].read = tty_fg_write; 
-    root_nodes[i].write = 0; 
-    root_nodes[i].open = 0; 
-    root_nodes[i].close = 0; 
-    root_nodes[i].readdir = 0; 
-    root_nodes[i].finddir = 0; 
-    root_nodes[i].ref = 0; 
+    i++;
+
+    strcpyz(root_nodes[i].name, "ttybg");
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 1;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = tty_bg_write;
+    root_nodes[i].write   = 0;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
+    root_nodes[i].readdir = 0;
+    root_nodes[i].finddir = 0;
+    root_nodes[i].ref     = 0;
+    num_root_nodes++;
+
+    i++;
+
+    strcpyz(root_nodes[i].name, "ttyfg");
+    root_nodes[i].flags   = FS_FILE;
+    root_nodes[i].inode   = i;
+    root_nodes[i].length  = 1;
+    root_nodes[i].offset  = 0;
+    root_nodes[i].read    = tty_fg_write;
+    root_nodes[i].write   = 0;
+    root_nodes[i].open    = 0;
+    root_nodes[i].close   = 0;
+    root_nodes[i].readdir = 0;
+    root_nodes[i].finddir = 0;
+    root_nodes[i].ref     = 0;
     num_root_nodes++;
 }
 
 FsNode_t* devfs_init() {
     strcpyz(root_node.name, "dev");
-    root_node.flags = FS_DIRECTORY;
-    root_node.inode = 0;
-    root_node.length = 0;
-    root_node.offset = 0;
-    root_node.read = 0;
-    root_node.write = 0;
-    root_node.open = 0;
-    root_node.close = 0;
+    root_node.flags   = FS_DIRECTORY;
+    root_node.inode   = 0;
+    root_node.length  = 0;
+    root_node.offset  = 0;
+    root_node.read    = 0;
+    root_node.write   = 0;
+    root_node.open    = 0;
+    root_node.close   = 0;
     root_node.readdir = devfs_readdir;
     root_node.finddir = devfs_finddir;
-    root_node.ref = 0;
+    root_node.ref     = 0;
 
     num_root_nodes = 0;
 

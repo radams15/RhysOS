@@ -14,5 +14,4 @@ int rtc_init();
 unsigned int clock_ticks(unsigned int* buf);
 int clock_time(unsigned int* buf);
 
-
 #endif

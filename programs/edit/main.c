@@ -59,7 +59,7 @@ int draw_text(int fd) {
     seek(fd, 0);
 
     char buffer[32];
-    for(int i=0 ; i<2 ; i++) {
+    for (int i = 0; i < 2; i++) {
         read(fd, &buffer, 32);
         printf("%s\n", buffer);
     }
@@ -73,13 +73,13 @@ int mainloop(char* fname) {
         return 1;
 
     graphics_set_palette(2);
-    graphics_set_bg(BG_COLOUR); 
+    graphics_set_bg(BG_COLOUR);
 
-    // while(1) { 
-        topbar();
-        draw_text(fd);
-    // } 
-    
+    // while(1) {
+    topbar();
+    draw_text(fd);
+    // }
+
     close(fd);
 
     return 0;

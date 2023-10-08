@@ -30,11 +30,11 @@ int dump(char* file) {
             printf("%x ", buffer[i]);
         }
         printf(" => ");
-        for(i=0 ; i<bytes_read ; i++) {
-          if(buffer[i] > 33) // Printable characters printed
-            putc(buffer[i]);
-          else // Non-printable characters print '.'
-            putc('.');
+        for (i = 0; i < bytes_read; i++) {
+            if (buffer[i] > 33)  // Printable characters printed
+                putc(buffer[i]);
+            else  // Non-printable characters print '.'
+                putc('.');
         }
         printf("\n");
         total_read += bytes_read;

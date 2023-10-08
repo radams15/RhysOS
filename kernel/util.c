@@ -8,7 +8,7 @@ void memset(int* dest, int val, int len) {
 }
 
 void memcpy(char* dest, char* src, unsigned int n) {
-    for(int i=0 ; i<n ; i++)
+    for (int i = 0; i < n; i++)
         dest[i] = src[i];
 }
 
@@ -43,7 +43,7 @@ int strcmp(char* a, char* b) {
 }
 
 int oct2bin(unsigned char* str, int size) {
-    int n = 0;
+    int n            = 0;
     unsigned char* c = str;
     while (size-- > 0) {
         n *= 8;
@@ -83,7 +83,7 @@ cont:
      * Note that delim must have one NUL; we stop if we see that, too.
      */
     for (;;) {
-        c = *s++;
+        c     = *s++;
         spanp = (char*)delim;
         do {
             if ((sc = *spanp++) == c) {

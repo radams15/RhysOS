@@ -38,7 +38,7 @@ int* decodeFAT(int fp) {
         f2 |= (frame[1] & 0xF0) >> 4;
         f2 &= 0xFFF;
 
-        fat[i] = f1;
+        fat[i]     = f1;
         fat[i + 1] = f2;
         curr += 3;
     }
