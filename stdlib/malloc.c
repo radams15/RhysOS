@@ -84,14 +84,14 @@ void* malloc(unsigned int size) {
     header->magic = HEAP_MAGIC;
     header->free = 0;
 
-    return (int*)header + sizeof(BlkHeader_t);
+    return (void*) (((unsigned int*) header) + sizeof(BlkHeader_t));
 }
 
 void free(void* ptr) {
-    BlkHeader_t* header = ptr - sizeof(BlkHeader_t);
+    BlkHeader_t* header = ptr - (2*sizeof(BlkHeader_t)); // Really shouldn't be 2*size but some implicit type casting is causing chaos.
     
     if(header->magic != HEAP_MAGIC) {
-        fprintf(stderr, "Invalid free of pointer %x (magic = %x)\n", ptr, header->magic);
+        fprintf(stderr, "Invalid free of pointer %x (magic = %x)\n", header, header->magic);
         return;
     }
     
@@ -101,8 +101,5 @@ void free(void* ptr) {
     }
     
     header->free = 1;
-    
-    printf("Valid free\n");
-    // TODO implement memory management.
 }
 
