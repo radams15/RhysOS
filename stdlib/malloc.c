@@ -88,7 +88,7 @@ void* malloc(unsigned int size) {
 }
 
 void free(void* ptr) {
-    BlkHeader_t* header = ptr - (2*sizeof(BlkHeader_t)); // Really shouldn't be 2*size but some implicit type casting is causing chaos.
+    BlkHeader_t* header = (unsigned int*)ptr - sizeof(BlkHeader_t);
     
     if(header->magic != HEAP_MAGIC) {
         fprintf(stderr, "Invalid free of pointer %x (magic = %x)\n", header, header->magic);

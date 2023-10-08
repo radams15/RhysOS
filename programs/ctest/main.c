@@ -11,6 +11,10 @@ int main(int argc, char** argv) {
     
     
     void* a;
+    for(int i=0 ; i<10 ; i++) {
+        a = malloc(25);
+    }
+    
     for(int i=0 ; i<100 ; i++) {
         a = malloc(70);
         free(a);
