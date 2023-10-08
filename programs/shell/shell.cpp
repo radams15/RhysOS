@@ -64,39 +64,41 @@ static int run_external(char* exe, char* rest) {
 
     argc = 1;
     argv[0] = exe;
+    
+    if(rest != NULL) {
+        tok = (char*) strtok(rest, " ");
 
-    tok = (char*) strtok(rest, " ");
+        while (tok != NULL) {
+            *(tok - 1) = 0;  // null terminate section (replacing space)
 
-    while (tok != NULL) {
-        *(tok - 1) = 0;  // null terminate section (replacing space)
+            if (strcmp(tok, ">") == 0) {  // redirection?
+                tok = (char*) strtok(NULL, ">");
+                dest = tok;
+                *(tok - 1) = 0;
+                out_fh = open(dest);
 
-        if (strcmp(tok, ">") == 0) {  // redirection?
-            tok = (char*) strtok(NULL, ">");
-            dest = tok;
-            *(tok - 1) = 0;
-            out_fh = open(dest);
+                if (out_fh == -1)
+                    out_fh = stdout;
 
-            if (out_fh == -1)
-                out_fh = stdout;
+                err_fh = out_fh;
+                break;
+            }
 
-            err_fh = out_fh;
-            break;
+            if (strcmp(tok, "<") == 0) {  // redirection?
+                tok = (char*) strtok(NULL, "<");
+                dest = tok;
+                *(tok - 1) = 0;
+                in_fh = open(dest);
+
+                if (in_fh == -1)
+                    in_fh = stdin;
+
+                break;
+            }
+
+            argv[argc++] = tok;
+            tok = strtok(NULL, " ");
         }
-
-        if (strcmp(tok, "<") == 0) {  // redirection?
-            tok = (char*) strtok(NULL, "<");
-            dest = tok;
-            *(tok - 1) = 0;
-            in_fh = open(dest);
-
-            if (in_fh == -1)
-                in_fh = stdin;
-
-            break;
-        }
-
-        argv[argc++] = tok;
-        tok = strtok(NULL, " ");
     }
 
     if (endswith(exe, ".bat")) {
@@ -152,12 +154,16 @@ int loop() {
     return 0;
 }
 
-int main() {
-    char name[32];
-    int ret = 0;
-
-    while (!ret)
-        ret = loop();
+int main(int argc, char** argv) {
+    if(argc > 1) {
+        for(int i=1 ; i<argc ; i++) {
+            run_external(argv[i], NULL);
+        }
+    } else {
+        int ret = 0;
+        while (!ret)
+            ret = loop();
+    }
 
     return 0;
 }

@@ -247,18 +247,14 @@ int init(struct SystemInfo* info) {
     stdin = open("/dev/stdin");
     stdout = open("/dev/stdout");
     stderr = open("/dev/stderr");
-
-    print_string("Welcome to RhysOS!\n\n");
     
-    exec("mem", 0, NULL, stdin, stdout, stderr);
     print_string("\n");
-    exec("shell", 0, NULL, stdin, stdout, stderr);
+    char* shell_argv[] = {"shell", "login.bat"};
+    exec("shell", 2, shell_argv, stdin, stdout, stderr);
 
     close(stdin);
     close(stdout);
     close(stderr);
-
-    print_string("\n\nTerminated.");
 
     return 0;
 }

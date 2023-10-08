@@ -1,3 +1,3 @@
-echo Welcome to RhysOS!
 mem
 shell
+echo Terminated
