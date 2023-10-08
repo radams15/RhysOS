@@ -17,6 +17,7 @@ void printf(char* text, ...);
 
 char getch();
 char fgetch(int fh);
+int fprint(int fh, char* str);
 int print(char* str);
 int putc(char c);
 int fputc(int fh, char c);

@@ -16,7 +16,7 @@ static unsigned int heap;
 typedef struct BlkHeader {
     unsigned int magic;   // HEAP_MAGIC
     unsigned int length;  // Length of the block
-    unsigned int next;    // Pointer to next block
+    struct BlkHeader* next;    // Pointer to next block
     unsigned int free;  // Is it being used?
 } BlkHeader_t;
 
@@ -37,14 +37,14 @@ BlkHeader_t* split(BlkHeader_t* block, unsigned int size) {
     
     int old_size = block->length;
     
-    block += size;
+    block += size + sizeof(BlkHeader_t);
     block->magic = HEAP_MAGIC;
     block->length = old_size - (size + sizeof(BlkHeader_t));
     block->free = 1;
     
     out->length = size;
-    out->free = 0;
     out->next = block;
+    out->magic = HEAP_MAGIC;
     
     return out;
 }
@@ -58,17 +58,19 @@ void* malloc(unsigned int size) {
         return 0;
 
     size = align(size);
-
-    printf("Malloc: %d\n", size);
     
     BlkHeader_t* header = (BlkHeader_t*) &heap_begin;
-    while(! header->free) {
-        if(header == NULL || header->magic != HEAP_MAGIC) {
-            fprintf(stderr, "Memory allocation error!\n");
+    while(1) {
+        if(header == NULL) {
+            fprintf(stderr, "Memory allocation error (out of blocks)!\n");
+            return 0;
+        }
+        if(header->magic != HEAP_MAGIC) {
+            fprintf(stderr, "Memory allocation error (invalid magic = %x)!\n", header->magic);
             return 0;
         }
         
-        if(header->length >= size) {
+        if(header->length >= size && header->free) {
             break;
         }
         
@@ -80,7 +82,7 @@ void* malloc(unsigned int size) {
     }
     
     header->magic = HEAP_MAGIC;
-    header->length = size;
+    header->free = 0;
 
     return (int*)header + sizeof(BlkHeader_t);
 }
@@ -89,9 +91,16 @@ void free(void* ptr) {
     BlkHeader_t* header = ptr - sizeof(BlkHeader_t);
     
     if(header->magic != HEAP_MAGIC) {
-        fprintf(stderr, "Invalid free\n");
+        fprintf(stderr, "Invalid free of pointer %x (magic = %x)\n", ptr, header->magic);
         return;
     }
+    
+    if(header->next->free) {
+        header->next = header->next->next;
+        header->length += header->next->length + sizeof(BlkHeader_t);
+    }
+    
+    header->free = 1;
     
     printf("Valid free\n");
     // TODO implement memory management.
