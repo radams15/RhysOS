@@ -17,8 +17,9 @@ int start(int argc, char** argv_ext) {
     
     memmgr_init();
     
-    char** argv = malloc(argc * sizeof(char));
+    char** argv = 0;
     if(argc != 0) {
+        argv = malloc(argc * sizeof(char));
         seg_copy(argv_ext, argv_in, argc*sizeof(char*), KERNEL_DATA, my_ds);
         
         for(int i=0 ; i<argc ; i++) {
