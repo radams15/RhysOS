@@ -54,7 +54,7 @@ int align(int n) {
     return (n + sizeof(int) - 1) & ~(sizeof(int) - 1);
 }
 
-void* malloc(unsigned int size) {
+void* malloc(uint16 size) {
     if (size == 0)
         return 0;
 
@@ -87,6 +87,33 @@ void* malloc(unsigned int size) {
     header->free  = 0;
 
     return (void*)(((unsigned int*)header) + sizeof(BlkHeader_t));
+}
+
+void* calloc(uint16 n, uint16 size) {
+    void* out = malloc(n*size);
+    
+    memset(out, 0, n);
+    
+    return out;
+}
+
+void* realloc(void* ptr, uint16 size) {
+    BlkHeader_t* header = (unsigned int*)ptr - sizeof(BlkHeader_t);
+    
+    int extra = size - header->length;
+    
+    BlkHeader_t* new_header;
+    if(header->next->length >= extra) {
+        new_header = split(header->next, size);
+        header->length += new_header->length;
+    } else {
+        new_header = malloc(size);
+        uint16* dst = (void*)(((unsigned int*)new_header) + sizeof(BlkHeader_t));
+        memcpy(dst, ptr, header->length); 
+        free(ptr);
+    }
+    
+    return (void*) new_header;
 }
 
 void free(void* ptr) {

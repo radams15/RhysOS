@@ -3,12 +3,18 @@
 
 #define NULL 0
 
-#define BOOL int
-
 #define TRUE 1
 #define FALSE 0
 
-#define uint16 unsigned int
-#define int16 int
+typedef int BOOL;
+
+typedef unsigned int uint16;
+typedef int int16;
+
+typedef unsigned char uint8;
+typedef char int8;
+
+typedef unsigned int size_t;
+typedef int ssize_t;
 
 #endif
