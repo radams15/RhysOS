@@ -19,6 +19,10 @@ string::string(const char* buffer) {
     rbuf[length] = 0;
 }
 
+void string::setc(int i, char c) {
+    rbuf[i] = c;
+}
+
 void string::set(const char* buffer) {
     if (length < strlen((char*)buffer)) {
         length = strlen((char*)buffer);

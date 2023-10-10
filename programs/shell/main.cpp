@@ -10,16 +10,14 @@ extern "C" {
 
 static char* prompt = "A:/ ";
 
-int run_line(char* line, int length);
-
-string line(1024);
+int run_line(string& line);
 
 static int run_batch(char* path) {
     int fh;
     int totalread;
     int len;
     int c;
-    char linebuf[1024];
+    string line(1024);
 
     fh = open(path);
 
@@ -32,18 +30,18 @@ static int run_batch(char* path) {
     len = 0;
 
     while ((c = fgetch(fh)) != 0) {  // Each line
-        linebuf[len] = c;
+        line.setc(len, c);
         len++;
 
         if (c == '\n') {
-            linebuf[len - 1] = 0;
-            if (linebuf[len - 2] == '\r')
-                linebuf[len - 2] = 0;
+            line.setc(len - 1, 0);
+            if (line.c_str()[len - 2] == '\r')
+                line.setc(len - 2, 0);
 
             totalread += len;
             len = 0;
 
-            run_line(linebuf, len);
+            run_line(line);
         }
 
         seek(fh, totalread + len);
@@ -108,33 +106,35 @@ static int run_external(char* exe, char* rest) {
     }
 }
 
-int run_line(char* line, int length) {
+int run_line(string& line) {
     char* tok;
     char* exe;
+    
+    char* line_copy = (char*) line.c_copy();
 
-    tok = strtok(line, " ");
+    tok = strtok(line_copy, " ");
 
     exe = tok;
 
     if (strcmp(exe, "tty") == 0) {
         int fh;
 
-        fh = open(line + strlen(exe) + 1);
+        fh = open(line_copy + strlen(exe) + 1);
 
         if (fh == -1)
             printf("Error: File '%s' does not exist!\n",
-                   line + strlen(exe) + 1);
+                   line_copy + strlen(exe) + 1);
         else
             stdout = stdin = stderr = fh;
     } else if (strcmp(exe, "exit") == 0) {
         return -1;
     } else {
-        run_external(exe, line + strlen(exe) + 1);
+        run_external(exe, line_copy + strlen(exe) + 1);
     }
 }
 
 int loop() {
-    line.clear();
+    string line(1024);
 
     printf("%s", prompt);
     int len = readline(line.rbuf);
@@ -144,7 +144,7 @@ int loop() {
     if (len == 0)
         return 0;
 
-    int ret = run_line((char*)line.c_copy(), strlen(line.rbuf));
+    int ret = run_line(line);
 
     if (ret == -1)
         return 1;

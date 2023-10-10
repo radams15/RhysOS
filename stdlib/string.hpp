@@ -14,6 +14,7 @@ class string {
 
     const char* c_str();
     const char* c_copy();
+    void setc(int i, char c);
 
     char* rbuf;
 
