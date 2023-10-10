@@ -21,6 +21,8 @@ int memmgr_init() {
 void* malloc(unsigned int size) {
     BlkHeader_t* out = heap;
 
+    printi(heap, 16);printi(size, 16); print_string(";");
+
     if (heap + size > &heap_end) {
         print_string("Cannot allocate more memory!\n");
         return 0;

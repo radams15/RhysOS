@@ -3,7 +3,7 @@
 #include "stdio.h"
 #include "util.h"
 
-#define MAX_FILES 64
+#define MAX_FILES 25
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 struct DirectoryEntry {
@@ -30,10 +30,9 @@ struct DirectoryEntry {
 } __attribute__((packed));
 
 unsigned int fat_table[512];
-struct DirectoryEntry root_dir[MAX_FILES];
 
 static FsNode_t root_node;
-static FsNode_t root_nodes[MAX_FILES];
+static FsNode_t* root_nodes;
 static int num_root_nodes;
 static DirEnt_t dirent;
 
@@ -57,10 +56,6 @@ int fat_next_cluster(int prev_cluster) {
 
 int fat_next_lba(int prev_lba) {
     int cluster = lba_to_cluster(prev_lba);
-    if (prev_lba != cluster_to_lba(cluster)) {
-        print_string("ERROR LBA => CLUSTER CONVERSION");
-    }
-
     int next_cluster = fat_table[cluster];
 
     if (next_cluster >= 0xFF8)
@@ -216,7 +211,7 @@ void fat_mount(FsNode_t* node, char* name) {
     num_root_nodes++;
 }
 
-void fat_load_root() {
+void fat_load_root(struct DirectoryEntry* root_dir) {
     for (int i = 0; i < MAX_FILES; i++) {
         struct DirectoryEntry* entry = &root_dir[i];
 
@@ -264,6 +259,10 @@ void fat_load_root() {
 
 FsNode_t* fat_init(int sector_start) {
     unsigned char fat_sector[512];
+    
+    struct DirectoryEntry root_dir[MAX_FILES];
+    
+    root_nodes = malloc(MAX_FILES * sizeof(FsNode_t));
 
     sector_start = 1;  // TODO: Fix
 
@@ -315,7 +314,7 @@ FsNode_t* fat_init(int sector_start) {
     root_node.finddir = fat_finddir;
     root_node.ref     = 0;
 
-    fat_load_root();
+    fat_load_root(&root_dir);
 
     return &root_node;
 }

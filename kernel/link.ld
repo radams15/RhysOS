@@ -17,11 +17,7 @@ SECTIONS
         *(.rodata*);
         *(.bss);
     }
-    .comment :
-    {
-        *(.comment);
-    }
 
-    _heap_begin = 0x7000;
+    _heap_begin = . + 0x100;
     _heap_end = 0x8000;
 }

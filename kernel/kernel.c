@@ -259,9 +259,9 @@ int init(struct SystemInfo* info) {
     stdout = open("/dev/stdout");
     stderr = open("/dev/stderr");
 
-    print_string("\n");
     char* shell_argv[] = {"shell", "login.bat"};
-    exec("shell", 2, shell_argv, stdin, stdout, stderr);
+    exec("test", 0, NULL, stdin, stdout, stderr);
+    //exec("shell", 2, shell_argv, stdin, stdout, stderr);
 
     close(stdin);
     close(stdout);

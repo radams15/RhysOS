@@ -34,9 +34,6 @@ int memcmp(char* a, char* b, int n) {
 
 int segment_top = 0x4000;
 
-typedef int (*prog_t)(int argc, char** argv, int in, int out, int err);
-int call_0x5000(int argc, char** argv, int in, int out, int err);
-int call_0x8000(int argc, char** argv, int in, int out, int err);
 int call_far(int argc, char** argv, int in, int out, int err, int cs, int ds);
 
 int get_segment() {
