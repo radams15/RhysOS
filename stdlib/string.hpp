@@ -8,6 +8,8 @@ class string {
     explicit string();
     explicit string(int len);
     string(const char* buffer);
+    
+    ~string();
 
     void set(const char* buffer);
     void clear();

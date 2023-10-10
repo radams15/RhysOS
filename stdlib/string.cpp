@@ -19,6 +19,10 @@ string::string(const char* buffer) {
     rbuf[length] = 0;
 }
 
+string::~string() {
+    free(rbuf);
+}
+
 void string::setc(int i, char c) {
     rbuf[i] = c;
 }
