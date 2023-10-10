@@ -42,7 +42,7 @@ int create_file(char* name) {
         fsnode = fs_finddir(fsnode, tok);
 
         previous_tok = tok;
-        tok          = strtok(NULL, "/");
+        tok = strtok(NULL, "/");
     }
 
     return NULL;
@@ -102,8 +102,8 @@ FsNode_t* get_dir(char* name) {
 }
 
 void read_sector(int* buffer, int sector) {
-    int track         = sector / (18 * 2);  // Number of tracks
-    int head          = (sector / 18) % 2;  // Head number (0 or 1)
+    int track = sector / (18 * 2);          // Number of tracks
+    int head = (sector / 18) % 2;           // Head number (0 or 1)
     int sector_number = (sector % 18) + 1;  // Sector number (1-based)
 
     // Prepare the registers
@@ -174,8 +174,8 @@ FsNode_t* fs_finddir(FsNode_t* node, char* name) {
 }
 
 void read_lba_to_segment(int disk, int lba, int dst_addr, int dst_seg) {
-    int head   = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
-    int track  = (lba / (SECTORS_PER_TRACK * 2));
+    int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
+    int track = (lba / (SECTORS_PER_TRACK * 2));
     int sector = (lba % SECTORS_PER_TRACK + 1);
 
     read_sector_to_segment(disk, track, head, sector, dst_addr, dst_seg);

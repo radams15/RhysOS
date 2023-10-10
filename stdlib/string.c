@@ -31,7 +31,7 @@ int endswith(char* a, char* suffix) {
     char* a_end;
     char* suff_end;
 
-    a_end    = a + (strlen(a) - 1);
+    a_end = a + (strlen(a) - 1);
     suff_end = suffix + (strlen(suffix) - 1);
 
     for (; suff_end >= suffix;) {
@@ -83,7 +83,7 @@ cont:
      * Note that delim must have one NUL; we stop if we see that, too.
      */
     for (;;) {
-        c     = *s++;
+        c = *s++;
         spanp = (char*)delim;
         do {
             if ((sc = *spanp++) == c) {

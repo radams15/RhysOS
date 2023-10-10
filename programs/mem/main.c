@@ -35,7 +35,7 @@ int highmem() {
 
 int main(int argc, char** argv) {
     int mem_high = highmem();
-    int mem_low  = lowmem();
+    int mem_low = lowmem();
 
     printf("Memory:\n\t- Low (under 640k): %dk\n\t- High (above 1M): %dk\n",
            mem_low, mem_high);

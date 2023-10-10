@@ -49,8 +49,8 @@ void main(int src_ds, void* boot_ptr) {
 }
 
 int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
-    int i          = 0;
-    int count      = 0;
+    int i = 0;
+    int count = 0;
     DirEnt_t* node = NULL;
     FsNode_t* fsnode;
     FsNode_t* root = get_dir(dir_name);
@@ -227,7 +227,7 @@ int a20_init() {
 int init(struct SystemInfo* info) {
     cls();
 
-    _lowmem  = info->lowmem;
+    _lowmem = info->lowmem;
     _highmem = info->highmem;
 
     a20_init();
@@ -250,12 +250,12 @@ int init(struct SystemInfo* info) {
                   "Failed to initialise /dev/com2\n", COM2, BAUD_9600,
                   PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 
-    fs_root          = fat_init(info->rootfs_start);
+    fs_root = fat_init(info->rootfs_start);
     FsNode_t* fs_dev = devfs_init();
     fat_mount(fs_dev, "dev");
     print_string("Root filesystem mounted\n");
 
-    stdin  = open("/dev/stdin");
+    stdin = open("/dev/stdin");
     stdout = open("/dev/stdout");
     stderr = open("/dev/stderr");
 

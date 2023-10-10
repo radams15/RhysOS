@@ -84,8 +84,8 @@ void read_sector(int disk,
 void call_kernel(int ds, struct SystemInfo* info);
 
 void read_sector_lba(int disk, int lba, int dst_addr, int dst_seg) {
-    int head   = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
-    int track  = (lba / (SECTORS_PER_TRACK * 2));
+    int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
+    int track = (lba / (SECTORS_PER_TRACK * 2));
     int sector = (lba % SECTORS_PER_TRACK + 1);
 
     read_sector(disk, track, head, sector, dst_addr, dst_seg);
@@ -113,7 +113,7 @@ int read_cluster(int disk, int cluster, int dst_addr, int dst_seg) {
 
 int load_segment(int disk, int sect_start, int dst_addr, int dst_seg) {
     int sect;
-    int addr    = dst_addr;
+    int addr = dst_addr;
     int cluster = sect_start;
 
     while (1) {
@@ -191,7 +191,7 @@ int main() {
         f2 |= (frame[1] & 0xF0) >> 4;
         f2 &= 0xFFF;
 
-        fat_table[i]     = f1;
+        fat_table[i] = f1;
         fat_table[i + 1] = f2;
 
         curr += 3;
@@ -221,8 +221,8 @@ int main() {
 
     struct SystemInfo info;
     info.rootfs_start = sect;
-    info.highmem      = highmem();
-    info.lowmem       = lowmem();
+    info.highmem = highmem();
+    info.lowmem = lowmem();
     strcpy(info.cmdline, cmdline);
 
     call_kernel(ds(), &info);

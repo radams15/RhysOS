@@ -1,4 +1,3 @@
 name: shell
-main: shell.cpp
+main: main.cpp
 stdlib: true
-shell: true

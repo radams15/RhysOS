@@ -116,7 +116,7 @@ unsigned int fat_read(FsNode_t* node,
                sector_bytes);
 
         bytes_read += sector_bytes;
-        cluster       = fat_table[cluster];
+        cluster = fat_table[cluster];
         sector_offset = 0;
     }
 
@@ -154,7 +154,7 @@ FsNode_t* fat_create(char* name) {
     int start_cluster;
     for (int i = 0; i < 512; i++) {
         if (fat_table[i] == 0) {
-            fat_table[i]  = 0xFF8;
+            fat_table[i] = 0xFF8;
             start_cluster = i;
             break;
         }
@@ -165,7 +165,7 @@ FsNode_t* fat_create(char* name) {
     for (int i = 0; i < MAX_FILES; i++) {
         if (root_nodes[i].name[0] == 0) {
             printi(i, 10);
-            out   = &root_nodes[i];
+            out = &root_nodes[i];
             inode = i;
             break;
         }
@@ -178,17 +178,17 @@ FsNode_t* fat_create(char* name) {
 
     strcpy(out->name, name);
     out->start_sector = start_cluster;
-    out->inode        = inode;
-    out->flags        = FS_FILE;
-    out->length       = 0;
-    out->offset       = 0;
-    out->read         = fat_read;
-    out->write        = 0;
-    out->open         = 0;
-    out->close        = 0;
-    out->readdir      = 0;
-    out->finddir      = 0;
-    out->ref          = 0;
+    out->inode = inode;
+    out->flags = FS_FILE;
+    out->length = 0;
+    out->offset = 0;
+    out->read = fat_read;
+    out->write = 0;
+    out->open = 0;
+    out->close = 0;
+    out->readdir = 0;
+    out->finddir = 0;
+    out->ref = 0;
 
     num_root_nodes++;
 
@@ -201,17 +201,17 @@ void fat_mount(FsNode_t* node, char* name) {
     strcpy(root_nodes[i].name, name);
     root_nodes[i].name[11] = 0;
 
-    root_nodes[i].flags   = FS_DIRECTORY | FS_MOUNTPOINT;
-    root_nodes[i].inode   = i;
-    root_nodes[i].length  = 1;
-    root_nodes[i].offset  = 0;
-    root_nodes[i].read    = 0;
-    root_nodes[i].write   = 0;
-    root_nodes[i].open    = 0;
-    root_nodes[i].close   = 0;
+    root_nodes[i].flags = FS_DIRECTORY | FS_MOUNTPOINT;
+    root_nodes[i].inode = i;
+    root_nodes[i].length = 1;
+    root_nodes[i].offset = 0;
+    root_nodes[i].read = 0;
+    root_nodes[i].write = 0;
+    root_nodes[i].open = 0;
+    root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
-    root_nodes[i].ref     = node;
+    root_nodes[i].ref = node;
 
     num_root_nodes++;
 }
@@ -245,18 +245,18 @@ void fat_load_root() {
                     root_nodes[i].name[x] += 32;
             }
 
-            root_nodes[i].flags        = FS_FILE;
-            root_nodes[i].inode        = i;
+            root_nodes[i].flags = FS_FILE;
+            root_nodes[i].inode = i;
             root_nodes[i].start_sector = entry->cluster;
-            root_nodes[i].length       = entry->filesize[0];
-            root_nodes[i].offset       = 0;
-            root_nodes[i].read         = fat_read;
-            root_nodes[i].write        = 0;
-            root_nodes[i].open         = 0;
-            root_nodes[i].close        = 0;
-            root_nodes[i].readdir      = 0;
-            root_nodes[i].finddir      = 0;
-            root_nodes[i].ref          = 0;
+            root_nodes[i].length = entry->filesize[0];
+            root_nodes[i].offset = 0;
+            root_nodes[i].read = fat_read;
+            root_nodes[i].write = 0;
+            root_nodes[i].open = 0;
+            root_nodes[i].close = 0;
+            root_nodes[i].readdir = 0;
+            root_nodes[i].finddir = 0;
+            root_nodes[i].ref = 0;
             num_root_nodes++;
         }
     }
@@ -268,7 +268,7 @@ FsNode_t* fat_init(int sector_start) {
     sector_start = 1;  // TODO: Fix
 
     for (int i = 0; i < MAX_FILES; i++) {
-        root_dir[i].name[0]   = NULL;
+        root_dir[i].name[0] = NULL;
         root_nodes[i].name[0] = NULL;
     }
 
@@ -294,7 +294,7 @@ FsNode_t* fat_init(int sector_start) {
         f2 |= (frame[1] & 0xF0) >> 4;
         f2 &= 0xFFF;
 
-        fat_table[i]     = f1;
+        fat_table[i] = f1;
         fat_table[i + 1] = f2;
 
         curr += 3;
@@ -303,17 +303,17 @@ FsNode_t* fat_init(int sector_start) {
     num_root_nodes = 0;
 
     strcpy(root_node.name, "/");
-    root_node.flags   = FS_DIRECTORY;
-    root_node.inode   = 0;
-    root_node.length  = 0;
-    root_node.offset  = 0;
-    root_node.read    = 0;
-    root_node.write   = 0;
-    root_node.open    = 0;
-    root_node.close   = 0;
+    root_node.flags = FS_DIRECTORY;
+    root_node.inode = 0;
+    root_node.length = 0;
+    root_node.offset = 0;
+    root_node.read = 0;
+    root_node.write = 0;
+    root_node.open = 0;
+    root_node.close = 0;
     root_node.readdir = fat_readdir;
     root_node.finddir = fat_finddir;
-    root_node.ref     = 0;
+    root_node.ref = 0;
 
     fat_load_root();
 
