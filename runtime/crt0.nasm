@@ -15,22 +15,31 @@ extern _stderr
 extern _printf
 
 _crt0:
-    mov bx, [bp-10]
-    mov cx, [bp-8]
+    push bp
+    mov bp, sp
+    
+    mov dx, [bp+16] ; should_free
+    mov bx, [bp+8] ; argc
+    mov cx, [bp+6] ; argv
 
-    mov al, [bp-6] ; set stdin, stdout, stderr from the stack
+    mov al, [bp+10] ; set stdin, stdout, stderr from the stack
     mov [_stdin], al
     
-    mov al, [bp-4]
+    mov al, [bp+12]
     mov [_stdout], al
     
-    mov al, [bp-2]
+    mov al, [bp+14]
     mov [_stderr], al
     
-    push DWORD bx ; argc
+    push DWORD dx ; should_free
     push DWORD cx ; argv
+    push DWORD bx ; argc
     call _start
-    add sp, 4
+    add sp, 6
+    
+    xchg bx, bx
+    
+    pop bp
     retf
 
 ;int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);

@@ -19,18 +19,21 @@ _call_far:
 	mov [stdout], ax
 	mov ax, [bp+12]
 	mov [stderr], ax
+	mov ax, [bp+14]
+	mov [should_free], ax
 	
     mov ax, ss
     mov [stackseg], ax
     
-    mov bx, [bp+14] ; bx => segment
+    mov bx, [bp+16] ; bx => segment
     
-    mov ax, [bp+16] ; ax => new ds
+    mov ax, [bp+18] ; ax => new ds
     mov ss, ax
     
 	push bp ; new program stack frame
 	mov bp, sp
 	
+	push WORD [should_free]
 	push WORD [stderr]
     push WORD [stdout]
     push WORD [stdin]
@@ -57,7 +60,8 @@ _call_far:
         pop bp
         ret
 
-stackseg: dw 0        
+stackseg: dw 0
+should_free: dw 0
 stdin: dw 0
 stdout: dw 0
 stderr: dw 0

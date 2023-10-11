@@ -34,7 +34,7 @@ int memcmp(char* a, char* b, int n) {
 
 int segment_top = 0x4000;
 
-int call_far(int argc, char** argv, int in, int out, int err, int cs, int ds);
+int call_far(int argc, char** argv, int in, int out, int err, BOOL should_free, int cs, int ds);
 
 int get_segment() {
     for (int i = 0; i < sizeof(segments); i++) {
@@ -45,13 +45,11 @@ int get_segment() {
     return -1;
 }
 
-int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
+int exec(char* file_name, int argc, char** argv, int in, int out, int err, BOOL should_free) {
     struct FsNode* fs_node;
     int size;
     int ret;
     ExeHeader_t header;
-
-    ProcFunc_t entry;
 
     fs_node = get_dir(file_name);
 
@@ -92,7 +90,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err) {
         addr += 512;
     }
 
-    ret = call_far(argc, argv, in, out, err, segment, segment);
+    ret = call_far(argc, argv, in, out, err, should_free, segment, segment);
 
     cli();  // Atomic again
     segments[segment_index] = 0;

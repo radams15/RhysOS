@@ -5,7 +5,7 @@
 
 #include "serial.h"
 
-#define MAX_FILES 16
+#define MAX_FILES 12
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define SECTOR_SIZE 512
 
@@ -396,6 +396,9 @@ FsNode_t* devfs_init() {
     root_node.ref     = 0;
     
     root_nodes = malloc(MAX_FILES * sizeof(FsNode_t));
+    
+    if(root_nodes == NULL)
+        return NULL;
 
     num_root_nodes = 0;
 

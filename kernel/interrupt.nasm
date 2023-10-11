@@ -90,6 +90,7 @@ _make_break_interrupt:
 	mov [si],dx	;set up our vector
 	pop ds
 	
+	mov ax, 0
 	ret	
 
 _make_rtc_interrupt:
@@ -103,6 +104,7 @@ _make_rtc_interrupt:
 	mov [si],dx	;set up our vector
 	pop ds
 	
+	mov ax, 0
 	ret
 
 _sti:
@@ -134,6 +136,8 @@ _makeInterrupt21:
 	pop si
 	pop ax
 	pop dx
+	
+	mov ax, 0
 	ret
 
 ;void handleInterrupt21 (int AX, int BX, int CX, int DX)

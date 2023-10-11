@@ -3,7 +3,7 @@
 #include "stdio.h"
 #include "util.h"
 
-#define MAX_FILES 25
+#define MAX_FILES 32
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 struct DirectoryEntry {
@@ -29,7 +29,7 @@ struct DirectoryEntry {
     int filesize[2];
 } __attribute__((packed));
 
-unsigned int fat_table[512];
+static unsigned int fat_table[512];
 
 static FsNode_t root_node;
 static FsNode_t* root_nodes;
@@ -133,6 +133,8 @@ DirEnt_t* fat_readdir(FsNode_t* node, unsigned int index) {
 FsNode_t* fat_finddir(FsNode_t* node, char* name) {
     int i;
     for (i = 0; i < num_root_nodes; i++) {
+        print_string(root_nodes[i].name);
+        print_string("\n");
         if (strcmp(name, root_nodes[i].name) == 0) {
             if ((root_nodes[i].flags & 0x08)) {  // Is a mount
                 return root_nodes[i].ref;
@@ -230,6 +232,8 @@ void fat_load_root(struct DirectoryEntry* root_dir) {
 
                 memcpy(root_nodes[i].name + x + 1, entry->ext, 3);
             }
+            
+            print_string(root_nodes[i].name);
 
             root_nodes[i].name[x + 4] = 0;
 
@@ -263,6 +267,9 @@ FsNode_t* fat_init(int sector_start) {
     struct DirectoryEntry root_dir[MAX_FILES];
     
     root_nodes = malloc(MAX_FILES * sizeof(FsNode_t));
+    
+    if(root_nodes == NULL)
+        return NULL;
 
     sector_start = 1;  // TODO: Fix
 
@@ -276,7 +283,7 @@ FsNode_t* fat_init(int sector_start) {
     read_lba_to_segment(0, sector_start + 19, &root_dir[16], DATA_SEGMENT);
 
     unsigned char frame[3];
-    int i, f1, f2, curr;
+    unsigned int i, f1, f2, curr;
     curr = 0;
     for (i = 0; i < 512; i += 2) {
         frame[0] = fat_sector[curr];
@@ -294,7 +301,8 @@ FsNode_t* fat_init(int sector_start) {
         f2 &= 0xFFF;
 
         fat_table[i]     = f1;
-        fat_table[i + 1] = f2;
+        if(i+1 < 512)
+            fat_table[i + 1] = f2;
 
         curr += 3;
     }

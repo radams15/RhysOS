@@ -3,7 +3,7 @@
 #include "proc.h"
 #include "util.h"
 
-#define MAX_OPEN_FILES 64
+#define MAX_OPEN_FILES 32
 #define SECTORS_PER_TRACK 18
 
 extern int interrupt(int number, int AX, int BX, int CX, int DX);
