@@ -4,15 +4,30 @@
 #include "util.h"
 
 #define MAX_OPEN_FILES 64
+#define MAX_MOUNTS 4
 #define SECTORS_PER_TRACK 18
 
 extern int interrupt(int number, int AX, int BX, int CX, int DX);
 
 FsNode_t* open_files[MAX_OPEN_FILES];
+FsMount_t mounts[MAX_MOUNTS] = {NULL};
 FsNode_t* fs_root;
 
 FsNode_t* fh_get_node(int fh) {
     return open_files[fh];
+}
+
+int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child) {
+    for(int i=0 ; i<MAX_MOUNTS ; i++) {
+        if(mounts[i].parent == NULL && mounts[i].child == NULL) {
+            strcpy(mounts[i].name, name);
+            mounts[i].parent = parent;
+            mounts[i].child = child;
+            return 0;
+        }
+    }
+    
+    return 1;
 }
 
 int write(int fh, unsigned char* buffer, unsigned int size) {
@@ -93,11 +108,17 @@ FsNode_t* get_dir(char* name) {
     tok = strtok(buf, "/");
 
     while (tok != NULL && fsnode != NULL) {
+        for(int i=0 ; i<MAX_MOUNTS ; i++) {
+            if(fsnode == mounts[i].parent && mounts[i].parent != NULL && mounts[i].child != NULL && strcmp(tok, mounts[i].name) == 0) {
+                fsnode = mounts[i].child;
+                goto next;
+            }
+        }
+        
         fsnode = fs_finddir(fsnode, tok);
-
+next:
         tok = strtok(NULL, "/");
     }
-
     return fsnode;
 }
 

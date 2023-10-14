@@ -4,7 +4,6 @@
 #include "fs.h"
 
 FsNode_t* fat_init(int sector_start);
-void fat_mount(FsNode_t* node, char* name);
 
 int fat_next_lba(int prev_lba);
 int fat_next_cluster(int prev_cluster);

@@ -48,6 +48,28 @@ void main(int src_ds, void* boot_ptr) {
     }
 }
 
+void kdir(char* dir_name) {
+    int i = 0;
+    DirEnt_t* node = NULL;
+    FsNode_t* fsnode;
+    FsNode_t* root = get_dir(dir_name);
+
+    if (root == NULL) {
+        print_string("Cannot find directory!\n");
+        return 0;
+    }
+
+    while ((node = fs_readdir(root, i)) != NULL) {
+        fsnode = fs_finddir(root, node->name);
+        if (fsnode != NULL) {
+            print_string(fsnode->name);
+            print_string("\n");
+        }
+
+        i++;
+    }
+}
+
 int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
     int i = 0;
     int count = 0;
@@ -68,7 +90,6 @@ int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
                 seg_copy(fsnode, buf, sizeof(FsNode_t), DATA_SEGMENT, ds);
                 seg_copy(fsnode->name, buf->name, FILE_NAME_MAX * sizeof(char),
                          DATA_SEGMENT, ds);
-                // print_string(fsnode->name);
             }
             count++;
         }
@@ -252,16 +273,17 @@ int init(struct SystemInfo* info) {
 
     fs_root = fat_init(info->rootfs_start);
     FsNode_t* fs_dev = devfs_init();
-    fat_mount(fs_dev, "dev");
+    fs_mount("dev", fs_root, fs_dev);
     print_string("Root filesystem mounted\n");
 
     stdin = open("/dev/stdin");
     stdout = open("/dev/stdout");
     stderr = open("/dev/stderr");
+    
+    kdir("/");
 
-    print_string("\n");
     char* shell_argv[] = {"shell", "login.bat"};
-    exec("shell", 2, shell_argv, stdin, stdout, stderr);
+    exec("shell", 0, NULL, stdin, stdout, stderr);
 
     close(stdin);
     close(stdout);
