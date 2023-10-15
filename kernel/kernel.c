@@ -48,6 +48,12 @@ void main(int src_ds, void* boot_ptr) {
     }
 }
 
+void debug(const char* label, int data) {
+    print_string(label);
+    printi(data, 16);
+    print_string("\n");
+}
+
 void kdir(char* dir_name) {
     int i = 0;
     DirEnt_t* node = NULL;
@@ -98,12 +104,6 @@ int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
     }
 
     return count;
-}
-
-void debug(const char* label, int data) {
-    print_string(label);
-    printi(data, 16);
-    print_string("\n");
 }
 
 typedef struct SyscallArgs {
@@ -279,10 +279,9 @@ int init(struct SystemInfo* info) {
     stdin = open("/dev/stdin");
     stdout = open("/dev/stdout");
     stderr = open("/dev/stderr");
-    
-    kdir("/");
 
     char* shell_argv[] = {"shell", "login.bat"};
+    exec("dir", 0, NULL, stdin, stdout, stderr);
     exec("shell", 0, NULL, stdin, stdout, stderr);
 
     close(stdin);
