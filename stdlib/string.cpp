@@ -15,7 +15,7 @@ string::string(int len) : length(len) {
 string::string(const char* buffer) {
     length = strlen((char*)buffer);
     rbuf = (char*)malloc(length);
-    strcpy(rbuf, (char*)buffer, length);
+    strncpy(rbuf, (char*)buffer, length);
     rbuf[length] = 0;
 }
 
@@ -34,7 +34,7 @@ void string::set(const char* buffer) {
         rbuf = (char*)malloc(length);
     }
 
-    strcpy(rbuf, (char*)buffer, length);
+    strncpy(rbuf, (char*)buffer, length);
     rbuf[length] = 0;
 }
 
@@ -51,7 +51,7 @@ const char* string::c_copy() {
     int str_len = strlen((char*)rbuf);
     char* out = (char*)malloc(str_len * sizeof(char));
 
-    strcpy((char*)out, rbuf, str_len);
+    strncpy((char*)out, rbuf, str_len);
 
     return out;
 }

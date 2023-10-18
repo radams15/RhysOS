@@ -45,7 +45,11 @@ int endswith(char* a, char* suffix) {
     return 1;
 }
 
-int strcpy(char* dst, char* src, int length) {
+int strcpy(char* dst, char* src) {
+    return strncpy(dst, src, strlen(src));
+}
+
+int strncpy(char* dst, char* src, int length) {
     for (int i = 0; i < length; i++) {
         dst[i] = src[i];
     }
@@ -97,4 +101,105 @@ cont:
         } while (sc != 0);
     }
     /* NOTREACHED */
+}
+
+int atoi(char* str) {
+    // Initialize result
+    int res = 0;
+ 
+    // Initialize sign as positive
+    int sign = 1;
+ 
+    // Initialize index of first digit
+    int i = 0;
+ 
+    // If number is negative,
+    // then update sign
+    if (str[0] == '-') {
+        sign = -1;
+ 
+        // Also update index of first digit
+        i++;
+    }
+ 
+    // Iterate through all digits
+    // and update the result
+    for (; str[i] != ' '; ++i)
+        res = res * 10 + str[i] - '0';
+ 
+    // Return result with sign
+    return sign * res;
+}
+
+#define INT_MAX 32767
+#define INT_MIN -32767
+
+int strtoi(const char* nptr, char** endptr, int base) {
+    const char *p = nptr, *endp;
+    _Bool is_neg = 0, overflow = 0;
+    /* Need unsigned so (-INT_MIN) can fit in these: */
+    unsigned int n = 0, cutoff;
+    int cutlim;
+    if (base < 0 || base == 1 || base > 36) {
+        return 0;
+    }
+    endp = nptr;
+    while (*p == ' ')
+        p++;
+    if (*p == '+') {
+        p++;
+    } else if (*p == '-') {
+        is_neg = 1, p++;
+    }
+    if (*p == '0') {
+        p++;
+        /* For strtol(" 0xZ", &endptr, 16), endptr should point to 'x';
+         * pointing to ' ' or '0' is non-compliant.
+         * (Many implementations do this wrong.) */
+        endp = p;
+        if (base == 16 && (*p == 'X' || *p == 'x')) {
+            p++;
+        } else if (base == 2 && (*p == 'B' || *p == 'b')) {
+            /* C23 standard supports "0B" and "0b" prefixes. */
+            p++;
+        } else if (base == 0) {
+            if (*p == 'X' || *p == 'x') {
+                base = 16, p++;
+            } else if (*p == 'B' || *p == 'b') {
+                base = 2, p++;
+            } else {
+                base = 8;
+            }
+        }
+    } else if (base == 0) {
+        base = 10;
+    }
+    cutoff = (is_neg) ? -(INT_MIN / base) : INT_MAX / base;
+    cutlim = (is_neg) ? -(INT_MIN % base) : INT_MAX % base;
+    while (1) {
+        int c;
+        if (*p >= 'A')
+            c = ((*p - 'A') & (~('a' ^ 'A'))) + 10;
+        else if (*p <= '9')
+            c = *p - '0';
+        else
+            break;
+        if (c < 0 || c >= base) break;
+        endp = ++p;
+        if (overflow) {
+            /* endptr should go forward and point to the non-digit character
+             * (of the given base); required by ANSI standard. */
+            if (endptr) continue;
+            break;
+        }
+        if (n > cutoff || (n == cutoff && c > cutlim)) {
+            overflow = 1; continue;
+        }
+        n = n * base + c;
+    }
+    if (endptr) *endptr = (char *)endp;
+    if (overflow) {
+        return ((is_neg) ? INT_MIN : INT_MAX);
+    }
+    return (int)((is_neg) ? -n : n);
 }
