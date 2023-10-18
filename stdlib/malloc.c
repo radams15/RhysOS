@@ -10,8 +10,6 @@ static unsigned int heap;
 #define BLOCK_SIZE \
     (0x100 - sizeof(BlkHeader_t))  // size-blocks that can be allocated
 
-#define CEIL_DIV(x, y) ((x / y) + (x % y != 0))
-
 // https://wiki.osdev.org/Page_Frame_Allocation
 
 typedef struct BlkHeader {
@@ -26,9 +24,9 @@ void memmgr_init() {
 
     BlkHeader_t* header = (BlkHeader_t*)&heap_begin;
 
-    header->magic  = HEAP_MAGIC;
+    header->magic = HEAP_MAGIC;
     header->length = &heap_end - &heap_begin;
-    header->free   = 1;
+    header->free = 1;
 
     header->next = NULL;
 }
@@ -39,13 +37,13 @@ BlkHeader_t* split(BlkHeader_t* block, unsigned int size) {
     int old_size = block->length;
 
     block += size + sizeof(BlkHeader_t);
-    block->magic  = HEAP_MAGIC;
+    block->magic = HEAP_MAGIC;
     block->length = old_size - (size + sizeof(BlkHeader_t));
-    block->free   = 1;
+    block->free = 1;
 
     out->length = size;
-    out->next   = block;
-    out->magic  = HEAP_MAGIC;
+    out->next = block;
+    out->magic = HEAP_MAGIC;
 
     return out;
 }
@@ -54,7 +52,7 @@ int align(int n) {
     return (n + sizeof(int) - 1) & ~(sizeof(int) - 1);
 }
 
-void* malloc(unsigned int size) {
+void* malloc(uint16 size) {
     if (size == 0)
         return 0;
 
@@ -84,9 +82,37 @@ void* malloc(unsigned int size) {
     }
 
     header->magic = HEAP_MAGIC;
-    header->free  = 0;
+    header->free = 0;
 
     return (void*)(((unsigned int*)header) + sizeof(BlkHeader_t));
+}
+
+void* calloc(uint16 n, uint16 size) {
+    void* out = malloc(n * size);
+
+    memset(out, 0, n);
+
+    return out;
+}
+
+void* realloc(void* ptr, uint16 size) {
+    BlkHeader_t* header = (unsigned int*)ptr - sizeof(BlkHeader_t);
+
+    int extra = size - header->length;
+
+    BlkHeader_t* new_header;
+    if (header->next->length >= extra) {
+        new_header = split(header->next, size);
+        header->length += new_header->length;
+    } else {
+        new_header = malloc(size);
+        uint16* dst =
+            (void*)(((unsigned int*)new_header) + sizeof(BlkHeader_t));
+        memcpy(dst, ptr, header->length);
+        free(ptr);
+    }
+
+    return (void*)new_header;
 }
 
 void free(void* ptr) {

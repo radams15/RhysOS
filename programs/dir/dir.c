@@ -11,7 +11,7 @@ void dir_listing(char* dir) {
     FsNode_t* file;
 
     for (i = 0; i < MAX_FILES; i++) {
-        dir_buf[i].name[0] = 0;
+        dir_buf[i].name[0] = NULL;
     }
 
     printf("Files in directory '%s'\n", dir);
@@ -22,7 +22,7 @@ void dir_listing(char* dir) {
     for (i = 0; i < len; i++) {
         file = &dir_buf[i];
 
-        if (file == NULL || file->name[0] == 0)
+        if (file == NULL || file->name[0] == NULL)
             continue;
 
         printf("\t - %s\n", file->name);

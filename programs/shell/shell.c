@@ -1,18 +1,10 @@
-#include "string.hpp"
-
-extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include <syscall.h>
-}
 
 #define MAX_PARAMS 16
 
 static char* prompt = "A:/ ";
-
-int run_line(char* line, int length);
-
-string line(1024);
 
 static int run_batch(char* path) {
     int fh;
@@ -29,7 +21,7 @@ static int run_batch(char* path) {
     }
 
     totalread = 0;
-    len       = 0;
+    len = 0;
 
     while ((c = fgetch(fh)) != 0) {  // Each line
         linebuf[len] = c;
@@ -60,45 +52,43 @@ static int run_external(char* exe, char* rest) {
 
     int err_fh = stderr;
     int out_fh = stdout;
-    int in_fh  = stdin;
+    int in_fh = stdin;
 
-    argc    = 1;
+    argc = 1;
     argv[0] = exe;
 
-    if (rest != NULL) {
-        tok = (char*)strtok(rest, " ");
+    tok = strtok(rest, " ");
 
-        while (tok != NULL) {
-            *(tok - 1) = 0;  // null terminate section (replacing space)
+    while (tok != NULL) {
+        *(tok - 1) = 0;  // null terminate section (replacing space)
 
-            if (strcmp(tok, ">") == 0) {  // redirection?
-                tok        = (char*)strtok(NULL, ">");
-                dest       = tok;
-                *(tok - 1) = 0;
-                out_fh     = open(dest);
+        if (strcmp(tok, ">") == 0) {  // redirection?
+            tok = strtok(NULL, ">");
+            dest = tok;
+            *(tok - 1) = 0;
+            out_fh = open(dest);
 
-                if (out_fh == -1)
-                    out_fh = stdout;
+            if (out_fh == -1)
+                out_fh = stdout;
 
-                err_fh = out_fh;
-                break;
-            }
-
-            if (strcmp(tok, "<") == 0) {  // redirection?
-                tok        = (char*)strtok(NULL, "<");
-                dest       = tok;
-                *(tok - 1) = 0;
-                in_fh      = open(dest);
-
-                if (in_fh == -1)
-                    in_fh = stdin;
-
-                break;
-            }
-
-            argv[argc++] = tok;
-            tok          = strtok(NULL, " ");
+            err_fh = out_fh;
+            break;
         }
+
+        if (strcmp(tok, "<") == 0) {  // redirection?
+            tok = strtok(NULL, "<");
+            dest = tok;
+            *(tok - 1) = 0;
+            in_fh = open(dest);
+
+            if (in_fh == -1)
+                in_fh = stdin;
+
+            break;
+        }
+
+        argv[argc++] = tok;
+        tok = strtok(NULL, " ");
     }
 
     if (endswith(exe, ".bat")) {
@@ -126,7 +116,7 @@ int run_line(char* line, int length) {
                    line + strlen(exe) + 1);
         else
             stdout = stdin = stderr = fh;
-    } else if (strcmp(exe, "exit") == 0) {
+    } else if(strcmp(exe, "exit") == 0) {
         return -1;
     } else {
         run_external(exe, line + strlen(exe) + 1);
@@ -134,19 +124,21 @@ int run_line(char* line, int length) {
 }
 
 int loop() {
-    line.clear();
+    char line[1024];
 
-    printf("%s", prompt);
-    int len = readline(line.rbuf);
+    memset(&line, 0, 1024 / 8);
+
+    printf(prompt);
+    int len = readline(line);
 
     printf("\n");
 
     if (len == 0)
         return 0;
 
-    int ret = run_line((char*)line.c_copy(), strlen(line.rbuf));
-
-    if (ret == -1)
+    int ret = run_line(line, sizeof(line));
+    
+    if(ret == -1)
         return 1;
 
     printf("\n");
@@ -154,16 +146,12 @@ int loop() {
     return 0;
 }
 
-int main(int argc, char** argv) {
-    if (argc > 1) {
-        for (int i = 1; i < argc; i++) {
-            run_external(argv[i], NULL);
-        }
-    } else {
-        int ret = 0;
-        while (!ret)
-            ret = loop();
-    }
+int main() {
+    char name[32];
+    int ret = 0;
+
+    while (!ret)
+        ret = loop();
 
     return 0;
 }

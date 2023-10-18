@@ -61,6 +61,13 @@ typedef struct FsNode {
     struct FsNode* ref;  // Pointer to symlink or mount
 } FsNode_t;
 
+
+typedef struct FsMount {
+    char name[FILE_NAME_MAX];
+    FsNode_t* parent;
+    FsNode_t* child;
+} FsMount_t;
+
 unsigned int fs_read(FsNode_t* node,
                      unsigned int offset,
                      unsigned int size,
@@ -78,6 +85,8 @@ FsNode_t* get_dir(char* name);
 int open(char* name);
 void close(int fh);
 void seek(int fh, unsigned int location);
+
+int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child);
 
 extern FsNode_t* fs_root;
 

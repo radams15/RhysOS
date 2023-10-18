@@ -48,9 +48,37 @@ void main(int src_ds, void* boot_ptr) {
     }
 }
 
+void debug(const char* label, int data) {
+    print_string(label);
+    printi(data, 16);
+    print_string("\n");
+}
+
+void kdir(char* dir_name) {
+    int i = 0;
+    DirEnt_t* node = NULL;
+    FsNode_t* fsnode;
+    FsNode_t* root = get_dir(dir_name);
+
+    if (root == NULL) {
+        print_string("Cannot find directory!\n");
+        return 0;
+    }
+
+    while ((node = fs_readdir(root, i)) != NULL) {
+        fsnode = fs_finddir(root, node->name);
+        if (fsnode != NULL) {
+            print_string(fsnode->name);
+            print_string("\n");
+        }
+
+        i++;
+    }
+}
+
 int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
-    int i          = 0;
-    int count      = 0;
+    int i = 0;
+    int count = 0;
     DirEnt_t* node = NULL;
     FsNode_t* fsnode;
     FsNode_t* root = get_dir(dir_name);
@@ -66,9 +94,8 @@ int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
             if (buf != NULL) {
                 buf++;
                 seg_copy(fsnode, buf, sizeof(FsNode_t), DATA_SEGMENT, ds);
-                seg_copy(fsnode->name, buf->name, FILE_NAME_MAX * sizeof(char),
+                seg_copy(fsnode->name, buf->name, strlen(fsnode->name),
                          DATA_SEGMENT, ds);
-                // print_string(fsnode->name);
             }
             count++;
         }
@@ -79,12 +106,6 @@ int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
     return count;
 }
 
-void debug(const char* label, int data) {
-    print_string(label);
-    printi(data, 16);
-    print_string("\n");
-}
-
 typedef struct SyscallArgs {
     int num;  // Syscall number
     int a, b, c, d, e, f;
@@ -92,8 +113,7 @@ typedef struct SyscallArgs {
 } SyscallArgs_t;
 
 int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
-extern int make_break_interrupt();
-extern int makeInterrupt21();
+extern void make_break_interrupt();
 
 int i21_handler(SyscallArgs_t* args) {
     const int argv_item_size = 64;  // 64 chars per arg
@@ -104,7 +124,6 @@ int i21_handler(SyscallArgs_t* args) {
 
             char** argv_in;
             char** argv = malloc(args->b * sizeof(char));
-            //print_string("Malloc: ");printi(argv, 16);
 
             seg_copy(args->c, argv_in, args->b * sizeof(char*), args->ds,
                      DATA_SEGMENT);
@@ -113,18 +132,15 @@ int i21_handler(SyscallArgs_t* args) {
                 argv[i] = malloc(argv_item_size * sizeof(char));
                 seg_copy(argv_in[i], argv[i], argv_item_size, args->ds,
                          DATA_SEGMENT);
-                 //print_string("Malloc: ");printi(argv[i], 16);
             }
 
             seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
             int ret = exec(name, args->b, argv, args->d, args->e, args->f, TRUE);
 
-            if(ret != 0) {
-                for (int i = 0; i < args->b; i++) {
-                    free(argv[i]);
-                }
-                free(argv);
+            for (int i = 0; i < args->b; i++) {
+                free(argv[i]);
             }
+            free(argv);
         } break;
 
         case 2: {
@@ -181,15 +197,11 @@ int i21_handler(SyscallArgs_t* args) {
         case 7:
             seek(args->a, args->b);
             break;
-            
-        case 8: // kfree
-            free(args->a);
-            break;
 
         default:
             print_string("Unknown interrupt: ");
             printi(args->a, 16);
-            print_string("!\n");
+            print_string("!\r\n");
             return -1;
             break;
     }
@@ -236,50 +248,40 @@ int a20_init() {
 int init(struct SystemInfo* info) {
     cls();
 
-    _lowmem  = info->lowmem;
+    _lowmem = info->lowmem;
     _highmem = info->highmem;
 
     a20_init();
 
     MUST_COMPLETE(memmgr_init, "Memory manager enabled\n",
                   "Memory manager failed to initialise\n");
-    
-    //MUST_COMPLETE(make_break_interrupt, "Break interrupt enabled\n", "Failed enable break interrupt\n");
-    
-    MUST_COMPLETE(makeInterrupt21, "Int 21h enabled\n", "Failed enable int 21h\n");
 
-    //MUST_COMPLETE(rtc_init, "RTC enabled\n", "Failed to initialise rtc\n");
+    make_break_interrupt();
 
-    /*MUST_COMPLETE(serial_init, "Enabled /dev/com1\n",
+    makeInterrupt21();
+    print_string("Int 21h enabled\n");
+
+    MUST_COMPLETE(rtc_init, "RTC enabled\n", "Failed to initialise rtc\n");
+
+    MUST_COMPLETE(serial_init, "Enabled /dev/com1\n",
                   "Failed to initialise /dev/com1\n", COM1, BAUD_9600,
                   PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 
     MUST_COMPLETE(serial_init, "Enabled /dev/com2\n",
                   "Failed to initialise /dev/com2\n", COM2, BAUD_9600,
-                  PARITY_NONE, STOPBITS_ONE, DATABITS_8);*/
+                  PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 
-
-    fs_root          = fat_init(info->rootfs_start);
-    if(fs_root == NULL) {
-        print_string("Failed to initialise the rootfs\n");
-        return 1;
-    }
+    fs_root = fat_init(info->rootfs_start);
     FsNode_t* fs_dev = devfs_init();
-    if(fs_dev == NULL) {
-        print_string("Failed to initialise the devfs\n");
-        return 1;
-    }
-    fat_mount(fs_dev, "dev");
+    fs_mount("dev", fs_root, fs_dev);
     print_string("Root filesystem mounted\n");
 
-    stdin  = open("/dev/stdin");
+    stdin = open("/dev/stdin");
     stdout = open("/dev/stdout");
     stderr = open("/dev/stderr");
 
     char* shell_argv[] = {"shell", "login.bat"};
-    //exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
-    
-    //exec("ctest", 0, NULL, stdin, stdout, stderr, FALSE);
+    exec("dir", 0, NULL, stdin, stdout, stderr, FALSE);
     exec("shell", 0, NULL, stdin, stdout, stderr, FALSE);
 
     close(stdin);

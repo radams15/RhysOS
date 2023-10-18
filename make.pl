@@ -14,8 +14,8 @@ use Data::Dumper;
 use Config::Simple;
 
 my $ASM = 'nasm';
-my $CC = 'ia16-elf-gcc -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore';
-my $CXX = 'ia16-elf-g++ -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore';
+my $CC = 'ia16-elf-gcc -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore -DRHYSOS';
+my $CXX = 'ia16-elf-g++ -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore -fno-unwind-tables -fno-rtti -fno-exceptions -DRHYSOS';
 my $LD = 'ia16-elf-ld';
 
 # Must be strings for some reason
@@ -153,6 +153,8 @@ sub programs {
 		next if !(-e "$program/config");
 		
 		my $conf = Config::Simple->import_from("$program/config");
+		
+		next if $conf->param('ignore');
 		
 		my $load_addr = $conf->param('shell') ? $SHELL_ADDR : $EXE_ADDR;
 		my $segment = $conf->param('shell') ? $SHELL_SEGMENT : $EXE_SEGMENT;

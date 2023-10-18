@@ -77,7 +77,7 @@ int exec(char* file_name, int argc, char** argv, int in, int out, int err, BOOL 
         print_string("Segment allocation error in `exec`\n");
         return 1;
     }
-    int segment             = segment_top + (0x1000 * segment_index);
+    int segment = segment_top + (0x1000 * segment_index);
     segments[segment_index] = 1;
     sti();  // Enable interrupts
 

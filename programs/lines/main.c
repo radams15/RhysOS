@@ -50,8 +50,8 @@ void mainloop() {
     graphics_set_bg(1);
 
     colour = 1;
-    x      = 30;
-    y      = 100;
+    x = 30;
+    y = 100;
     while (x <= 60) {
         graphics_putc(x, y, colour);
         x++;

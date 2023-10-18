@@ -2,8 +2,8 @@
 #define RHYSOS_TTY_H
 
 enum {
-    GRAPHICS_MONO_80x25  = 3,
-    GRAPHICS_MONO_40x25  = 1,
+    GRAPHICS_MONO_80x25 = 3,
+    GRAPHICS_MONO_40x25 = 1,
     GRAPHICS_CGA_320x200 = 4
 } GraphicsMode;
 

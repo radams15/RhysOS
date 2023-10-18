@@ -4,10 +4,10 @@
 #include "stddef.h"
 
 enum {
-    GRAPHICS_MONO_80x25   = 2,
-    GRAPHICS_MONO_40x25   = 1,
+    GRAPHICS_MONO_80x25 = 2,
+    GRAPHICS_MONO_40x25 = 1,
     GRAPHICS_COLOUR_80x25 = 3,
-    GRAPHICS_CGA_320x200  = 4
+    GRAPHICS_CGA_320x200 = 4
 } GraphicsMode;
 
 extern int stdout, stdin, stderr;

@@ -3,16 +3,31 @@
 #include "proc.h"
 #include "util.h"
 
-#define MAX_OPEN_FILES 32
+#define MAX_OPEN_FILES 64
+#define MAX_MOUNTS 4
 #define SECTORS_PER_TRACK 18
 
 extern int interrupt(int number, int AX, int BX, int CX, int DX);
 
 FsNode_t* open_files[MAX_OPEN_FILES];
+FsMount_t mounts[MAX_MOUNTS] = {NULL};
 FsNode_t* fs_root;
 
 FsNode_t* fh_get_node(int fh) {
     return open_files[fh];
+}
+
+int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child) {
+    for(int i=0 ; i<MAX_MOUNTS ; i++) {
+        if(mounts[i].parent == NULL && mounts[i].child == NULL) {
+            strcpy(mounts[i].name, name);
+            mounts[i].parent = parent;
+            mounts[i].child = child;
+            return 0;
+        }
+    }
+    
+    return 1;
 }
 
 int write(int fh, unsigned char* buffer, unsigned int size) {
@@ -42,7 +57,7 @@ int create_file(char* name) {
         fsnode = fs_finddir(fsnode, tok);
 
         previous_tok = tok;
-        tok          = strtok(NULL, "/");
+        tok = strtok(NULL, "/");
     }
 
     return NULL;
@@ -93,17 +108,23 @@ FsNode_t* get_dir(char* name) {
     tok = strtok(buf, "/");
 
     while (tok != NULL && fsnode != NULL) {
+        for(int i=0 ; i<MAX_MOUNTS ; i++) {
+            if(fsnode == mounts[i].parent && mounts[i].parent != NULL && mounts[i].child != NULL && strcmp(tok, mounts[i].name) == 0) {
+                fsnode = mounts[i].child;
+                goto next;
+            }
+        }
+        
         fsnode = fs_finddir(fsnode, tok);
-
+next:
         tok = strtok(NULL, "/");
     }
-
     return fsnode;
 }
 
 void read_sector(int* buffer, int sector) {
-    int track         = sector / (18 * 2);  // Number of tracks
-    int head          = (sector / 18) % 2;  // Head number (0 or 1)
+    int track = sector / (18 * 2);          // Number of tracks
+    int head = (sector / 18) % 2;           // Head number (0 or 1)
     int sector_number = (sector % 18) + 1;  // Sector number (1-based)
 
     // Prepare the registers
@@ -174,8 +195,8 @@ FsNode_t* fs_finddir(FsNode_t* node, char* name) {
 }
 
 void read_lba_to_segment(int disk, int lba, int dst_addr, int dst_seg) {
-    int head   = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
-    int track  = (lba / (SECTORS_PER_TRACK * 2));
+    int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
+    int track = (lba / (SECTORS_PER_TRACK * 2));
     int sector = (lba % SECTORS_PER_TRACK + 1);
 
     read_sector_to_segment(disk, track, head, sector, dst_addr, dst_seg);

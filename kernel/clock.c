@@ -46,9 +46,9 @@ int rtc_init() {
     }
 
     counter.tick = 0;
-    counter.sec  = bcdToDecimal(cmos_time[2]);
-    counter.min  = bcdToDecimal(cmos_time[1]);
-    counter.hr   = bcdToDecimal(cmos_time[0]);
+    counter.sec = bcdToDecimal(cmos_time[2]);
+    counter.min = bcdToDecimal(cmos_time[1]);
+    counter.hr = bcdToDecimal(cmos_time[0]);
 
     return make_rtc_interrupt();
 }
