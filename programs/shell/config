@@ -1,4 +1,3 @@
 name: shell
 main: shell.c
 stdlib: true
-shell: true
