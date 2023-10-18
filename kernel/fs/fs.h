@@ -3,7 +3,7 @@
 
 #include "type.h"
 
-#define FILE_NAME_MAX 128
+#define FILE_NAME_MAX 32
 #define SECTOR_SIZE 512
 
 #define FS_FILE 0x01

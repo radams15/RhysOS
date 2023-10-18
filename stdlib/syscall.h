@@ -1,7 +1,7 @@
 #ifndef SYSCALL_H
 #define SYSCALL_H
 
-#define FILE_NAME_MAX 128
+#define FILE_NAME_MAX 32
 
 extern int interrupt(int number, int AX, int BX, int CX, int DX);
 
@@ -35,6 +35,7 @@ int open(char* name);
 void close(int fh);
 void seek(int fh, unsigned int location);
 int dir_list(char* dir_name, struct FsNode* buf, int max);
+void kfree(void* ptr);
 
 int interrupt_10(int AX, int BX, int CX, int DX);
 int interrupt_21(int AX, int BX, int CX, int DX);

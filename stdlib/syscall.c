@@ -51,6 +51,11 @@ void seek(int fh, unsigned int location) {
     return syscall(7, fh, location, 0, 0, 0, 0);
 }
 
+void kfree(void* ptr) {
+    printf("Kfree: %x\n", ptr);
+    return syscall(8, ptr, 0, 0, 0, 0, 0);
+}
+
 void int2chars(unsigned int in, unsigned char* buffer) {
     buffer[0] = (unsigned char)in & 0xff;  // low byte
     buffer[1] = (in >> 8) & 0xff;          // high byte

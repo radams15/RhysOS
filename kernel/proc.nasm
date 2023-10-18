@@ -19,18 +19,21 @@ _call_far:
 	mov [stdout], ax
 	mov ax, [bp+12]
 	mov [stderr], ax
+	mov ax, [bp+14]
+	mov [should_free], ax
 	
     mov ax, ss
     mov [stackseg], ax
     
-    mov bx, [bp+14] ; bx => segment
+    mov bx, [bp+16] ; bx => segment
     
-    mov ax, [bp+16] ; ax => new ds
+    mov ax, [bp+18] ; ax => new ds
     mov ss, ax
     
 	push bp ; new program stack frame
 	mov bp, sp
 	
+	push WORD [should_free]
 	push WORD [stderr]
     push WORD [stdout]
     push WORD [stdin]
@@ -45,19 +48,20 @@ _call_far:
 	
 	retf ; call function
 .ret:
-	add sp, 10 ; pop all of the program args
+	add sp, 12 ; pop all of the program args
 	pop bp ; restore stack frame for call_far
 	
-        mov ax, DATA_SEGMENT ; restore kernel data segment
-        mov ds, ax
-	
-        mov ax, [stackseg] ; restore kernel stack
-        mov ss, ax
+    mov ax, DATA_SEGMENT ; restore kernel data segment
+    mov ds, ax
 
-        pop bp
-        ret
+    mov ax, [stackseg] ; restore kernel stack
+    mov ss, ax
 
-stackseg: dw 0        
+    pop bp
+    ret
+
+stackseg: dw 0
+should_free: dw 0
 stdin: dw 0
 stdout: dw 0
 stderr: dw 0

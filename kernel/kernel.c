@@ -135,7 +135,7 @@ int i21_handler(SyscallArgs_t* args) {
             }
 
             seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
-            int ret = exec(name, args->b, argv, args->d, args->e, args->f);
+            int ret = exec(name, args->b, argv, args->d, args->e, args->f, TRUE);
 
             for (int i = 0; i < args->b; i++) {
                 free(argv[i]);
@@ -281,8 +281,7 @@ int init(struct SystemInfo* info) {
     stderr = open("/dev/stderr");
 
     char* shell_argv[] = {"shell", "login.bat"};
-    exec("dir", 0, NULL, stdin, stdout, stderr);
-    exec("shell", 0, NULL, stdin, stdout, stderr);
+    exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
 
     close(stdin);
     close(stdout);
