@@ -52,7 +52,6 @@ void seek(int fh, unsigned int location) {
 }
 
 void kfree(void* ptr) {
-    printf("Kfree: %x\n", ptr);
     return syscall(8, ptr, 0, 0, 0, 0, 0);
 }
 

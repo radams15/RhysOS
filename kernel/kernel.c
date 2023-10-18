@@ -197,10 +197,14 @@ int i21_handler(SyscallArgs_t* args) {
         case 7:
             seek(args->a, args->b);
             break;
+            
+        case 8:
+            free(args->a);
+            break;
 
         default:
             print_string("Unknown interrupt: ");
-            printi(args->a, 16);
+            printi(args->num, 16);
             print_string("!\r\n");
             return -1;
             break;
