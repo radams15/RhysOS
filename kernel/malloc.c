@@ -15,6 +15,7 @@ typedef struct BlkHeader {
 
 int memmgr_init() {
     heap = &heap_begin;
+    
     return 0;
 }
 

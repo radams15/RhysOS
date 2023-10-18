@@ -94,7 +94,7 @@ int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
             if (buf != NULL) {
                 buf++;
                 seg_copy(fsnode, buf, sizeof(FsNode_t), DATA_SEGMENT, ds);
-                seg_copy(fsnode->name, buf->name, FILE_NAME_MAX * sizeof(char),
+                seg_copy(fsnode->name, buf->name, strlen(fsnode->name),
                          DATA_SEGMENT, ds);
             }
             count++;
