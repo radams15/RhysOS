@@ -133,8 +133,8 @@ DirEnt_t* fat_readdir(FsNode_t* node, unsigned int index) {
 FsNode_t* fat_finddir(FsNode_t* node, char* name) {
     int i;
     for (i = 0; i < num_root_nodes; i++) {
-        print_string(root_nodes[i].name);
-        print_string("\n");
+        /*print_string(root_nodes[i].name);
+        print_string("\n");*/
         if (strcmp(name, root_nodes[i].name) == 0) {
             if ((root_nodes[i].flags & 0x08)) {  // Is a mount
                 return root_nodes[i].ref;
@@ -267,6 +267,8 @@ FsNode_t* fat_init(int sector_start) {
     struct DirectoryEntry root_dir[MAX_FILES];
     
     root_nodes = malloc(MAX_FILES * sizeof(FsNode_t));
+    
+    printi(root_nodes, 16);
     
     if(root_nodes == NULL)
         return NULL;

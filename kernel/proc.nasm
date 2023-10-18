@@ -48,17 +48,17 @@ _call_far:
 	
 	retf ; call function
 .ret:
-	add sp, 10 ; pop all of the program args
+	add sp, 12 ; pop all of the program args
 	pop bp ; restore stack frame for call_far
 	
-        mov ax, DATA_SEGMENT ; restore kernel data segment
-        mov ds, ax
-	
-        mov ax, [stackseg] ; restore kernel stack
-        mov ss, ax
+    mov ax, DATA_SEGMENT ; restore kernel data segment
+    mov ds, ax
 
-        pop bp
-        ret
+    mov ax, [stackseg] ; restore kernel stack
+    mov ss, ax
+
+    pop bp
+    ret
 
 stackseg: dw 0
 should_free: dw 0

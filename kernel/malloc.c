@@ -90,10 +90,10 @@ void* malloc(unsigned int size) {
     unsigned int end = header + header->length;
     printi(end, 16);
     
-    print_string("Valid malloc\n");
+    print_string("Valid malloc\n");*/
 
     header->magic = HEAP_MAGIC;
-    header->free  = 0;*/
+    header->free  = 0;
     
     unsigned int* out = ((unsigned int*)header) + sizeof(BlkHeader_t);
 

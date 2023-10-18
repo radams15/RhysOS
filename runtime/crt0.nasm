@@ -37,9 +37,10 @@ _crt0:
     call _start
     add sp, 6
     
+    pop bp
+    
     xchg bx, bx
     
-    pop bp
     retf
 
 ;int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
