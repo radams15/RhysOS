@@ -22,8 +22,6 @@ int memmgr_init() {
     header->magic  = HEAP_MAGIC;
     header->length = &heap_end - &heap_begin;
     header->free   = 1;
-    
-    printi(header, 16);print_string("-"); printi(header+header->length, 16);print_string(";");
 
     header->next = NULL;
     
@@ -44,8 +42,6 @@ BlkHeader_t* split(BlkHeader_t* block, unsigned int size) {
     out->next   = block;
     out->magic  = HEAP_MAGIC;
     out->free = 1;
-    
-    //print_string("Split: "); printi(old_size, 16); print_string(" => "); printi(out->length, 16); print_string(", ");printi(block->length, 16); print_string("\n");
 
     return out;
 }
@@ -55,8 +51,6 @@ void* malloc(unsigned int size) {
         return 0;
 
     size += sizeof(BlkHeader_t);
-    
-    //printi(heap, 16);print_string("-");printi(size, 16); print_string(";");
 
     BlkHeader_t* header = (BlkHeader_t*)&heap_begin;
     while (1) {
@@ -80,17 +74,6 @@ void* malloc(unsigned int size) {
     if (header->length > size) {
         header = split(header, size);
     }
-    
-    /*printi(header, 16);
-    
-    print_string("+");
-    printi(header->length, 16);
-    
-    print_string("=");
-    unsigned int end = header + header->length;
-    printi(end, 16);
-    
-    print_string("Valid malloc\n");*/
 
     header->magic = HEAP_MAGIC;
     header->free  = 0;

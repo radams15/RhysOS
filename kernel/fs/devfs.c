@@ -397,8 +397,6 @@ FsNode_t* devfs_init() {
     
     root_nodes = malloc(MAX_FILES * sizeof(FsNode_t));
     
-    printi(root_nodes, 16);
-    
     if(root_nodes == NULL)
         return NULL;
 

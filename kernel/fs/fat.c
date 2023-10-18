@@ -233,8 +233,6 @@ void fat_load_root(struct DirectoryEntry* root_dir) {
                 memcpy(root_nodes[i].name + x + 1, entry->ext, 3);
             }
             
-            print_string(root_nodes[i].name);
-
             root_nodes[i].name[x + 4] = 0;
 
             for (int x = 0; x < 11; x++) {
@@ -267,8 +265,6 @@ FsNode_t* fat_init(int sector_start) {
     struct DirectoryEntry root_dir[MAX_FILES];
     
     root_nodes = malloc(MAX_FILES * sizeof(FsNode_t));
-    
-    printi(root_nodes, 16);
     
     if(root_nodes == NULL)
         return NULL;
