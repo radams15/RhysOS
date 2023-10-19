@@ -13,8 +13,9 @@ int running = 1;
 #define getchar() getch()
 #define putchar(c) putc(c)
 #define strtol(a, b, c) strtoi(a, b, c)
+#define exit(a) end(a)
 
-void exit(char code) {
+void end(char code) {
     running = 0;
 }
 
@@ -49,6 +50,11 @@ struct Val {
 /* number of cells for the shared stack and atom heap, increase N as desired */
 #define N 1024
 
+/* length of strings array */
+#define S 2048
+
+#define OOM() (hp > sp<<3)
+
 /* hp: heap pointer, A+hp with hp=0 points to the first atom string in cell[]
    sp: stack pointer, the stack starts at the top of cell[] with sp=N
    safety invariant: hp <= sp<<3 */
@@ -63,7 +69,8 @@ enum {
 };
 
 /* cell[N] array of Lisp expressions, shared by the stack and atom heap */
-Expr cell[N];
+Expr cell[N] = {0};
+char strings[S] = {0};
 
 /* Lisp constant expressions () (nil), #t, ERR, and the global environment env */
 Expr nil, tru, err, env;
@@ -95,23 +102,38 @@ I equ(Expr x, Expr y) {
 I dups(const char* in) {
     int len = strlen(in) + 1;
 
-    char* out = malloc(len * sizeof(char*));
+    int i;
+    for(i=0 ; i<S ; i++) {
+        if(strings[i] == 0 && strings[i+1] == 0) {
+            i++;
+            break;
+        }
+    }
 
-    strncpy(out, in, len);
+    strncpy(strings+i, in, len);
+    *(strings+i+len) = 0;
 
-    return (I) out;
+    if(i == S) {
+        fprintf(stderr, "Cannot allocate strings!\n");
+        abort();
+    }
+
+    return (I) strings+i;
 }
 
 /* interning of atom names (Lisp symbols), returns a unique NaN-boxed ATOM */
 Expr atom(const char *s) {
   I i = 0;
-  while (i < hp && ord(cell[i]) != 0 && strcmp((char*) ord(cell[i]), s) != 0)              /* search for a matching atom name on the heap */
+  while ( /* search for a matching atom name on the heap */
+            i < hp && ord(cell[i]) != 0
+            && strcmp((char*) ord(cell[i]), s) != 0
+    )
     i ++;
 
   if (i == hp) {                                /* if not found */
       hp++;             /*   allocate and add a new atom name to the heap */
       cell[i] = box(ATOM, dups(s));
-      if (hp > sp<<3)                             /* abort when out of memory */
+      if (OOM())                             /* abort when out of memory */
           abort();
   }
 
@@ -122,7 +144,7 @@ Expr atom(const char *s) {
 Expr cons(Expr x, Expr y) {
   cell[--sp] = x;                               /* push the car value x */
   cell[--sp] = y;                               /* push the cdr value y */
-  if (hp > sp<<3)                               /* abort when out of memory */
+  if (OOM())                               /* abort when out of memory */
     abort();
   return box(CONS, sp);
 }
@@ -367,16 +389,20 @@ Expr bind(Expr v, Expr t, Expr e) {
          pair(v, t, e);
 }
 
-/* apply closure f to arguments t in environemt e */
+/* apply closure f to arguments t in environment */
 Expr reduce(Expr f, Expr t, Expr e) {
   return eval(cdr(car(f)), bind(car(car(f)), evlis(t, e), not(cdr(f)) ? env : cdr(f)));
 }
 
 /* apply closure or primitive f to arguments t in environment e, or return ERR */
 Expr apply(Expr f, Expr t, Expr e) {
-  return T(f) == PRIM ? prim[ord(f)].f(t, e) :
-         T(f) == CLOS ? reduce(f, t, e) :
-         err;
+  if(T(f) == PRIM)
+      return prim[ord(f)].f(t, e);
+  else
+         if (T(f) == CLOS)
+             return reduce(f, t, e);
+         else
+            return err;
 }
 
 /* evaluate x and return its value in environment e */
@@ -395,10 +421,17 @@ Expr eval(Expr x, Expr e) {
 char buf[40], see = ' ';
 
 /* advance to the next character */
-void look() {
-  int c = getchar();
+void look(char** charbuf) {
+  char c;
+
+  if(charbuf != NULL)
+      c = *((*charbuf)++);
+  else
+    c = (char) getchar();
+
   see = c;
-  if (c == EOF)
+
+  if (c == EOF && charbuf == NULL)
     exit(0);
 }
 
@@ -408,51 +441,51 @@ I seeing(char c) {
 }
 
 /* return the look ahead character from standard input, advance to the next */
-char get() {
+char get(char** charbuf) {
   char c = see;
-  look();
+  look(charbuf);
   return c;
 }
 
 /* tokenize into buf[], return first character of buf[] */
-char scan() {
+char scan(char** charbuf) {
   I i = 0;
   while (seeing(' '))
-    look();
+    look(charbuf);
   if (seeing('(') || seeing(')') || seeing('\''))
-    buf[i++] = get();
+    buf[i++] = get(charbuf);
   else
     do
-      buf[i++] = get();
+      buf[i++] = get(charbuf);
     while (i < 39 && !seeing('(') && !seeing(')') && !seeing(' '));
   buf[i] = 0;
   return *buf;
 }
 
 /* return the Lisp expression read from standard input */
-Expr parse();
-Expr Read() {
-  scan();
-  return parse();
+Expr parse(char** charbuf);
+Expr read_expr(char** charbuf) {
+  scan(charbuf);
+  return parse(charbuf);
 }
 
 /* return a parsed Lisp list */
-Expr list() {
+Expr list(char** charbuf) {
   Expr x;
-  if (scan() == ')')
+  if (scan(charbuf) == ')')
     return nil;
   if (!strcmp(buf, ".")) {
-    x = Read();
-    scan();
+    x = read_expr(charbuf);
+    scan(charbuf);
     return x;
   }
-  x = parse();
-  return cons(x, list());
+  x = parse(charbuf);
+  return cons(x, list(charbuf));
 }
 
 /* return a parsed Lisp expression x quoted as (quote x) */
-Expr quote() {
-  return cons(atom("quote"), cons(Read(), nil));
+Expr quote(char** charbuf) {
+  return cons(atom("quote"), cons(read_expr(charbuf), nil));
 }
 
 /* return a parsed atomic Lisp expression (a number or an atom) */
@@ -468,9 +501,9 @@ Expr atomic() {
 }
 
 /* return a parsed Lisp expression */
-Expr parse() {
-  return *buf == '(' ? list() :
-         *buf == '\'' ? quote() :
+Expr parse(char** charbuf) {
+  return *buf == '(' ? list(charbuf) :
+         *buf == '\'' ? quote(charbuf) :
          atomic();
 }
 
@@ -513,21 +546,31 @@ void gc() {
   sp = ord(env);
 }
 
+char* init[] = {
+    "(define mod (lambda (n m) (- n (* m (int (/ n m))))))",
+    "(define inc (lambda (x) (+ x 1)))"
+};
+
 /* Lisp initialization and REPL */
 int main() {
   I i;
-  printf("tinylisp");
+  printf("tinylisp\n");
   nil = box(NIL, 0);
   err = atom("ERR");
   tru = atom("#t");
   env = pair(tru, tru, nil);
 
   for (i = 0; prim[i].s; ++i)
-    env = pair(atom(prim[i].s), box(PRIM, i), env);
+      env = pair(atom(prim[i].s), box(PRIM, i), env);
 
-  while (running) {
-    printf("\n%u>", sp-hp/sizeof(Expr));
-      print_expr(eval(Read(), env));
+  for(i=0 ; i<sizeof(init)/sizeof(init[0]) ; i++) {
+      print_expr(eval(read_expr(&init[i]), env));
+      see = ' ';
+  }
+
+    while (running) {
+    printf("\n%u> ", sp-hp/sizeof(Expr));
+      print_expr(eval(read_expr(NULL), env));
     gc();
   }
 }

@@ -1,4 +1,5 @@
 #include "stdlib.h"
+#include "stdio.h"
 
 void memset(int* buf, int val, int n) {
     for (; n != 0; n--)
@@ -11,4 +12,6 @@ void memcpy(uint8* dst, uint8* src, int n) {
     }
 }
 
-void abort() {}
+void abort() {
+    fprintf(stderr, "Program abort!\n");
+}

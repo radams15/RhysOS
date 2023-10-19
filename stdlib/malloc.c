@@ -23,6 +23,8 @@ void memmgr_init() {
     heap = &heap_begin;
 
     BlkHeader_t* header = (BlkHeader_t*)&heap_begin;
+    
+    printf("Memory size: %x\n", &heap_end-&heap_begin);
 
     header->magic = HEAP_MAGIC;
     header->length = &heap_end - &heap_begin;
@@ -44,19 +46,16 @@ BlkHeader_t* split(BlkHeader_t* block, unsigned int size) {
     out->length = size;
     out->next = block;
     out->magic = HEAP_MAGIC;
+    out->free = 1;
 
     return out;
-}
-
-int align(int n) {
-    return (n + sizeof(int) - 1) & ~(sizeof(int) - 1);
 }
 
 void* malloc(uint16 size) {
     if (size == 0)
         return 0;
 
-    size = align(size);
+    size += sizeof(BlkHeader_t);
 
     BlkHeader_t* header = (BlkHeader_t*)&heap_begin;
     while (1) {
@@ -84,7 +83,9 @@ void* malloc(uint16 size) {
     header->magic = HEAP_MAGIC;
     header->free = 0;
 
-    return (void*)(((unsigned int*)header) + sizeof(BlkHeader_t));
+    unsigned int* out = ((unsigned int*)header) + sizeof(BlkHeader_t);
+
+    return (void*) out;
 }
 
 void* calloc(uint16 n, uint16 size) {
@@ -124,7 +125,7 @@ void free(void* ptr) {
         return;
     }
 
-    if (header->next->free) {
+    if (header->next != NULL && header->next->free) {
         header->next = header->next->next;
         header->length += header->next->length + sizeof(BlkHeader_t);
     }
