@@ -131,6 +131,12 @@ enum Interrupt {
 
 void handle_interrupt(enum Interrupt code) {
     switch(code) {
+        case INTR_DIV0:
+            print_string("Division by zero!");
+            break;
+        case INV_OPCODE:
+            print_string("Invalid Opcode!");
+            break;
         case INTR_BREAK:
             ctrl_break();
             break;
