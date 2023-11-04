@@ -26,8 +26,9 @@ int oct2bin(unsigned char* str, int size);
 
 char* strtok(register char* s, register char* delim);
 
-void outb(int port, char data);
-
 int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
+
+void outb(unsigned int port, unsigned char val);
+unsigned char inb(unsigned int port);
 
 #endif
