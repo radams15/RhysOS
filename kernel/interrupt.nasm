@@ -3,10 +3,7 @@ bits 16
 global _interrupt
 global _sti
 global _cli
-global _make_rtc_interrupt
-global _make_break_interrupt
 
-extern _ctrl_break
 extern stackseg
 
 ;int interrupt (int number, int AX, int BX, int CX, int DX)
@@ -32,10 +29,11 @@ intr:
 	pop bp
 	ret
 
-
-extern _tick
-
-_tick_handler:
+extern _handle_interrupt
+global _init_interrupts
+	
+%macro INT_HANDLER_DEFN 1
+handle_%1:
 	cli
 	push dx
 	push cx
@@ -46,7 +44,11 @@ _tick_handler:
 	mov ax, 0x3000 ; Restore KSEG
 	mov ds, ax
 	
-	call _tick
+	push %1
+	
+	call _handle_interrupt
+	
+	pop bx
 	
 	pop ds
 	pop ax
@@ -56,53 +58,30 @@ _tick_handler:
 	sti
 
 	iret
-	
-_break_handler:
-	cli
-	push dx
-	push cx
-	push bx
-	push ax
-	push ds
-	
-	mov ax, 0x3000 ; Restore KSEG
-	mov ds, ax
-	
-	call _ctrl_break
-	
-	pop ds
-	pop ax
-	pop bx
-	pop cx
-	pop dx
-	sti
+%endmacro
 
-	iret
-	
-_make_break_interrupt:
-	mov dx,_break_handler
+%macro INT_HANDLER_DECL 1
+	mov dx, handle_%1
 	push ds
 	mov ax, 0	;interrupts are in lowest memory
 	mov ds,ax
-	mov si,0x1b*4
+	mov si, %1
 	mov ax,cs	;have interrupt go to the current segment
 	mov [si+2],ax
 	mov [si],dx	;set up our vector
 	pop ds
-	
-	mov ax, 0
-	ret	
+%endmacro
 
-_make_rtc_interrupt:
-	mov dx,_tick_handler
-	push ds
-	mov ax, 0	;interrupts are in lowest memory
-	mov ds,ax
-	mov si,0x1c*4
-	mov ax,cs	;have interrupt go to the current segment
-	mov [si+2],ax
-	mov [si],dx	;set up our vector
-	pop ds
+INT_HANDLER_DEFN 0x00
+INT_HANDLER_DEFN 0x06
+INT_HANDLER_DEFN 0x70
+INT_HANDLER_DEFN 0x6c
+
+_init_interrupts:
+    INT_HANDLER_DECL 0x00
+    INT_HANDLER_DECL 0x06
+    INT_HANDLER_DECL 0x70
+    INT_HANDLER_DECL 0x6c
 	
 	mov ax, 0
 	ret
@@ -128,7 +107,7 @@ _makeInterrupt21:
 	push ds
 	mov ax, 0	;interrupts are in lowest memory
 	mov ds,ax
-	mov si,0x84	;interrupt 0x21 vector (21 * 4 = 84)
+	mov si, 0x21 * 4
 	mov ax,cs	;have interrupt go to the current segment
 	mov [si+2],ax
 	mov [si],dx	;set up our vector
@@ -152,11 +131,11 @@ _interrupt21ServiceRoutine:
 	
 	mov cx, ss ; program ss in cx
 	
-        mov bx, DATA_SEGMENT ; restore kernel ds, ss
-        mov ds, bx
-        mov bx, [stackseg]
-        mov ss, bx
-	
+    mov bx, DATA_SEGMENT ; restore kernel ds, ss
+    mov ds, bx
+    mov bx, [stackseg]
+    mov ss, bx
+
 	push cx ; push ss in cx
 	push ax ; push ax as argument for function
 	

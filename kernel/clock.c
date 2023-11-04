@@ -4,7 +4,6 @@
 
 TimeDelta_t counter;
 
-extern int make_rtc_interrupt();
 void task();
 
 int time(struct TimeDelta* buf) {
@@ -50,5 +49,5 @@ int rtc_init() {
     counter.min = bcdToDecimal(cmos_time[1]);
     counter.hr = bcdToDecimal(cmos_time[0]);
 
-    return make_rtc_interrupt();
+    return 0;
 }

@@ -48,37 +48,6 @@ _imod:
     mov ax, dx              ; Move remainder from DX to AX
     pop bp                  ; Restore old base pointer
     ret                     ; Return with result in AX
-
-global _outb
-_outb:
-	push bp
-	mov bp, sp
-	
-	push dx
-	
-	mov dx, [bp+4] ; port
-	mov al, [bp+6] ; data
-	out dx, al
-	
-	pop bx
-	
-	pop bp
-	ret
-	
-global _inb
-_inb:
-	push bp
-	mov bp, sp
-	
-	push dx
-	
-	mov dx, [bp+4] ; port
-	in ax, dx
-	
-	pop bx
-	
-	pop bp
-	ret
 	
 ;int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
 global _seg_copy
