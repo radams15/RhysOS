@@ -128,6 +128,29 @@ int a20_init() {
     return 0;
 }
 
+#define SERIAL_PORT 0x3f8
+
+int serial_init1() {
+    outb(SERIAL_PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
+    outb(SERIAL_PORT + 0, 0x03);    // Set divisor to 3 (low byte) 38400 baud
+    outb(SERIAL_PORT + 1, 0x00);    //                  (high byte)
+    outb(SERIAL_PORT + 3, 0x03);    // 8 bits, no parity, one stop bit
+    outb(SERIAL_PORT + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+    outb(SERIAL_PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
+    outb(SERIAL_PORT + 4, 0x1E);    // Set in loopback mode, test the serial chip
+    outb(SERIAL_PORT + 0, 0xAE);    // Test serial chip (send byte 0xAE and check if serial returns same byte)
+
+    // Check if serial is faulty (i.e: not same byte as sent)
+    if(inb(SERIAL_PORT + 0) != 0xAE) {
+        return 1;
+    }
+
+    // If serial is not faulty set it in normal operation mode
+    // (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled)
+    outb(SERIAL_PORT + 4, 0x0F);
+    return 0;
+}
+
 int init(struct SystemInfo* info) {
     cls();
 
@@ -141,6 +164,9 @@ int init(struct SystemInfo* info) {
 
     makeInterrupt21();
     print_string("Int 21h enabled\n");
+    
+    MUST_COMPLETE(serial_init1, "Enabled serial\n",
+                  "Failed to initialise serial\n");
     
     MUST_COMPLETE(init_interrupts, "Interrupts enabled\n",
               "Interrupts failed to initialise\n");

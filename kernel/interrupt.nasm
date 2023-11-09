@@ -61,27 +61,35 @@ handle_%1:
 %endmacro
 
 %macro INT_HANDLER_DECL 1
-	mov dx, handle_%1
-	push ds
-	mov ax, 0	;interrupts are in lowest memory
-	mov ds,ax
 	mov si, %1
-	mov ax,cs	;have interrupt go to the current segment
+	mov dx, handle_%1
 	mov [si+2],ax
 	mov [si],dx	;set up our vector
-	pop ds
 %endmacro
+
 
 INT_HANDLER_DEFN 0x00
 INT_HANDLER_DEFN 0x06
 INT_HANDLER_DEFN 0x70
 INT_HANDLER_DEFN 0x6c
 
-_init_interrupts:
+INT_HANDLER_DEFN 0x0c
+
+; int init_interrupts()
+_init_interrupts:    
+	push ds
+	mov ax, 0	;interrupts are in lowest memory
+	mov ds,ax
+	mov ax,cs	;have interrupt go to the current segment
+	
     INT_HANDLER_DECL 0x00
     INT_HANDLER_DECL 0x06
     INT_HANDLER_DECL 0x70
     INT_HANDLER_DECL 0x6c
+    
+    INT_HANDLER_DECL 0x0c
+	
+	pop ds
 	
 	mov ax, 0
 	ret
