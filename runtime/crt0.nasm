@@ -39,8 +39,6 @@ _crt0:
     
     pop bp
     
-    xchg bx, bx
-    
     retf
 
 ;int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);

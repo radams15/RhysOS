@@ -31,34 +31,6 @@ intr:
 
 extern _handle_interrupt
 global _init_interrupts
-	
-%macro INT_HANDLER_DEFN 1
-handle_%1:
-	cli
-	push dx
-	push cx
-	push bx
-	push ax
-	push ds
-	
-	mov ax, 0x3000 ; Restore KSEG
-	mov ds, ax
-	
-	push %1
-	
-	call _handle_interrupt
-	
-	pop bx
-	
-	pop ds
-	pop ax
-	pop bx
-	pop cx
-	pop dx
-	sti
-
-	iret
-%endmacro
 
 %macro INT_HANDLER_DECL 1
 	mov si, %1
@@ -67,13 +39,41 @@ handle_%1:
 	mov [si],dx	;set up our vector
 %endmacro
 
+%macro INT_HANDLER_DEFN 1
+handle_%1:
+    cli
+
+	push dx
+	push cx
+	push bx
+	push ax
+	push ds
+	
+	mov ax, 0x3000 ; Restore KSEG
+	mov ds, ax
+
+	push %1
+	
+	jmp ivt_handle_end
+%endmacro
 
 INT_HANDLER_DEFN 0x00
 INT_HANDLER_DEFN 0x06
 INT_HANDLER_DEFN 0x70
 INT_HANDLER_DEFN 0x6c
+ivt_handle_end:
+	call _handle_interrupt
+	
+	pop bx
 
-INT_HANDLER_DEFN 0x0c
+	pop ds
+	pop ax
+	pop bx
+	pop cx
+	pop dx
+	sti
+
+	iret
 
 ; int init_interrupts()
 _init_interrupts:    
@@ -86,8 +86,6 @@ _init_interrupts:
     INT_HANDLER_DECL 0x06
     INT_HANDLER_DECL 0x70
     INT_HANDLER_DECL 0x6c
-    
-    INT_HANDLER_DECL 0x0c
 	
 	pop ds
 	
