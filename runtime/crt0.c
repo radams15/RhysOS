@@ -27,11 +27,11 @@ int start(int argc, char** argv_ext, int should_free) {
         for (int i = 0; i < argc; i++) {
             argv[i] = malloc(argv_item_size * sizeof(char));
             seg_copy(argv_in[i], argv[i], argv_item_size, KERNEL_DATA, my_ds);
-            if(should_free)
+            if (should_free)
                 kfree(argv_in[i]);
         }
-        
-        if(should_free)
+
+        if (should_free)
             kfree(argv_ext);
     }
 

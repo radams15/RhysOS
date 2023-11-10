@@ -4,11 +4,11 @@ void entry(int src_ds, void* boot_ptr) {
 }
 
 #include "fs/fs.h"
+#include "interrupt.h"
 #include "malloc.h"
 #include "proc.h"
 #include "sysinfo.h"
 #include "tty.h"
-#include "interrupt.h"
 #include "util.h"
 
 #include "fs/devfs.h"
@@ -16,7 +16,6 @@ void entry(int src_ds, void* boot_ptr) {
 
 #include "clock.h"
 #include "serial.h"
-
 
 struct SystemInfo {
     int rootfs_start;
@@ -104,7 +103,6 @@ int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
     return count;
 }
 
-
 void task() {}
 
 #define MUST_COMPLETE(method, success, error, ...) \
@@ -141,7 +139,7 @@ int init(struct SystemInfo* info) {
 
     makeInterrupt21();
     print_string("Int 21h enabled\n");
-    
+
     MUST_COMPLETE(rtc_init, "RTC enabled\n", "Failed to initialise rtc\n");
 
     MUST_COMPLETE(serial_init, "Enabled /dev/com1\n",
@@ -152,9 +150,8 @@ int init(struct SystemInfo* info) {
     //               "Failed to initialise /dev/com2\n", COM2, BAUD_9600,
     //               PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 
-    
     MUST_COMPLETE(init_interrupts, "Interrupts enabled\n",
-              "Interrupts failed to initialise\n");
+                  "Interrupts failed to initialise\n");
 
     fs_root = fat_init(info->rootfs_start);
     FsNode_t* fs_dev = devfs_init();

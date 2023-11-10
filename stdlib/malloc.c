@@ -23,8 +23,8 @@ void memmgr_init() {
     heap = &heap_begin;
 
     BlkHeader_t* header = (BlkHeader_t*)&heap_begin;
-    
-    //printf("Memory size: %x\n", &heap_end-&heap_begin);
+
+    // printf("Memory size: %x\n", &heap_end-&heap_begin);
 
     header->magic = HEAP_MAGIC;
     header->length = &heap_end - &heap_begin;
@@ -85,7 +85,7 @@ void* malloc(uint16 size) {
 
     unsigned int* out = ((unsigned int*)header) + sizeof(BlkHeader_t);
 
-    return (void*) out;
+    return (void*)out;
 }
 
 void* calloc(uint16 n, uint16 size) {

@@ -106,27 +106,27 @@ cont:
 int atoi(char* str) {
     // Initialize result
     int res = 0;
- 
+
     // Initialize sign as positive
     int sign = 1;
- 
+
     // Initialize index of first digit
     int i = 0;
- 
+
     // If number is negative,
     // then update sign
     if (str[0] == '-') {
         sign = -1;
- 
+
         // Also update index of first digit
         i++;
     }
- 
+
     // Iterate through all digits
     // and update the result
     for (; str[i] != ' '; ++i)
         res = res * 10 + str[i] - '0';
- 
+
     // Return result with sign
     return sign * res;
 }
@@ -184,20 +184,24 @@ int strtoi(const char* nptr, char** endptr, int base) {
             c = *p - '0';
         else
             break;
-        if (c < 0 || c >= base) break;
+        if (c < 0 || c >= base)
+            break;
         endp = ++p;
         if (overflow) {
             /* endptr should go forward and point to the non-digit character
              * (of the given base); required by ANSI standard. */
-            if (endptr) continue;
+            if (endptr)
+                continue;
             break;
         }
         if (n > cutoff || (n == cutoff && c > cutlim)) {
-            overflow = 1; continue;
+            overflow = 1;
+            continue;
         }
         n = n * base + c;
     }
-    if (endptr) *endptr = (char *)endp;
+    if (endptr)
+        *endptr = (char*)endp;
     if (overflow) {
         return ((is_neg) ? INT_MIN : INT_MAX);
     }

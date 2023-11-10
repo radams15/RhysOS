@@ -12,15 +12,15 @@ int main(int argc, char** argv) {
     char* ptrs[10];
     for (int i = 0; i < 10; i++) {
         ptrs[i] = malloc(25);
-        
-        if(ptrs[i] == 0)
+
+        if (ptrs[i] == 0)
             goto end;
     }
-    
+
     for (int i = 0; i < 10; i++) {
         free(ptrs[i]);
     }
-    
+
     printf("Pass phase 1\n");
 
     void* a;

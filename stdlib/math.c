@@ -5,7 +5,7 @@ int abs(int a) {
 }
 
 int pow(int a, int b) {
-    for(int i=0 ; i<b ; i++)
+    for (int i = 0; i < b; i++)
         a *= b;
 
     return a;

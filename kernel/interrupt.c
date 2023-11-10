@@ -29,7 +29,8 @@ int i21_handler(SyscallArgs_t* args) {
             }
 
             seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
-            int ret = exec(name, args->b, argv, args->d, args->e, args->f, TRUE);
+            int ret =
+                exec(name, args->b, argv, args->d, args->e, args->f, TRUE);
 
             for (int i = 0; i < args->b; i++) {
                 free(argv[i]);
@@ -91,7 +92,7 @@ int i21_handler(SyscallArgs_t* args) {
         case 7:
             seek(args->a, args->b);
             break;
-            
+
         case 8:
             free(args->a);
             break;
@@ -116,7 +117,6 @@ int handleInterrupt21(int* ax, int ss, int cx, int dx) {
     seg_copy(&arg_data, ax, sizeof(SyscallArgs_t), DATA_SEGMENT, ss);
 }
 
-
 void ctrl_break() {
     print_string("Break");
 }
@@ -130,7 +130,7 @@ enum Interrupt {
 };
 
 void handle_interrupt(enum Interrupt code) {
-    switch(code) {
+    switch (code) {
         case INTR_DIV0:
             print_string("Division by zero!");
             break;

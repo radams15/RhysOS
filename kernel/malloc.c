@@ -2,7 +2,7 @@
 #include "type.h"
 
 extern unsigned int heap_begin;
-extern unsigned int  heap_end;
+extern unsigned int heap_end;
 static unsigned int heap;
 
 #define HEAP_MAGIC 0xCAFE
@@ -19,12 +19,12 @@ int memmgr_init() {
 
     BlkHeader_t* header = (BlkHeader_t*)&heap_begin;
 
-    header->magic  = HEAP_MAGIC;
+    header->magic = HEAP_MAGIC;
     header->length = &heap_end - &heap_begin;
-    header->free   = 1;
+    header->free = 1;
 
     header->next = NULL;
-    
+
     return 0;
 }
 
@@ -34,13 +34,13 @@ BlkHeader_t* split(BlkHeader_t* block, unsigned int size) {
     int old_size = block->length;
 
     block += size + sizeof(BlkHeader_t);
-    block->magic  = HEAP_MAGIC;
+    block->magic = HEAP_MAGIC;
     block->length = old_size - (size + sizeof(BlkHeader_t));
-    block->free   = 1;
+    block->free = 1;
 
     out->length = size;
-    out->next   = block;
-    out->magic  = HEAP_MAGIC;
+    out->next = block;
+    out->magic = HEAP_MAGIC;
     out->free = 1;
 
     return out;
@@ -58,9 +58,10 @@ void* malloc(unsigned int size) {
             print_string("Kernel memory allocation error (out of blocks)!\n");
             return 0;
         }
-        
+
         if (header->magic != HEAP_MAGIC) {
-            print_string("Kernel memory allocation error (invalid heap magic)!\n");
+            print_string(
+                "Kernel memory allocation error (invalid heap magic)!\n");
             return 0;
         }
 
@@ -76,11 +77,11 @@ void* malloc(unsigned int size) {
     }
 
     header->magic = HEAP_MAGIC;
-    header->free  = 0;
-    
+    header->free = 0;
+
     unsigned int* out = ((unsigned int*)header) + sizeof(BlkHeader_t);
 
-    return (void*) out;
+    return (void*)out;
 }
 
 void free(void* ptr) {
@@ -98,8 +99,6 @@ void free(void* ptr) {
 
     header->free = 1;
 }
-
-
 
 int a20_available() {
     return interrupt(0x15, 0x2403, 0, 0, 0);

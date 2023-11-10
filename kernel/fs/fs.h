@@ -61,7 +61,6 @@ typedef struct FsNode {
     struct FsNode* ref;  // Pointer to symlink or mount
 } FsNode_t;
 
-
 typedef struct FsMount {
     char name[FILE_NAME_MAX];
     FsNode_t* parent;

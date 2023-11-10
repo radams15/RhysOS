@@ -116,7 +116,7 @@ int run_line(char* line, int length) {
                    line + strlen(exe) + 1);
         else
             stdout = stdin = stderr = fh;
-    } else if(strcmp(exe, "exit") == 0) {
+    } else if (strcmp(exe, "exit") == 0) {
         return -1;
     } else {
         run_external(exe, line + strlen(exe) + 1);
@@ -137,8 +137,8 @@ int loop() {
         return 0;
 
     int ret = run_line(line, sizeof(line));
-    
-    if(ret == -1)
+
+    if (ret == -1)
         return 1;
 
     printf("\n");
