@@ -13,11 +13,10 @@ int get_graphics_mode() {
     return chars2int(buf);
 }
 
-void set_graphics_mode(int mode) {
+void set_graphics_mode(char mode, char font) {
     int fh;
 
-    char buf[2];
-    int2chars(mode, &buf);
+    char buf[2] = {mode, font};
 
     fh = open("/dev/graphmode");
     write(fh, &buf, sizeof(&buf));
@@ -27,18 +26,28 @@ void set_graphics_mode(int mode) {
 int main(int argc, char** argv) {
     if (argc == 1) {
         printf("Current mode: %d\n", get_graphics_mode());
-    } else if (argc == 2) {
+        return 1;
+    } else if (argc == 2 || argc == 3) {
+        int font = 0;
+        if (argc == 3) {
+            if (STREQ("8", argv[2])) {
+                font = FONT_8x8;
+            } else if (STREQ("16", argv[2])) {
+                font = FONT_8x16;
+            }
+        }
+
         if (STREQ("40", argv[1])) {
-            set_graphics_mode(GRAPHICS_MONO_40x25);
+            set_graphics_mode(GRAPHICS_MONO_40x25, font);
         } else if (STREQ("80", argv[1])) {
-            set_graphics_mode(GRAPHICS_MONO_80x25);
+            set_graphics_mode(GRAPHICS_MONO_80x25, font);
         } else if (STREQ("cga", argv[1])) {
-            set_graphics_mode(GRAPHICS_CGA_320x200);
+            set_graphics_mode(GRAPHICS_CGA_320x200, font);
         } else {
             printf("Unknown graphics mode: %s\n", argv[1]);
         }
     } else {
-        printf("Usage: %s [MODE]\n", argv[0]);
+        printf("Usage: %s [MODE] (FONT)\n", argv[0]);
         return 1;
     }
 

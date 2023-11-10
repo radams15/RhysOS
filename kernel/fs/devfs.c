@@ -161,8 +161,7 @@ void graphics_mode_write(FsNode_t* node,
                          unsigned int offset,
                          unsigned int size,
                          unsigned char* buffer) {
-    int mode = chars2int(buffer);
-    set_graphics_mode(mode);
+    set_graphics_mode(buffer[0], buffer[1]);
 }
 
 int time_read(FsNode_t* node,

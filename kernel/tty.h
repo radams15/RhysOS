@@ -2,10 +2,13 @@
 #define RHYSOS_TTY_H
 
 enum {
-    GRAPHICS_MONO_80x25 = 3,
-    GRAPHICS_MONO_40x25 = 1,
-    GRAPHICS_CGA_320x200 = 4
+    GRAPHICS_MONO_80x25 = 0x3,
+    GRAPHICS_MONO_40x25 = 0x1,
+    GRAPHICS_COLOUR_80x25 = 0x3,
+    GRAPHICS_CGA_320x200 = 0x4
 } GraphicsMode;
+
+enum { FONT_8x8 = 0x12, FONT_8x16 = 0x00 } Font;
 
 void clear_screen();
 
@@ -29,7 +32,7 @@ void set_cursor(char row, char col);
 int readline(char* buffer);
 char getch();
 
-void set_graphics_mode(int mode);
+void set_graphics_mode(int mode, int fnt);
 int get_graphics_mode();
 void cls();
 

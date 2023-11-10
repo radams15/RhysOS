@@ -1,6 +1,7 @@
 #include "tty.h"
 
 int graphics_mode = GRAPHICS_MONO_80x25;
+int font = FONT_8x16;
 
 char text_bg = 0xF;
 char text_fg = 0x0;
@@ -115,8 +116,9 @@ char getch() {
     return out;
 }
 
-void set_graphics_mode(int mode) {
+void set_graphics_mode(int mode, int fnt) {
     graphics_mode = mode;
+    font = fnt;
 
     cls();
 }
@@ -128,4 +130,5 @@ int get_graphics_mode() {
 void cls() {
     interrupt(0x10, graphics_mode, 0, 0,
               0);  // TODO: Replace with screen scrolling
+    interrupt(0x10, (0x11 << 8) + font, 0, 0, 0);
 }
