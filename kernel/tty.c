@@ -14,6 +14,14 @@ void set_cursor(char row, char col) {
     interrupt(0x10, 0x0200, 0, 0, (row << 2) | (col & 0xFF));
 }
 
+char get_cursor_row() {
+    return (get_cursor() >> 4) & 0xFF;
+}
+
+char get_cursor_col() {
+    return get_cursor() & 0xFF;
+}
+
 void set_bg(char colour) {
     text_bg = colour;
 }
@@ -38,8 +46,8 @@ void print_char_colour(int c, char fg, char bg) {
     colour = (fg << 2) | (bg & 0xF);
 
     if (c == '\t') {
-        int row = get_cursor() & 0xFF;
-        for (int i = 0; i < row % TAB_SIZE; i++)  // Round to nearest tab col
+        int col = get_cursor_col();
+        for (int i = 0; i < col % TAB_SIZE; i++)  // Round to nearest tab col
             print_char(' ');
         return;
     }
