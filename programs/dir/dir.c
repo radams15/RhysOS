@@ -28,7 +28,7 @@ void dir_listing(char* dir) {
             continue;
 
         printf("\t - %s", file->name);
-        if(i % COLS == 0)
+        if (i % COLS == 0)
             printf("\n");
         else
             printf("\t");

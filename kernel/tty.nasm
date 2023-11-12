@@ -15,12 +15,12 @@ _get_cursor:
 	ret
 	
 _get_cursor_row:
-	;call _get_cursor
+	call _get_cursor
 	xor al, al
 	mov al, ah
 	ret
 
 _get_cursor_col:
-	;call _get_cursor
+	call _get_cursor
 	xor ah, ah
 	ret

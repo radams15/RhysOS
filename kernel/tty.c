@@ -1,5 +1,7 @@
 #include "tty.h"
 
+#define TAB_SIZE 4
+
 int graphics_mode = GRAPHICS_MONO_80x25;
 int font = FONT_8x16;
 
@@ -36,7 +38,9 @@ void print_char_colour(int c, char fg, char bg) {
     colour = (fg << 2) | (bg & 0xF);
 
     if (c == '\t') {
-        print_string("    ");
+        int row = get_cursor() & 0xFF;
+        for (int i = 0; i < row % TAB_SIZE; i++)  // Round to nearest tab col
+            print_char(' ');
         return;
     }
 
