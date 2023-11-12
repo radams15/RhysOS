@@ -1,15 +1,20 @@
-extern _main
-
-jmp _main
+global _main
 
 _main:
-	push bp
-	
-	mov ax, 5307h ; apm
-	mov bx, 1 ; everything
-	mov cx, 3 ; shutdown
-	int 15h
+	mov ax, 5301h
+    xor bx, bx
+    int 15h
 
-	pop bp
+    mov ax, 530fh
+    mov bx, 1
+    mov cx, 1
+    int 15h
+
+    mov ax, 5307h
+    mov bx, 1
+    mov cx, 3
+    int 15h
+
+    mov ax, 0
 
 	ret

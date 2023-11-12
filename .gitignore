@@ -3,3 +3,4 @@ build/
 .gdb_history
 diff.txt
 *.swp
+serial.txt
