@@ -4,6 +4,8 @@
 
 #define MAX_FILES 64
 
+#define COLS 3
+
 void dir_listing(char* dir) {
     int i;
     int len;
@@ -25,7 +27,11 @@ void dir_listing(char* dir) {
         if (file == NULL || file->name[0] == NULL)
             continue;
 
-        printf("\t - %s\n", file->name);
+        printf("\t - %s", file->name);
+        if(i % COLS == 0)
+            printf("\n");
+        else
+            printf("\t");
     }
 }
 
