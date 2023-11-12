@@ -79,13 +79,21 @@ void* malloc(unsigned int size) {
     header->magic = HEAP_MAGIC;
     header->free = 0;
 
-    unsigned int* out = ((unsigned int*)header) + sizeof(BlkHeader_t);
+    unsigned int out = ((unsigned int)header) + sizeof(BlkHeader_t);
+
+    // print_string("Malloc: ");
+    // printi(out, 16);
+    // print_string("\n");
 
     return (void*)out;
 }
 
 void free(void* ptr) {
-    BlkHeader_t* header = (unsigned int*)ptr - sizeof(BlkHeader_t);
+    // print_string("Free: ");
+    // printi(ptr, 16);
+    // print_string("\n");
+
+    BlkHeader_t* header = (unsigned int)ptr - sizeof(BlkHeader_t);
 
     if (header->magic != HEAP_MAGIC) {
         print_string("Invalid kernel free!\n");
