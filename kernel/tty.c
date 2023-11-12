@@ -15,7 +15,7 @@ void set_cursor(char row, char col) {
 }
 
 char get_cursor_row() {
-    return (get_cursor() >> 4) & 0xFF;
+    return (get_cursor() >> 2) & 0xFF;
 }
 
 char get_cursor_col() {
