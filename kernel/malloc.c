@@ -7,6 +7,20 @@ static unsigned int heap;
 
 #define HEAP_MAGIC 0xCAFE
 
+/* Kernel memory allocator.
+ *
+ *
+ * Similar to the original MS-DOS allocator, this algorithm
+ * splits memory into variable-length chunks which can be re-combined
+ * when free'd.
+ * Each block begins with a BlkHeader, which is a linked-list structure
+ * allowing the next block to be pointed to, along with the block length
+ * and whether the block is free.
+ *
+ * Headers begin with a magic variable to allow the kernel to show an error
+ * if a free'd block is not actually a memory block which it allocated.
+*/
+
 typedef struct BlkHeader {
     unsigned int magic;      // HEAP_MAGIC
     unsigned int length;     // Length of the block

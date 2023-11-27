@@ -9,6 +9,7 @@ void entry(int src_ds, void* boot_ptr) {
 #include "proc.h"
 #include "sysinfo.h"
 #include "tty.h"
+#include "graphics.h"
 #include "util.h"
 
 #include "fs/devfs.h"
@@ -142,9 +143,9 @@ int init(struct SystemInfo* info) {
 
     MUST_COMPLETE(rtc_init, "RTC enabled\n", "Failed to initialise rtc\n");
 
-    MUST_COMPLETE(serial_init, "Enabled /dev/com1\n",
-                  "Failed to initialise /dev/com1\n", COM1, BAUD_9600,
-                  PARITY_NONE, STOPBITS_ONE, DATABITS_8);
+    // MUST_COMPLETE(serial_init, "Enabled /dev/com1\n", 
+                  // "Failed to initialise /dev/com1\n", COM1, BAUD_9600, 
+                  // PARITY_NONE, STOPBITS_ONE, DATABITS_8); 
 
     // MUST_COMPLETE(serial_init, "Enabled /dev/com2\n",
     //               "Failed to initialise /dev/com2\n", COM2, BAUD_9600,

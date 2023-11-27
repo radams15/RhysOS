@@ -140,7 +140,7 @@ int get_graphics_mode() {
 }
 
 void cls() {
-    interrupt(0x10, graphics_mode, 0, 0,
-              0);  // TODO: Replace with screen scrolling
     interrupt(0x10, (0x11 << 8) + font, 0, 0, 0);
+    interrupt(0x10, graphics_mode, 0, 0,
+          0);  // TODO: Replace with screen scrolling
 }

@@ -5,7 +5,8 @@ enum {
     GRAPHICS_MONO_80x25 = 0x3,
     GRAPHICS_MONO_40x25 = 0x1,
     GRAPHICS_COLOUR_80x25 = 0x3,
-    GRAPHICS_CGA_320x200 = 0x4
+    GRAPHICS_CGA_320x200 = 0x4,
+    GRAPHICS_VGA_640x480 = 0x12
 } GraphicsMode;
 
 enum { FONT_8x8 = 0x12, FONT_8x16 = 0x00 } Font;
