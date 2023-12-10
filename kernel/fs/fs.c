@@ -108,9 +108,25 @@ int open(char* name, FileMode_t mode) {
         }
     }
 
-    print_string("Error\n");
-
     return -1;
+}
+
+int stat(const char* name, Stat_t* stat) {
+    FsNode_t* handle;
+
+    handle = get_dir(name);
+
+    if (handle == NULL) {
+        return 1;
+    }
+
+    strcpy(stat->name, handle->name);
+    stat->flags = handle->flags;
+    stat->inode = handle->inode;
+    stat->length = handle->length;
+    stat->offset = handle->offset;
+
+    return 0;
 }
 
 void close(int fh) {
@@ -198,6 +214,7 @@ unsigned int fs_close(FsNode_t* node) {
 
     return 0;
 }
+
 
 DirEnt_t* fs_readdir(FsNode_t* node, unsigned int index) {
     if (node->readdir != 0 && (node->flags & 0x07) == FS_DIRECTORY) {

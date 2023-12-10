@@ -55,6 +55,10 @@ int kfree(void* ptr) {
     return syscall(8, ptr, 0, 0, 0, 0, 0);
 }
 
+int stat(const char* name, Stat_t* stat) {
+    return syscall(9, name, stat, 0, 0, 0, 0);
+}
+
 int int2chars(unsigned int in, unsigned char* buffer) {
     buffer[0] = (unsigned char)in & 0xff;  // low byte
     buffer[1] = (in >> 8) & 0xff;          // high byte

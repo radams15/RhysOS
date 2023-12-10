@@ -24,6 +24,14 @@ typedef enum FileMode {
     O_WRONLY = 0b00001000,
 } FileMode_t;
 
+typedef struct Stat {
+    char name[FILE_NAME_MAX];
+    unsigned int flags;
+    unsigned int inode;
+    unsigned int length;
+    unsigned int offset;
+} Stat_t;
+
 void read_sector(int* buffer, int sector);
 void read_sector_to_segment(int disk,
                             int track,
@@ -67,6 +75,8 @@ typedef struct FsNode {
     struct FsNode* ref;  // Pointer to symlink or mount
 } FsNode_t;
 
+
+
 typedef struct FsMount {
     char name[FILE_NAME_MAX];
     FsNode_t* parent;
@@ -92,6 +102,7 @@ FsNode_t* get_dir(char* name);
 int open(char* name, FileMode_t mode);
 void close(int fh);
 void seek(int fh, unsigned int location);
+int stat(const char* name, Stat_t* stat);
 
 int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child);
 

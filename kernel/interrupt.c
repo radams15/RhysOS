@@ -1,5 +1,6 @@
 #include "interrupt.h"
 #include "type.h"
+#include "fs/fs.h"
 
 #define SYSCALL_BUF_SIZ 1024
 
@@ -36,6 +37,8 @@ int i21_handler(SyscallArgs_t* args) {
                 free(argv[i]);
             }
             free(argv);
+
+            return ret;
         } break;
 
         case 2: {
@@ -96,6 +99,21 @@ int i21_handler(SyscallArgs_t* args) {
         case 8:
             free(args->a);
             break;
+
+        case 9: {
+            char name[SYSCALL_BUF_SIZ];
+            Stat_t dst;
+
+            seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
+
+            int ret = stat(name, &dst);
+
+            if (ret == 0) {
+                seg_copy(&dst, args->b, sizeof(Stat_t), DATA_SEGMENT, args->ds);
+            }
+
+            return ret;
+        }
 
         default:
             print_string("Unknown interrupt: ");

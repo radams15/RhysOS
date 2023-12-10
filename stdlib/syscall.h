@@ -26,6 +26,14 @@ typedef struct FsNode {
     struct FsNode* ref;  // Pointer to symlink or mount
 } FsNode_t;
 
+typedef struct Stat {
+    char name[FILE_NAME_MAX];
+    unsigned int flags;
+    unsigned int inode;
+    unsigned int length;
+    unsigned int offset;
+} Stat_t;
+
 typedef enum FileMode {
     O_CREAT  = 0b00000001,
     O_APPEND = 0b00000010,
@@ -43,6 +51,7 @@ int close(int fh);
 int seek(int fh, unsigned int location);
 int dir_list(char* dir_name, struct FsNode* buf, int max);
 int kfree(void* ptr);
+int stat(const char* name, Stat_t* stat);
 
 int interrupt_10(int AX, int BX, int CX, int DX);
 int interrupt_21(int AX, int BX, int CX, int DX);
