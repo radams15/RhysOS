@@ -44,6 +44,9 @@ Command_t parse(Ctx_t* ctx, char c) {
         case 'i':
             return CMD_INSERT;
 
+        case 'q':
+            return CMD_QUIT;
+
         default:
             return CMD_ESC;
     }
@@ -68,12 +71,15 @@ int main() {
             case CMD_INSERT:
                 ctx.mode = MODE_EDIT;
                 break;
+            case CMD_QUIT:
+                goto quit;
             default:
                 fprintf(stderr, "Input error, exiting...");
                 goto error;
         }
     }
 
+quit:
     return 0;
 
 error:
