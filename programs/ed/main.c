@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <syscall.h>
 
 #include "buffer.h"
 
@@ -21,8 +22,10 @@ typedef enum Mode {
 
 typedef struct Ctx {
     Mode_t mode;
-    char buf[8];
-    char bufptr;
+    char line[8];
+    char* lptr;
+    int llength;
+    char* bufptr; 
 } Ctx_t;
 
 Command_t parse(Ctx_t* ctx, char c) {
@@ -54,17 +57,43 @@ Command_t parse(Ctx_t* ctx, char c) {
 
 int main() {
     Ctx_t ctx;
-    ctx.bufptr = &ctx.buf;
+    ctx.bufptr = &buffer;
+    ctx.lptr = &ctx.line;
+    ctx.llength = 0;
     ctx.mode = MODE_CMD;
-    char c[2] = {0};
+    char c = 0;
 
     while(TRUE) {
-        c[0] = ngetch();
-        switch(parse(&ctx, c[0])) {
+        putc('\r');
+        for(int i=0 ; i<ctx.llength ; i++)
+            putc(' ');
+        putc('\r');
+
+        ctx.llength = 0;
+        for(char* c=ctx.bufptr ; *c != '\n' && *c != 0 ; c++) {
+            putc(*c);
+            ctx.llength++;
+        }
+
+        c = ngetch() & 0xFF;
+        switch(parse(&ctx, c)) {
             case CMD_CHAR:
                 // Add char
-                printf("%d", c[0]);
                 break;
+            case CMD_NL: {
+                while(*ctx.bufptr != '\n' && *ctx.bufptr != 0) {
+                    ctx.bufptr++;
+                }
+                ctx.bufptr++;
+            }; break;
+            case CMD_PL: {
+                ctx.bufptr--;
+                ctx.bufptr--;
+                while(*ctx.bufptr != '\n' && ctx.bufptr != buffer) {
+                    ctx.bufptr--;
+                }
+                ctx.bufptr++;
+            }; break;
             case CMD_ESC:
                 ctx.mode = MODE_CMD;
                 break;
