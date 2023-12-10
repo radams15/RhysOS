@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include <syscall.h>
-
-#include "buffer.h"
-
-#define buffer make_pl
-// const char buffer[] = ""; 
+#include <malloc.h>
 
 typedef enum Command {
     CMD_ESC,
@@ -25,6 +21,7 @@ typedef struct Ctx {
     char line[8];
     char* lptr;
     int llength;
+    char* bufhead; 
     char* bufptr; 
 } Ctx_t;
 
@@ -55,9 +52,27 @@ Command_t parse(Ctx_t* ctx, char c) {
     }
 };
 
-int main() {
+int main(int argc, char** argv) {
+    if(argc != 2) {
+        fprintf(stderr, "Usage: ed [FILE]\n");
+        return 1;
+    }
+
+    File_t* file = fopen(argv[1], "r");
+    if(file == NULL) {
+        fprintf(stderr, "Failed to open '%s'\n", argv[1]);
+        return 1;
+    }
+
+    int fsize = 1024;
+
+    char* buffer = malloc(fsize*sizeof(char));
+    fread(file, buffer, fsize);
+    fclose(file);
+
     Ctx_t ctx;
-    ctx.bufptr = &buffer;
+    ctx.bufhead = buffer;
+    ctx.bufptr = buffer;
     ctx.lptr = &ctx.line;
     ctx.llength = 0;
     ctx.mode = MODE_CMD;
@@ -89,7 +104,7 @@ int main() {
             case CMD_PL: {
                 ctx.bufptr--;
                 ctx.bufptr--;
-                while(*ctx.bufptr != '\n' && ctx.bufptr != buffer) {
+                while(*ctx.bufptr != '\n' && ctx.bufptr != ctx.bufhead) {
                     ctx.bufptr--;
                 }
                 ctx.bufptr++;
@@ -109,8 +124,12 @@ int main() {
     }
 
 quit:
+    free(buffer);
+
     return 0;
 
 error:
+    free(buffer);
+
     return 1;
 }

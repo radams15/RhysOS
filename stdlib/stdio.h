@@ -12,6 +12,10 @@ enum {
 
 enum { FONT_8x8 = 0x12, FONT_8x16 = 0x00 } Font;
 
+typedef struct File {
+    int fh;
+} File_t;
+
 extern int stdout, stdin, stderr;
 
 void fprintf(int fd, char* text, ...);
@@ -27,6 +31,12 @@ int fputc(int fh, char c);
 int readline(char* buffer);
 int freadline(int fh, char* buffer);
 void exit(char code);  // Defined in crt0.c
+
+File_t* fopen(const char* fname, const char* mode);
+int fwrite(File_t* file, unsigned char* buffer, unsigned int size);
+int fclose(File_t* file);
+int fread(File_t* file, unsigned char* buffer, unsigned int size);
+int fseek(File_t* file, int pos);
 
 void term_set_bg(char colour);
 void term_set_fg(char colour);
