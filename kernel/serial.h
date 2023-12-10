@@ -1,7 +1,7 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
-typedef enum Port { COM1 = 0, COM2 = 1 } Port_t;
+typedef enum Port { COM1 = 0, COM2 = 1, COM3 = 2 } Port_t;
 
 typedef enum Baud {
     BAUD_110 = 0,

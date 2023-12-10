@@ -67,7 +67,7 @@ int stdin_read(FsNode_t* node,
     int i;
 
     for (i = 0; i < size; i++) {
-        buffer[i] = getch();
+        buffer[i] = ngetch();
     }
 
     return size;

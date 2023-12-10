@@ -17,6 +17,7 @@ extern int stdout, stdin, stderr;
 void fprintf(int fd, char* text, ...);
 void printf(char* text, ...);
 
+char ngetch();
 char getch();
 char fgetch(int fh);
 int fprint(int fh, char* str);

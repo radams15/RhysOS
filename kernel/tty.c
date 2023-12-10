@@ -119,6 +119,15 @@ int readline(char* buffer) {
     *(buffer++) = 0;  // null-terminate
 }
 
+// Getch without echo
+char ngetch() {
+    char out;
+
+    out = interrupt(0x16, 0, 0, 0, 0);
+
+    return out;
+}
+
 char getch() {
     char out;
 
@@ -127,6 +136,7 @@ char getch() {
 
     return out;
 }
+
 
 void set_graphics_mode(int mode, int fnt) {
     graphics_mode = mode;

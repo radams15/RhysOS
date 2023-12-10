@@ -31,6 +31,7 @@ char get_cursor_row();
 void set_cursor(char row, char col);
 
 int readline(char* buffer);
+char ngetch();
 char getch();
 
 void set_graphics_mode(int mode, int fnt);

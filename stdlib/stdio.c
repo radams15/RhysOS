@@ -79,8 +79,16 @@ int cls() {
     putc('\xC');
 }
 
-char getch() {
+char ngetch() {
     return fgetch(stdin);
+}
+
+char getch() {
+    char c = fgetch(stdin);
+
+    putc(c);
+
+    return c;
 }
 
 char fgetch(int fh) {

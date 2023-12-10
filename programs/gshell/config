@@ -1,3 +1,4 @@
 name: gshell
 main: main.c
+files: graphics.nasm
 stdlib: true
