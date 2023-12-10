@@ -26,23 +26,30 @@ typedef struct FsNode {
     struct FsNode* ref;  // Pointer to symlink or mount
 } FsNode_t;
 
+typedef enum FileMode {
+    O_CREAT  = 0b00000001,
+    O_APPEND = 0b00000010,
+    O_RDONLY = 0b00000100,
+    O_WRONLY = 0b00001000,
+} FileMode_t;
+
 typedef int (*FsCallback)(struct FsNode*);
 
 int execa(char* file, int argc, char** argv, int in, int out, int err);
 int read(int fh, unsigned char* buffer, unsigned int size);
 int write(int fh, unsigned char* buffer, unsigned int size);
-int open(char* name);
-void close(int fh);
-void seek(int fh, unsigned int location);
+int open(char* name, FileMode_t mode);
+int close(int fh);
+int seek(int fh, unsigned int location);
 int dir_list(char* dir_name, struct FsNode* buf, int max);
-void kfree(void* ptr);
+int kfree(void* ptr);
 
 int interrupt_10(int AX, int BX, int CX, int DX);
 int interrupt_21(int AX, int BX, int CX, int DX);
 
 #define exec(file, argc, argv) execa(file, argc, argv, stdin, stdout, stderr)
 
-void int2chars(unsigned int in, unsigned char* buffer);
+int int2chars(unsigned int in, unsigned char* buffer);
 int chars2int(unsigned char* buffer);
 
 #endif

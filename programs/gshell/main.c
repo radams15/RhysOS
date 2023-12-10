@@ -31,7 +31,7 @@ int get_graphics_mode() {
     int fh;
     int mode;
 
-    fh = open("/dev/graphmode");
+    fh = open("/dev/graphmode", NULL);
 
     read(fh, &buf, sizeof(buf));
     mode = chars2int(buf);
@@ -47,7 +47,7 @@ void set_graphics_mode(int mode) {
 
     int2chars(mode, buf);
 
-    fh = open("/dev/graphmode");
+    fh = open("/dev/graphmode", NULL);
 
     write(fh, &buf, sizeof(buf));
 
@@ -60,7 +60,7 @@ int main() {
 //  
     // set_graphics_mode(0x13); 
 //  
-    // int com1 = open("/dev/com1"); 
+    // int com1 = open("/dev/com1", NULL); 
 //  
     // Ctx_t ctx = { 
         // com1 
@@ -73,7 +73,7 @@ int main() {
     // set_graphics_mode(before_mode); 
 //  
 
-    int com1 = open("/dev/com1");
+    int com1 = open("/dev/com1", NULL);
     char data[32];
 
     for(int i=0 ; i<10 ; i++) {

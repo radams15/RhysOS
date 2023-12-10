@@ -11,7 +11,7 @@ int get_graphics_mode() {
     int fh;
     int mode;
 
-    fh = open("/dev/graphmode");
+    fh = open("/dev/graphmode", NULL);
 
     read(fh, &buf, sizeof(buf));
     mode = chars2int(buf);
@@ -27,7 +27,7 @@ void set_graphics_mode(int mode) {
 
     int2chars(mode, buf);
 
-    fh = open("/dev/graphmode");
+    fh = open("/dev/graphmode", NULL);
 
     write(fh, &buf, sizeof(buf));
 
@@ -68,7 +68,7 @@ int draw_text(int fd) {
 int mainloop(char* fname) {
     int fd;
 
-    fd = open(fname);
+    fd = open(fname, NULL);
     if (fd == -1)
         return 1;
 

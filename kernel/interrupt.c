@@ -82,7 +82,7 @@ int i21_handler(SyscallArgs_t* args) {
         case 5: {
             char name[SYSCALL_BUF_SIZ];
             seg_copy(args->a, name, sizeof(name), args->ds, DATA_SEGMENT);
-            return open(name);
+            return open(name, args->b);
         }
 
         case 6:

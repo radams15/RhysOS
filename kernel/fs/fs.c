@@ -60,17 +60,23 @@ int create_file(char* name) {
         tok = strtok(NULL, "/");
     }
 
+    // TODO: create the file
+
     return NULL;
 }
 
-int open(char* name) {
+int open(char* name, FileMode_t mode) {
     int i;
     FsNode_t* handle;
 
     handle = get_dir(name);
 
     if (handle == NULL) {
-        handle = create_file(name);
+        if(mode & O_CREAT) {
+            handle = create_file(name);
+        } else {
+            return -1;
+        }
 
         if (handle == NULL) {
             print_string("Could not find directory: '");
@@ -83,7 +89,21 @@ int open(char* name) {
     for (i = 0; i < MAX_OPEN_FILES; i++) {
         if (open_files[i] == NULL) {
             open_files[i] = handle;
-            seek(i, 0);
+
+            seek(i, 0); // Go to start of file
+
+            if(mode & O_RDONLY) {
+                open_files[i]->write = NULL;
+            }
+
+            if(mode & O_WRONLY) {
+                open_files[i]->read = NULL;
+            }
+
+            if(mode & O_APPEND) {
+                // TODO: Go to end of file
+            }
+
             return i;
         }
     }

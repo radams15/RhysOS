@@ -13,7 +13,7 @@ static int run_batch(char* path) {
     int c;
     char linebuf[1024];
 
-    fh = open(path);
+    fh = open(path, NULL);
 
     if (fh == -1) {
         printf("Error reading file '%s'!\n", path);
@@ -66,7 +66,7 @@ static int run_external(char* exe, char* rest) {
             tok = strtok(NULL, ">");
             dest = tok;
             *(tok - 1) = 0;
-            out_fh = open(dest);
+            out_fh = open(dest, NULL);
 
             if (out_fh == -1)
                 out_fh = stdout;
@@ -79,7 +79,7 @@ static int run_external(char* exe, char* rest) {
             tok = strtok(NULL, "<");
             dest = tok;
             *(tok - 1) = 0;
-            in_fh = open(dest);
+            in_fh = open(dest, NULL);
 
             if (in_fh == -1)
                 in_fh = stdin;
@@ -109,7 +109,7 @@ int run_line(char* line, int length) {
     if (strcmp(exe, "tty") == 0) {
         int fh;
 
-        fh = open(line + strlen(exe) + 1);
+        fh = open(line + strlen(exe) + 1, NULL);
 
         if (fh == -1)
             printf("Error: File '%s' does not exist!\n",

@@ -4,7 +4,7 @@ int lowmem() {
     int fh;
     int mem = 0;
 
-    fh = open("/dev/lowmem");
+    fh = open("/dev/lowmem", NULL);
 
     if (fh == -1) {
         fprintf(stderr, "Cannot open lowmem!\n");
@@ -21,7 +21,7 @@ int highmem() {
     int fh;
     int mem = 0;
 
-    fh = open("/dev/highmem");
+    fh = open("/dev/highmem", NULL);
 
     if (fh == -1) {
         fprintf(stderr, "Cannot open highmem!\n");

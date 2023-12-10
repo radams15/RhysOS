@@ -204,7 +204,7 @@ void printf(char* text, ...) {
 void term_set_bg(char colour) {
     int fh;
 
-    fh = open("/dev/ttybg");
+    fh = open("/dev/ttybg", NULL);
 
     write(fh, &colour, 1);
 
@@ -214,7 +214,7 @@ void term_set_bg(char colour) {
 void term_set_fg(char colour) {
     int fh;
 
-    fh = open("/dev/ttyfg");
+    fh = open("/dev/ttyfg", NULL);
 
     write(fh, &colour, 1);
 

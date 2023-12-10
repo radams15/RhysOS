@@ -159,9 +159,9 @@ int init(struct SystemInfo* info) {
     fs_mount("dev", fs_root, fs_dev);
     print_string("Root filesystem mounted\n");
 
-    stdin = open("/dev/stdin");
-    stdout = open("/dev/stdout");
-    stderr = open("/dev/stderr");
+    stdin = open("/dev/stdin", O_RDONLY);
+    stdout = open("/dev/stdout", O_WRONLY);
+    stderr = open("/dev/stderr", O_WRONLY);
 
     char* shell_argv[] = {"shell", "login.bat"};
     exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);

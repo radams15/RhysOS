@@ -6,7 +6,7 @@ int main(int argc, char** argv) {
     int fh;
     struct TimeDelta time;
 
-    fh = open("/dev/time");
+    fh = open("/dev/time", NULL);
 
     read(fh, &time, sizeof(struct TimeDelta));
 

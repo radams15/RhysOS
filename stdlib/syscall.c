@@ -39,25 +39,26 @@ int write(int fh, unsigned char* buffer, unsigned int size) {
     return syscall(4, fh, buffer, size, 0, 0, 0);
 }
 
-int open(char* name) {
-    return syscall(5, name, 0, 0, 0, 0, 0);
+int open(char* name, FileMode_t mode) {
+    return syscall(5, name, mode, 0, 0, 0, 0);
 }
 
-void close(int fh) {
+int close(int fh) {
     return syscall(6, fh, 0, 0, 0, 0, 0);
 }
 
-void seek(int fh, unsigned int location) {
+int seek(int fh, unsigned int location) {
     return syscall(7, fh, location, 0, 0, 0, 0);
 }
 
-void kfree(void* ptr) {
+int kfree(void* ptr) {
     return syscall(8, ptr, 0, 0, 0, 0, 0);
 }
 
-void int2chars(unsigned int in, unsigned char* buffer) {
+int int2chars(unsigned int in, unsigned char* buffer) {
     buffer[0] = (unsigned char)in & 0xff;  // low byte
     buffer[1] = (in >> 8) & 0xff;          // high byte
+    return 0;
 }
 
 int chars2int(unsigned char* buffer) {

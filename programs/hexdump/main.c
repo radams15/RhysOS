@@ -11,7 +11,7 @@ int dump(char* file) {
     int total_read = 0;
     int i;
 
-    fh = open(file);
+    fh = open(file, NULL);
 
     if (fh == -1) {
         printf("Error reading file '%s'!\n", file);
@@ -29,7 +29,7 @@ int dump(char* file) {
         for (i = 0; i < bytes_read; i++) {
             printf("%x ", buffer[i]);
         }
-        printf(" => ");
+        printf(" =>\t");
         for (i = 0; i < bytes_read; i++) {
             if (buffer[i] > 33)  // Printable characters printed
                 putc(buffer[i]);

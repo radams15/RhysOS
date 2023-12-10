@@ -8,7 +8,7 @@ int comfd;
 
 int connect_com() {
     char buf[512];
-    comfd = open("/dev/com1");
+    comfd = open("/dev/com1", NULL);
     write(comfd, "AT", 2);
 
     read(comfd, buf, 2);

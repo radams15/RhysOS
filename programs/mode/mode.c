@@ -6,7 +6,7 @@ int get_graphics_mode() {
     int fh;
 
     char buf[2];
-    fh = open("/dev/graphmode");
+    fh = open("/dev/graphmode", NULL);
     read(fh, &buf, sizeof(&buf));
     close(fh);
 
@@ -18,7 +18,7 @@ void set_graphics_mode(char mode, char font) {
 
     char buf[2] = {mode, font};
 
-    fh = open("/dev/graphmode");
+    fh = open("/dev/graphmode", NULL);
     write(fh, &buf, sizeof(&buf));
     close(fh);
 }

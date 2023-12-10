@@ -10,7 +10,7 @@ int type(char* file) {
     int total_read = 0;
     int i;
 
-    fh = open(file);
+    fh = open(file, NULL);
 
     if (fh == -1) {
         printf("Error reading file '%s'!\n", file);
