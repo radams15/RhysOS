@@ -66,7 +66,7 @@ static int run_external(char* exe, char* rest) {
             tok = strtok(NULL, ">");
             dest = tok;
             *(tok - 1) = 0;
-            out_fh = open(dest, NULL);
+            out_fh = open(dest, O_CREAT);
 
             if (out_fh == -1)
                 out_fh = stdout;

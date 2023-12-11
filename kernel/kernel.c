@@ -144,7 +144,7 @@ int init(struct SystemInfo* info) {
     MUST_COMPLETE(rtc_init, "RTC enabled\n", "Failed to initialise rtc\n");
 
     MUST_COMPLETE(serial_init, "Enabled /dev/com1\n",
-                  "Failed to initialise /dev/com1\n", COM3, BAUD_9600,
+                  "Failed to initialise /dev/com1\n", COM1, BAUD_9600,
                   PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 
     // MUST_COMPLETE(serial_init, "Enabled /dev/com2\n",
@@ -156,7 +156,9 @@ int init(struct SystemInfo* info) {
 
     fs_root = fat_init(info->rootfs_start);
     FsNode_t* fs_dev = devfs_init();
+    // FsNode_t* fs_tmp = tmpfs_init(); 
     fs_mount("dev", fs_root, fs_dev);
+    // fs_mount("tmp", fs_root, fs_tmp); 
     print_string("Root filesystem mounted\n");
 
     stdin = open("/dev/stdin", O_RDONLY);

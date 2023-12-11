@@ -196,7 +196,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = 0;
     root_nodes[i].write = stdout_write;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -212,7 +212,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = stdin_read;
     root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -228,7 +228,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = 0;
     root_nodes[i].write = stderr_write;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -244,7 +244,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = stdin_read;
     root_nodes[i].write = stdout_write;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -260,7 +260,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = highmem_read;
     root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -276,7 +276,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = lowmem_read;
     root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -292,7 +292,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = graphics_mode_read;
     root_nodes[i].write = graphics_mode_write;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -308,7 +308,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = com1_read;
     root_nodes[i].write = com1_write;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -324,7 +324,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = com2_read;
     root_nodes[i].write = com2_write;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -340,7 +340,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = time_read;
     root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -356,7 +356,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = tty_bg_write;
     root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -372,7 +372,7 @@ void devfs_setup() {
     root_nodes[i].offset = 0;
     root_nodes[i].read = tty_fg_write;
     root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -388,7 +388,7 @@ FsNode_t* devfs_init() {
     root_node.offset = 0;
     root_node.read = 0;
     root_node.write = 0;
-    root_node.open = 0;
+    root_node.create = 0;
     root_node.close = 0;
     root_node.readdir = devfs_readdir;
     root_node.finddir = devfs_finddir;

@@ -49,7 +49,7 @@ typedef unsigned int (*WriteFunc)(struct FsNode*,
                                   unsigned int,
                                   unsigned int,
                                   unsigned char*);
-typedef unsigned int (*OpenFunc)(struct FsNode*, unsigned char, unsigned char);
+typedef struct FsNode* (*CreateFunc)(struct FsNode* parent, const char* name);
 typedef unsigned int (*CloseFunc)(struct FsNode*);
 typedef struct DirEnt* (*ReaddirFunc)(struct FsNode*, unsigned int);
 typedef struct FsNode* (*FinddirFunc)(struct FsNode*, char* name);
@@ -68,7 +68,7 @@ typedef struct FsNode {
     unsigned int offset;  // used by seek
     ReadFunc read;
     WriteFunc write;
-    OpenFunc open;
+    CreateFunc create;
     CloseFunc close;
     ReaddirFunc readdir;
     FinddirFunc finddir;

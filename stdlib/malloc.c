@@ -97,6 +97,13 @@ void* calloc(uint16 n, uint16 size) {
 }
 
 void* realloc(void* ptr, uint16 size) {
+    if(ptr == NULL)
+        return malloc(size);
+    else if(size == 0) {
+        free(ptr);
+        return NULL;
+    }
+
     BlkHeader_t* header = (unsigned int*)ptr - sizeof(BlkHeader_t);
 
     int extra = size - header->length;

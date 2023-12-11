@@ -20,6 +20,7 @@ FsNode_t* fh_get_node(int fh) {
 int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child) {
     for (int i = 0; i < MAX_MOUNTS; i++) {
         if (mounts[i].parent == NULL && mounts[i].child == NULL) {
+            print_string("Found!");
             strcpy(mounts[i].name, name);
             mounts[i].parent = parent;
             mounts[i].child = child;
@@ -29,6 +30,17 @@ int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child) {
 
     return 1;
 }
+
+// FsNode_t* get_mount(FsNode_t* fsnode, char* name) { 
+    // for (int i = 0; i < MAX_MOUNTS; i++) { 
+        // if (fsnode == mounts[i].parent && 
+            // mounts[i].child != NULL && strcmp(name, mounts[i].name) == 0) { 
+            // return mounts[i].child; 
+        // } 
+    // } 
+//  
+    // return NULL; 
+// } 
 
 int write(int fh, unsigned char* buffer, unsigned int size) {
     return fs_write(fh_get_node(fh), fh_get_node(fh)->offset, size, buffer);
@@ -44,6 +56,7 @@ void seek(int fh, unsigned int location) {
 
 int create_file(char* name) {
     FsNode_t* fsnode = fs_root;
+    FsNode_t* previous_fsnode = NULL;
     char* tok;
     char* previous_tok = NULL;
 
@@ -53,16 +66,20 @@ int create_file(char* name) {
 
     tok = strtok(buf, "/");
 
-    while (tok != NULL && fsnode != NULL) {
+    do {
+        previous_fsnode = fsnode;
         fsnode = fs_finddir(fsnode, tok);
 
         previous_tok = tok;
         tok = strtok(NULL, "/");
-    }
+    } while(tok != NULL && fsnode != NULL);
 
-    // TODO: create the file
+    fsnode = get_dir(previous_tok);
 
-    return NULL;
+    if(fsnode->create != NULL)
+        return fsnode->create(fsnode, tok);
+    else
+        return -1;
 }
 
 int open(char* name, FileMode_t mode) {
@@ -194,14 +211,6 @@ unsigned int fs_write(FsNode_t* node,
                       unsigned char* buffer) {
     if (node->write != 0) {
         return node->write(node, offset, size, buffer);
-    }
-
-    return 0;
-}
-
-unsigned int fs_open(FsNode_t* node, unsigned char read, unsigned char write) {
-    if (node->open != 0) {
-        return node->open(node, read, write);
     }
 
     return 0;

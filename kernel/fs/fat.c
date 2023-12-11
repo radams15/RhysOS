@@ -181,7 +181,7 @@ FsNode_t* fat_create(char* name) {
     out->offset = 0;
     out->read = fat_read;
     out->write = 0;
-    out->open = 0;
+    out->create = 0;
     out->close = 0;
     out->readdir = 0;
     out->finddir = 0;
@@ -204,7 +204,7 @@ void fat_mount(FsNode_t* node, char* name) {
     root_nodes[i].offset = 0;
     root_nodes[i].read = 0;
     root_nodes[i].write = 0;
-    root_nodes[i].open = 0;
+    root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
@@ -249,7 +249,7 @@ void fat_load_root(struct DirectoryEntry* root_dir) {
             root_nodes[i].offset = 0;
             root_nodes[i].read = fat_read;
             root_nodes[i].write = 0;
-            root_nodes[i].open = 0;
+            root_nodes[i].create = 0;
             root_nodes[i].close = 0;
             root_nodes[i].readdir = 0;
             root_nodes[i].finddir = 0;
@@ -314,7 +314,7 @@ FsNode_t* fat_init(int sector_start) {
     root_node.offset = 0;
     root_node.read = 0;
     root_node.write = 0;
-    root_node.open = 0;
+    root_node.create = 0;
     root_node.close = 0;
     root_node.readdir = fat_readdir;
     root_node.finddir = fat_finddir;

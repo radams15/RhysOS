@@ -3,6 +3,7 @@
 
 int memmgr_init();
 void* malloc(unsigned int size);
+void* realloc(void* ptr, unsigned int size);
 void free(void* ptr);
 
 int a20_available();

@@ -102,6 +102,33 @@ void* malloc(unsigned int size) {
     return (void*)out;
 }
 
+void* realloc(void* ptr, unsigned int size) {
+    if(ptr == NULL)
+        return malloc(size);
+    else if(size == 0) {
+        free(ptr);
+        return NULL;
+    }
+
+    BlkHeader_t* header = (unsigned int*)ptr - sizeof(BlkHeader_t);
+
+    int extra = size - header->length;
+
+    BlkHeader_t* new_header;
+    if (header->next->length >= extra) {
+        new_header = split(header->next, size);
+        header->length += new_header->length;
+    } else {
+        new_header = malloc(size);
+        unsigned int dst =
+            (void*)(((unsigned int*)new_header) + sizeof(BlkHeader_t));
+        memcpy(dst, ptr, header->length);
+        free(ptr);
+    }
+
+    return (void*)new_header;
+}
+
 void free(void* ptr) {
     // print_string("Free: ");
     // printi(ptr, 16);
