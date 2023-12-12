@@ -156,9 +156,9 @@ int init(struct SystemInfo* info) {
 
     fs_root = fat_init(info->rootfs_start);
     FsNode_t* fs_dev = devfs_init();
-    // FsNode_t* fs_tmp = tmpfs_init(); 
+    FsNode_t* fs_tmp = tmpfs_init();
     fs_mount("dev", fs_root, fs_dev);
-    // fs_mount("tmp", fs_root, fs_tmp); 
+    fs_mount("tmp", fs_root, fs_tmp);
     print_string("Root filesystem mounted\n");
 
     stdin = open("/dev/stdin", O_RDONLY);

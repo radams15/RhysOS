@@ -20,7 +20,6 @@ FsNode_t* fh_get_node(int fh) {
 int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child) {
     for (int i = 0; i < MAX_MOUNTS; i++) {
         if (mounts[i].parent == NULL && mounts[i].child == NULL) {
-            print_string("Found!");
             strcpy(mounts[i].name, name);
             mounts[i].parent = parent;
             mounts[i].child = child;
@@ -54,7 +53,7 @@ void seek(int fh, unsigned int location) {
     fh_get_node(fh)->offset = location;
 }
 
-int create_file(char* name) {
+FsNode_t* create_file(char* name) {
     FsNode_t* fsnode = fs_root;
     FsNode_t* previous_fsnode = NULL;
     char* tok;
@@ -64,20 +63,18 @@ int create_file(char* name) {
     memcpy(&buf, name, 100);
     buf[strlen(name)] = 0;
 
-    tok = strtok(buf, "/");
+    char* last_slash = NULL;
+    for(char* c=buf ; *c != NULL ; c++) {
+        if(*c == '/')
+            last_slash = c;
+    }
 
-    do {
-        previous_fsnode = fsnode;
-        fsnode = fs_finddir(fsnode, tok);
+    *last_slash = 0;
 
-        previous_tok = tok;
-        tok = strtok(NULL, "/");
-    } while(tok != NULL && fsnode != NULL);
-
-    fsnode = get_dir(previous_tok);
+    fsnode = get_dir(buf);
 
     if(fsnode->create != NULL)
-        return fsnode->create(fsnode, tok);
+        return fsnode->create(fsnode, last_slash+1);
     else
         return -1;
 }
@@ -95,7 +92,7 @@ int open(char* name, FileMode_t mode) {
             return -1;
         }
 
-        if (handle == NULL) {
+        if (handle == -1) {
             print_string("Could not find directory: '");
             print_string(name);
             print_string("'\n");
