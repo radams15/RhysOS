@@ -24,7 +24,7 @@ void memmgr_init() {
 
     BlkHeader_t* header = (BlkHeader_t*)&heap_begin;
 
-    // printf("Memory size: %x\n", &heap_end-&heap_begin);
+    printf("Memory size: %x\n", &heap_end-&heap_begin);
 
     header->magic = HEAP_MAGIC;
     header->length = &heap_end - &heap_begin;
