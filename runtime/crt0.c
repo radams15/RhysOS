@@ -37,5 +37,14 @@ int start(int argc, char** argv_ext, int should_free) {
 
     int ret = main(argc, argv);
 
+    if (argc != 0) {
+        argv = malloc(argc * sizeof(char));
+
+        for (int i = 0; i < argc; i++) {
+            free(argv[i]);
+        }
+        free(argv);
+    }
+
     return ret;
 }
