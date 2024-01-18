@@ -126,10 +126,9 @@ int run_line(char* line, int length) {
 int loop() {
     char line[1024];
 
-    memset(&line, 0, 1024 / 8);
-
     printf(prompt);
     int len = readline(line);
+    line[len-1] = 0;
 
     printf("\n");
 
