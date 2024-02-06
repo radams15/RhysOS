@@ -145,12 +145,14 @@ int loop() {
     return 0;
 }
 
-int main() {
-    char name[32];
-    int ret = 0;
-
-    while (!ret)
-        ret = loop();
-
+int main(int argc, char** argv) {
+    if(argc > 1) {
+        for(int i=1 ; i<argc ; i++)
+            run_batch(argv[i]);
+    } else {
+        int ret = 0;
+        while (!ret)
+            ret = loop();
+    }
     return 0;
 }
