@@ -4,7 +4,26 @@
 
 TimeDelta_t counter;
 
+tick_callback_t callbacks[32];
+tick_callback_t* callback_ptr = &callbacks;
+
 void task();
+
+int add_tick_callback(tick_callback_t callback) {
+    *callback_ptr = callback;
+    callback_ptr++;
+
+    return 0;
+}
+
+int call_tick_handlers() {
+
+    for(tick_callback_t* c=&callbacks ; c != callback_ptr ; c++) {
+        (*c)();
+    }
+
+    return 0;
+}
 
 int time(struct TimeDelta* buf) {
     memcpy(buf, &counter, sizeof(struct TimeDelta));
@@ -14,6 +33,8 @@ int time(struct TimeDelta* buf) {
 
 void tick() {
     counter.tick = counter.tick + 1;
+
+    call_tick_handlers();
 
     if (counter.tick >= 18) {
         counter.tick = 0;
