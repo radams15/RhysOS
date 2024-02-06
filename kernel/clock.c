@@ -7,8 +7,6 @@ TimeDelta_t counter;
 tick_callback_t callbacks[32];
 tick_callback_t* callback_ptr = &callbacks;
 
-void task();
-
 int add_tick_callback(tick_callback_t callback) {
     *callback_ptr = callback;
     callback_ptr++;
@@ -17,7 +15,6 @@ int add_tick_callback(tick_callback_t callback) {
 }
 
 int call_tick_handlers() {
-
     for(tick_callback_t* c=&callbacks ; c != callback_ptr ; c++) {
         (*c)();
     }
@@ -34,8 +31,6 @@ int time(struct TimeDelta* buf) {
 void tick() {
     counter.tick = counter.tick + 1;
 
-    call_tick_handlers();
-
     if (counter.tick >= 18) {
         counter.tick = 0;
         counter.sec++;
@@ -51,7 +46,7 @@ void tick() {
         counter.hr++;
     }
 
-    task();
+    // call_tick_handlers(); 
 }
 
 int bcdToDecimal(int bcdValue) {

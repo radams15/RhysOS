@@ -128,7 +128,7 @@ _makeInterrupt21:
 ;void handleInterrupt21 (int AX, int BX, int CX, int DX)
 _interrupt21ServiceRoutine:
 	cli
-	
+
 	push ds ; push regs into program stack
 	push dx
 	push cx
@@ -146,7 +146,7 @@ _interrupt21ServiceRoutine:
 	push ax ; push ax as argument for function
 	
 	call _handleInterrupt21
-	
+
 	pop ax
 	pop ss ; restore program stack from kernel stack
 
@@ -155,12 +155,7 @@ _interrupt21ServiceRoutine:
 	pop cx
 	pop dx
 	pop ds
-	
+
 	sti
 
 	iret
-
-call_addr: dw 0
-call_cs: db 0
-sp_bak: dw 0
-bp_bak: dw 0

@@ -127,6 +127,16 @@ int a20_init() {
     return 0;
 }
 
+void mouse_tick() {
+    // print_string("t"); 
+    // char mouse_bytes[8]; 
+//  
+    // for(int i=0 ; i<4 ; i++) { 
+        // mouse_bytes[i] = serial_getc(COM1); 
+        // printi(mouse_bytes[i], 16); 
+    // } 
+}
+
 int init(struct SystemInfo* info) {
     cls();
 
@@ -168,6 +178,8 @@ int init(struct SystemInfo* info) {
     stdin = open("/dev/stdin", O_RDONLY);
     stdout = open("/dev/stdout", O_WRONLY);
     stderr = open("/dev/stderr", O_WRONLY);
+
+    // add_tick_callback(mouse_tick); 
 
     char* shell_argv[] = {"shell", "login.bat"};
     exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);

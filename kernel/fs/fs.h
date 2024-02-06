@@ -103,6 +103,7 @@ int open(char* name, FileMode_t mode);
 void close(int fh);
 void seek(int fh, unsigned int location);
 int stat(const char* name, Stat_t* stat);
+int read(int fh, unsigned char* buffer, unsigned int size);
 
 int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child);
 
