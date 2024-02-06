@@ -24,7 +24,7 @@ void memmgr_init() {
 
     BlkHeader_t* header = (BlkHeader_t*)&heap_begin;
 
-    printf("Memory size: %x\n", &heap_end-&heap_begin);
+    printf("Free memory size: %x\n", &heap_end-(unsigned int) header);
 
     header->magic = HEAP_MAGIC;
     header->length = &heap_end - &heap_begin;
@@ -85,6 +85,8 @@ void* malloc(uint16 size) {
 
     unsigned int* out = ((unsigned int*)header) + sizeof(BlkHeader_t);
 
+    printf("Allocated %d bytes (%x)\n", header->length, out);
+
     return (void*)out;
 }
 
@@ -132,8 +134,11 @@ void free(void* ptr) {
         return;
     }
 
+    printf("Free'd %d bytes (%x)\n", header->length, ptr);
+
     if (header->next != NULL && header->next->free) {
         header->next = header->next->next;
+        header->magic = HEAP_MAGIC;
         header->length += header->next->length + sizeof(BlkHeader_t);
     }
 

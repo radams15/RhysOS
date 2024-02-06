@@ -126,10 +126,9 @@ int run_line(char* line, int length) {
 int loop() {
     char line[1024];
 
-    memset(&line, 0, 1024 / 8);
-
     printf(prompt);
     int len = readline(line);
+    line[len-1] = 0;
 
     printf("\n");
 
@@ -146,12 +145,14 @@ int loop() {
     return 0;
 }
 
-int main() {
-    char name[32];
-    int ret = 0;
-
-    while (!ret)
-        ret = loop();
-
+int main(int argc, char** argv) {
+    if(argc > 1) {
+        for(int i=1 ; i<argc ; i++)
+            run_batch(argv[i]);
+    } else {
+        int ret = 0;
+        while (!ret)
+            ret = loop();
+    }
     return 0;
 }
