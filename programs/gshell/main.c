@@ -19,7 +19,8 @@ int vga_putp(int x, int y, int colour) {
 
 int mainloop(Ctx_t* ctx) {
     for(int x=0 ; x<320 ; x++)
-        vga_putp(x, 0, 0xAA);
+        for(int y=0 ; y<4 ; y++)
+            vga_putp(x, y, 0xAA);
 
     getch();
 
@@ -56,30 +57,21 @@ void set_graphics_mode(int mode) {
 
 
 int main() {
-    // int before_mode = get_graphics_mode(); 
-//  
-    // set_graphics_mode(0x13); 
-//  
-    // int com1 = open("/dev/com1", NULL); 
-//  
-    // Ctx_t ctx = { 
-        // com1 
-    // }; 
-//  
-    // int err = mainloop(&ctx); 
-//  
-    // close(com1); 
-//  
-    // set_graphics_mode(before_mode); 
-//  
+    int before_mode = get_graphics_mode();
+
+    set_graphics_mode(0x13);
 
     int com1 = open("/dev/com1", NULL);
-    char data[32];
 
-    for(int i=0 ; i<10 ; i++) {
-        read(com1, &data, sizeof(data));
-        printf("%s\n", data);
-    }
+    Ctx_t ctx = {
+        com1
+    };
+
+    int err = mainloop(&ctx);
+
+    close(com1);
+
+    set_graphics_mode(before_mode);
 
     return 0;
 }
