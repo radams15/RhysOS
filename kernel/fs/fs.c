@@ -188,7 +188,7 @@ void read_sector(int* buffer, int sector) {
          << 8);  // DH = Head number, DL = Drive number (e.g., floppy drive 0)
 
     // Call BIOS interrupt 13h
-    interrupt(0x13, ax, bx, cx, dx);
+    interrupt_13(ax, bx, cx, dx);
 }
 
 unsigned int fs_read(FsNode_t* node,

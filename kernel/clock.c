@@ -46,7 +46,7 @@ void tick() {
         counter.hr++;
     }
 
-    call_tick_handlers();
+    // call_tick_handlers(); 
 }
 
 int bcdToDecimal(int bcdValue) {

@@ -150,20 +150,20 @@ void free(void* ptr) {
 }
 
 int a20_available() {
-    return interrupt(0x15, 0x2403, 0, 0, 0);
+    return interrupt_15(0x2403, 0, 0, 0);
 }
 
 int a20_enable() {
     int enabled;
 
-    enabled = interrupt(0x15, 0x2402, 0, 0, 0);  // is the gate enabled?
+    enabled = interrupt_15(0x2402, 0, 0, 0);  // is the gate enabled?
 
     if (enabled)  // Already enabled!
         return 0;
 
-    interrupt(0x15, 0x2401, 0, 0, 0);  // Enable a20
+    interrupt_15(0x2401, 0, 0, 0);  // Enable a20
 
-    enabled = interrupt(0x15, 0x2402, 0, 0, 0);  // is the gate enabled?
+    enabled = interrupt_15(0x2402, 0, 0, 0);  // is the gate enabled?
 
     return enabled != 0;
 }

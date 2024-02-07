@@ -1,4 +1,5 @@
 #include "tty.h"
+#include "interrupt.h"
 
 #define TAB_SIZE 4
 
@@ -8,10 +9,8 @@ int font = FONT_8x16;
 char text_bg = 0xF;
 char text_fg = 0x0;
 
-int interrupt(int number, int AX, int BX, int CX, int DX);
-
 void set_cursor(char row, char col) {
-    interrupt(0x10, 0x0200, 0, 0, (row << 2) | (col & 0xFF));
+    interrupt_10(0x0200, 0, 0, (row << 2) | (col & 0xFF));
 }
 
 char get_cursor_row() {
@@ -31,7 +30,7 @@ void set_fg(char colour) {
 }
 
 void set_resolution(int mode) {
-    interrupt(0x10, mode, 0, 0, 0);
+    interrupt_10(mode, 0, 0, 0);
 }
 
 void print_char(int c) {
@@ -66,9 +65,9 @@ void print_char_colour(int c, char fg, char bg) {
         print_char('\r');
 
     if (c > 13)  // Only chars above 13 need colour
-        interrupt(0x10, 0x0900 + c, colour, 1, 0);
+        interrupt_10(0x0900 + c, colour, 1, 0);
 
-    interrupt(0x10, 0x0E00 + c, 0, 0, 0);
+    interrupt_10(0x0E00 + c, 0, 0, 0);
 }
 
 void print_string(char* str) {
@@ -123,7 +122,7 @@ int readline(char* buffer) {
 char ngetch() {
     char out;
 
-    out = interrupt(0x16, 0, 0, 0, 0);
+    out = interrupt_16(0, 0, 0, 0);
 
     return out;
 }
@@ -131,7 +130,7 @@ char ngetch() {
 char getch() {
     char out;
 
-    out = interrupt(0x16, 0, 0, 0, 0);
+    out = interrupt_16(0, 0, 0, 0);
     print_char(out);  // echo back char
 
     return out;
@@ -150,7 +149,7 @@ int get_graphics_mode() {
 }
 
 void cls() {
-    interrupt(0x10, (0x11 << 8) + font, 0, 0, 0);
-    interrupt(0x10, graphics_mode, 0, 0,
+    interrupt_10((0x11 << 8) + font, 0, 0, 0);
+    interrupt_10(graphics_mode, 0, 0,
           0);  // TODO: Replace with screen scrolling
 }

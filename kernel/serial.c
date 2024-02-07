@@ -21,7 +21,7 @@ int serial_init(Port_t port,
     int code;
     code = (baud << 4) + (parity << 2) + (stop_bits << 1) + (data_bits);
 
-    interrupt(0x14, (0x00 << 8) + code, 0, 0, port);
+    interrupt_14((0x00 << 8) + code, 0, 0, port);
 
     return 0;
 }
@@ -30,14 +30,14 @@ void serial_putc(Port_t port, char c) {
     if (c == '\n')
         serial_putc(port, '\r');
 
-    interrupt(0x14, (0x01 << 8) + c, 0, 0, port);
+    interrupt_14((0x01 << 8) + c, 0, 0, port);
 }
 
 char serial_getc(Port_t port) {
     int out;
 
     do {
-        out = interrupt(0x14, (0x02 << 8), 0, 0, port);
+        out = interrupt_14((0x02 << 8), 0, 0, port);
     } while (out == 0);
 
 #if SERIAL_ECHO
@@ -91,7 +91,7 @@ char serial_getc(Port_t port) {
     int out;
 
     do {
-        out = interrupt(0x14, (0x02 << 8), 0, 0, port);
+        out = interrupt_14((0x02 << 8), 0, 0, port);
     } while (out == 0);
 
 #if SERIAL_ECHO

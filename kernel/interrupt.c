@@ -4,6 +4,13 @@
 
 #define SYSCALL_BUF_SIZ 1024
 
+#define DEF_INTERRUPT(n) int interrupt_##n(int AX, int BX, int CX, int DX) {return interrupt(n, AX, BX, CX, DX); }
+DEF_INTERRUPT(10)
+DEF_INTERRUPT(13)
+DEF_INTERRUPT(14)
+DEF_INTERRUPT(15)
+DEF_INTERRUPT(16)
+
 typedef struct SyscallArgs {
     int num;  // Syscall number
     int a, b, c, d, e, f;
