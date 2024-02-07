@@ -6,6 +6,7 @@ global _call_far
 global stackseg
 
 _call_far:
+    cli
 	push bp
 	mov bp, sp
 	
@@ -58,6 +59,7 @@ _call_far:
     mov ss, ax
 
     pop bp
+    sti
     ret
 
 stackseg: dw 0

@@ -104,8 +104,6 @@ int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
     return count;
 }
 
-void task() {}
-
 #define MUST_COMPLETE(method, success, error, ...) \
     if (method(__VA_ARGS__)) {                     \
         print_string(error);                       \
@@ -128,7 +126,7 @@ int a20_init() {
 }
 
 void mouse_tick() {
-    // print_string("t"); 
+    print_string("t");
     // char mouse_bytes[8]; 
 //  
     // for(int i=0 ; i<4 ; i++) { 
@@ -179,7 +177,7 @@ int init(struct SystemInfo* info) {
     stdout = open("/dev/stdout", O_WRONLY);
     stderr = open("/dev/stderr", O_WRONLY);
 
-    // add_tick_callback(mouse_tick); 
+    add_tick_callback(mouse_tick);
 
     char* shell_argv[] = {"shell", "login.bat"};
     exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
