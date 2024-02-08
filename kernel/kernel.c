@@ -136,9 +136,6 @@ void mouse_tick() {
 }
 
 int init(struct SystemInfo* info) {
-    print_string("OK");
-    return 1;
-
     cls();
 
     _lowmem = info->lowmem;

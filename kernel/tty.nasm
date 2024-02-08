@@ -40,7 +40,7 @@ intr:
 global _interrupt_%1
 ;int interrupt_%1 (int AX, int BX, int CX, int DX)
 _interrupt_%1:
-        xchg bx, bx
+       xchg bx, bx
        push bp
        mov bp,sp
 

@@ -85,8 +85,8 @@ sub kernel {
 		(push @objs, $out) unless $out =~ /kernel.nasm/;
 	}
 	
-	# &run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel_nasm.o ".(join ' ', @objs)); 
-	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel_nasm.o");
+	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel_nasm.o ".(join ' ', @objs));
+	# &run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel_nasm.o"); 
 	
 	&run("objcopy -O binary build/kernel.elf build/kernel.bin");
 
