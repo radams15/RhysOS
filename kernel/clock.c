@@ -34,6 +34,7 @@ void tick() {
     if (counter.tick >= 18) {
         counter.tick = 0;
         counter.sec++;
+        call_tick_handlers(); 
     }
 
     if (counter.sec >= 60) {
@@ -46,7 +47,6 @@ void tick() {
         counter.hr++;
     }
 
-    // call_tick_handlers(); 
 }
 
 int bcdToDecimal(int bcdValue) {
