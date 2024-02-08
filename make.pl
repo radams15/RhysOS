@@ -73,7 +73,7 @@ sub kernel {
 		make_path($folder) if !(-e $folder);
 
 		&run("$CC -Ikernel/ $KERNEL_FLAGS -c $c_file -o $out");
-		(push @objs, $out) unless $c_file =~ /kernel\.c/;
+		push @objs, $out;
 	}
 
 	for my $asm_file (&find('kernel/*.nasm')) {
@@ -82,10 +82,11 @@ sub kernel {
 		make_path($folder) if !(-e $folder);
 		
 		&run("$ASM -felf $KERNEL_FLAGS $asm_file -o $out");
-		(push @objs, $out);
+		(push @objs, $out) unless $out =~ /kernel.nasm/;
 	}
 	
-	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel.o ".(join ' ', @objs));
+	# &run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel_nasm.o ".(join ' ', @objs)); 
+	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel_nasm.o");
 	
 	&run("objcopy -O binary build/kernel.elf build/kernel.bin");
 

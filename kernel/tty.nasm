@@ -1,3 +1,5 @@
+bits 16
+
 global _get_cursor
 
 _get_cursor:
