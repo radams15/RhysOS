@@ -15,8 +15,11 @@ int add_tick_callback(tick_callback_t callback) {
 }
 
 int call_tick_handlers() {
+    sti();
+
     for(tick_callback_t* c=&callbacks ; c != callback_ptr ; c++) {
-        (*c)();
+        mouse_tick();
+        // (*c)(); 
     }
 
     return 0;
@@ -34,7 +37,6 @@ void tick() {
     if (counter.tick >= 18) {
         counter.tick = 0;
         counter.sec++;
-        call_tick_handlers(); 
     }
 
     if (counter.sec >= 60) {
@@ -47,6 +49,7 @@ void tick() {
         counter.hr++;
     }
 
+    // call_tick_handlers();  
 }
 
 int bcdToDecimal(int bcdValue) {

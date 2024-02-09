@@ -1,8 +1,3 @@
-void main(int src_ds, void* boot_ptr);
-void entry(int src_ds, void* boot_ptr) {
-    main(src_ds, boot_ptr);
-}
-
 #include "fs/fs.h"
 #include "interrupt.h"
 #include "malloc.h"
@@ -60,7 +55,7 @@ void kdir(char* dir_name) {
 
     if (root == NULL) {
         print_string("Cannot find directory!\n");
-        return 0;
+        return;
     }
 
     while ((node = fs_readdir(root, i)) != NULL) {
