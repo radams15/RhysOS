@@ -5,7 +5,6 @@ extern _seg_copy
 global _call_far
 global stackseg
 global ssp
-global sbp
 
 _call_far:
     cli
@@ -31,11 +30,8 @@ _call_far:
     
     mov ax, sp
     mov [ssp], ax
-    mov ax, bp
-    mov [sbp], ax
     mov ax, 0ff00h ; new stack @ ff00h
     mov sp, ax
-    mov bp, ax
 
     mov bx, [bp+16] ; bx => segment
     
@@ -69,9 +65,6 @@ _call_far:
     mov ax, [ssp] ; restore sp
     mov sp, ax
 
-    mov ax, [sbp]
-    mov bp, ax
-
     mov ax, [stackseg] ; restore kernel stack
     mov ss, ax
 
@@ -82,7 +75,6 @@ _call_far:
 
 stackseg: dw 0
 ssp: dw 0
-sbp: dw 0
 should_free: dw 0
 stdin: dw 0
 stdout: dw 0

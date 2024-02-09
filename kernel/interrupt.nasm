@@ -5,7 +5,6 @@ global _cli
 
 extern stackseg
 extern ssp
-extern sbp
 
 
 extern _handle_interrupt
@@ -121,11 +120,7 @@ _interrupt21ServiceRoutine:
     mov bx, [stackseg]
     mov ss, bx
 
-    ; restore kernel sp, bp - TODO: store program sp, bp
-    mov ax, [sbp]
-    mov bp, ax
-    mov ax, [ssp]
-    mov sp, ax
+    ; TODO: restore kernel sp, bp
 
 	push cx ; push ss in cx
 	push ax ; push ax as argument for function
