@@ -1,5 +1,7 @@
 # RhysOS
 
+![Build Status](https://jenkins.therhys.co.uk/job/RhysOS/badge/icon?style=plastic)
+
 ## 16-bit kernel inspired by DOS.
 
 This is my kernel/OS, written in mainly C with some assembler.
