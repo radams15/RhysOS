@@ -35,7 +35,7 @@ typedef struct Stat {
 } Stat_t;
 
 typedef enum FileMode {
-    O_CREAT  = 0b00000001,
+    O_CREAT = 0b00000001,
     O_APPEND = 0b00000010,
     O_RDONLY = 0b00000100,
     O_WRONLY = 0b00001000,

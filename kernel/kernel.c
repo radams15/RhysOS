@@ -4,12 +4,12 @@ void entry(int src_ds, void* boot_ptr) {
 }
 
 #include "fs/fs.h"
+#include "graphics.h"
 #include "interrupt.h"
 #include "malloc.h"
 #include "proc.h"
 #include "sysinfo.h"
 #include "tty.h"
-#include "graphics.h"
 #include "util.h"
 
 #include "fs/devfs.h"
@@ -128,13 +128,13 @@ int a20_init() {
 }
 
 void mouse_tick() {
-    // print_string("t"); 
-    // char mouse_bytes[8]; 
-//  
-    // for(int i=0 ; i<4 ; i++) { 
-        // mouse_bytes[i] = serial_getc(COM1); 
-        // printi(mouse_bytes[i], 16); 
-    // } 
+    // print_string("t");
+    // char mouse_bytes[8];
+    //
+    // for(int i=0 ; i<4 ; i++) {
+    // mouse_bytes[i] = serial_getc(COM1);
+    // printi(mouse_bytes[i], 16);
+    // }
 }
 
 int init(struct SystemInfo* info) {
@@ -179,7 +179,7 @@ int init(struct SystemInfo* info) {
     stdout = open("/dev/stdout", O_WRONLY);
     stderr = open("/dev/stderr", O_WRONLY);
 
-    // add_tick_callback(mouse_tick); 
+    // add_tick_callback(mouse_tick);
 
     char* shell_argv[] = {"shell", "login.bat"};
     exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);

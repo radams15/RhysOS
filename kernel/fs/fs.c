@@ -30,16 +30,16 @@ int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child) {
     return 1;
 }
 
-// FsNode_t* get_mount(FsNode_t* fsnode, char* name) { 
-    // for (int i = 0; i < MAX_MOUNTS; i++) { 
-        // if (fsnode == mounts[i].parent && 
-            // mounts[i].child != NULL && strcmp(name, mounts[i].name) == 0) { 
-            // return mounts[i].child; 
-        // } 
-    // } 
-//  
-    // return NULL; 
-// } 
+// FsNode_t* get_mount(FsNode_t* fsnode, char* name) {
+// for (int i = 0; i < MAX_MOUNTS; i++) {
+// if (fsnode == mounts[i].parent &&
+// mounts[i].child != NULL && strcmp(name, mounts[i].name) == 0) {
+// return mounts[i].child;
+// }
+// }
+//
+// return NULL;
+// }
 
 int write(int fh, unsigned char* buffer, unsigned int size) {
     return fs_write(fh_get_node(fh), fh_get_node(fh)->offset, size, buffer);
@@ -64,8 +64,8 @@ FsNode_t* create_file(char* name) {
     buf[strlen(name)] = 0;
 
     char* last_slash = NULL;
-    for(char* c=buf ; *c != NULL ; c++) {
-        if(*c == '/')
+    for (char* c = buf; *c != NULL; c++) {
+        if (*c == '/')
             last_slash = c;
     }
 
@@ -73,8 +73,8 @@ FsNode_t* create_file(char* name) {
 
     fsnode = get_dir(buf);
 
-    if(fsnode->create != NULL)
-        return fsnode->create(fsnode, last_slash+1);
+    if (fsnode->create != NULL)
+        return fsnode->create(fsnode, last_slash + 1);
     else
         return -1;
 }
@@ -86,7 +86,7 @@ int open(char* name, FileMode_t mode) {
     handle = get_dir(name);
 
     if (handle == NULL) {
-        if(mode & O_CREAT) {
+        if (mode & O_CREAT) {
             handle = create_file(name);
         } else {
             return -1;
@@ -104,17 +104,17 @@ int open(char* name, FileMode_t mode) {
         if (open_files[i] == NULL) {
             open_files[i] = handle;
 
-            seek(i, 0); // Go to start of file
+            seek(i, 0);  // Go to start of file
 
-            if(mode & O_RDONLY) {
+            if (mode & O_RDONLY) {
                 open_files[i]->write = NULL;
             }
 
-            if(mode & O_WRONLY) {
+            if (mode & O_WRONLY) {
                 open_files[i]->read = NULL;
             }
 
-            if(mode & O_APPEND) {
+            if (mode & O_APPEND) {
                 // TODO: Go to end of file
             }
 
@@ -220,7 +220,6 @@ unsigned int fs_close(FsNode_t* node) {
 
     return 0;
 }
-
 
 DirEnt_t* fs_readdir(FsNode_t* node, unsigned int index) {
     if (node->readdir != 0 && (node->flags & 0x07) == FS_DIRECTORY) {

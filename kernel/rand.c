@@ -7,7 +7,7 @@
 static unsigned int next = 1;
 
 int rand() {
-    next = (A*next+C) % M;
+    next = (A * next + C) % M;
     return next;
 }
 

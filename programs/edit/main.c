@@ -58,7 +58,8 @@ int topbar() {
 char* next_line(char* str) {
     char* begin;
 
-    for(begin=str ; *begin != '\n' && *begin != 0 ; begin++) {}
+    for (begin = str; *begin != '\n' && *begin != 0; begin++) {
+    }
 
     begin++;
 
@@ -68,7 +69,8 @@ char* next_line(char* str) {
 char* prev_line(char* str) {
     char* begin;
 
-    for(begin=str ; *begin != '\n' && *begin != 0 ; begin--) {}
+    for (begin = str; *begin != '\n' && *begin != 0; begin--) {
+    }
 
     return begin;
 }
@@ -76,14 +78,14 @@ char* prev_line(char* str) {
 void scroll_down(int n) {
     yval += n;
 
-    if(yval > 24)
+    if (yval > 24)
         yval = 24;
 }
 
 void scroll_up(int n) {
     yval -= n;
 
-    if(yval <= 0)
+    if (yval <= 0)
         yval = 0;
 }
 
@@ -108,13 +110,13 @@ int redraw(int from, int to) {
     char* line = buffer;
 
     int i;
-    for(i=0 ; i<from ; i++)
+    for (i = 0; i < from; i++)
         line = next_line(line);
 
-    for(i=from ; i<to ; i++) {
+    for (i = from; i < to; i++) {
         line = next_line(line);
 
-        for(char* c=line ; *c != '\n' && *c != 0 ; c++)
+        for (char* c = line; *c != '\n' && *c != 0; c++)
             putc(*c);
         putc('\n');
     }
@@ -131,18 +133,18 @@ int begin(char* fname) {
 
     close(fd);
 
-    // graphics_set_palette(2); 
-    // graphics_set_bg(BG_COLOUR); 
-    // term_set_bg(BG_COLOUR); 
-    // term_set_fg(FG_COLOUR); 
-    
+    // graphics_set_palette(2);
+    // graphics_set_bg(BG_COLOUR);
+    // term_set_bg(BG_COLOUR);
+    // term_set_fg(FG_COLOUR);
+
     char c;
-    
+
     do {
-        redraw(yval, yval+24);
+        redraw(yval, yval + 24);
 
         c = ngetch() & 0xFF;
-    } while(handle_key(c) == 0);
+    } while (handle_key(c) == 0);
 
     return 0;
 }
@@ -156,7 +158,6 @@ int main(int argc, char** argv) {
     set_graphics_mode(GRAPHICS_COLOUR_80x25);
 
     err = begin("/syscalls.md");
-
 
     set_graphics_mode(before_mode);
 

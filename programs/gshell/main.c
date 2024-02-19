@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <syscall.h>
 #include <string.h>
 #include <syscall.h>
 
@@ -10,16 +9,16 @@ typedef struct Ctx {
 int fb_putp(int es, int di, int ax);
 
 int cga_putp(int x, int y, int colour) {
-    return fp_putb(0xB000, 320*y + x, colour);
+    return fp_putb(0xB000, 320 * y + x, colour);
 }
 
 int vga_putp(int x, int y, int colour) {
-    return fp_putb(0xA000, 320*y + x, colour);
+    return fp_putb(0xA000, 320 * y + x, colour);
 }
 
 int mainloop(Ctx_t* ctx) {
-    for(int x=0 ; x<320 ; x++)
-        for(int y=0 ; y<4 ; y++)
+    for (int x = 0; x < 320; x++)
+        for (int y = 0; y < 4; y++)
             vga_putp(x, y, 0xAA);
 
     getch();
@@ -55,7 +54,6 @@ void set_graphics_mode(int mode) {
     close(fh);
 }
 
-
 int main() {
     int before_mode = get_graphics_mode();
 
@@ -63,9 +61,7 @@ int main() {
 
     int com1 = open("/dev/com1", NULL);
 
-    Ctx_t ctx = {
-        com1
-    };
+    Ctx_t ctx = {com1};
 
     int err = mainloop(&ctx);
 

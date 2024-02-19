@@ -69,9 +69,9 @@ int serial_init(Port_t port,
     outb(portnum + 1, 0xFF);  // Enable all interrupts
 
     // Check if serial is faulty (i.e: not same byte as sent)
-    // if (inb(portnum + 0) != 0xAE) { 
-        // return 1; 
-    // } 
+    // if (inb(portnum + 0) != 0xAE) {
+    // return 1;
+    // }
 
     // If serial is not faulty set it in normal operation mode
     // (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled)

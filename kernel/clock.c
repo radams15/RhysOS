@@ -15,7 +15,7 @@ int add_tick_callback(tick_callback_t callback) {
 }
 
 int call_tick_handlers() {
-    for(tick_callback_t* c=&callbacks ; c != callback_ptr ; c++) {
+    for (tick_callback_t* c = &callbacks; c != callback_ptr; c++) {
         (*c)();
     }
 
@@ -46,7 +46,7 @@ void tick() {
         counter.hr++;
     }
 
-    // call_tick_handlers(); 
+    // call_tick_handlers();
 }
 
 int bcdToDecimal(int bcdValue) {

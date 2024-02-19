@@ -19,7 +19,7 @@ static unsigned int heap;
  *
  * Headers begin with a magic variable to allow the kernel to show an error
  * if a free'd block is not actually a memory block which it allocated.
-*/
+ */
 
 typedef struct BlkHeader {
     unsigned int magic;      // HEAP_MAGIC
@@ -103,9 +103,9 @@ void* malloc(unsigned int size) {
 }
 
 void* realloc(void* ptr, unsigned int size) {
-    if(ptr == NULL)
+    if (ptr == NULL)
         return malloc(size);
-    else if(size == 0) {
+    else if (size == 0) {
         free(ptr);
         return NULL;
     }

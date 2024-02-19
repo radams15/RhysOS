@@ -1,6 +1,6 @@
 #include "interrupt.h"
-#include "type.h"
 #include "fs/fs.h"
+#include "type.h"
 
 #define SYSCALL_BUF_SIZ 1024
 

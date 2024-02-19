@@ -18,7 +18,7 @@
         http://www.jamesmolloy.co.uk/tutorial_html/8.-The%20VFS%20and%20the%20initrd.html
 */
 typedef enum FileMode {
-    O_CREAT  = 0b00000001,
+    O_CREAT = 0b00000001,
     O_APPEND = 0b00000010,
     O_RDONLY = 0b00000100,
     O_WRONLY = 0b00001000,
@@ -75,8 +75,6 @@ typedef struct FsNode {
     struct FsNode* ref;  // Pointer to symlink or mount
 } FsNode_t;
 
-
-
 typedef struct FsMount {
     char name[FILE_NAME_MAX];
     FsNode_t* parent;
@@ -95,8 +93,6 @@ unsigned int fs_open(FsNode_t* node, unsigned char read, unsigned char write);
 unsigned int fs_close(FsNode_t* node);
 DirEnt_t* fs_readdir(FsNode_t* node, unsigned int index);
 FsNode_t* fs_finddir(FsNode_t* node, char* name);
-
-
 
 FsNode_t* get_dir(char* name);
 int open(char* name, FileMode_t mode);

@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
     write(out1, "TESTMSG\n", 8);
 
     int rands[TESTS];
-    for(int i=0 ; i<TESTS ; i++) {
+    for (int i = 0; i < TESTS; i++) {
         read(rand, &rands[i], sizeof(int));
         rands[i] %= 500;
     }

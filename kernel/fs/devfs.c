@@ -187,9 +187,9 @@ void tty_bg_write(FsNode_t* node,
 }
 
 int rand_read(FsNode_t* node,
-                       unsigned int byte_offset,
-                       unsigned int byte_size,
-                       unsigned char* out_buffer) {
+              unsigned int byte_offset,
+              unsigned int byte_size,
+              unsigned char* out_buffer) {
     int out = rand();
     int2chars(out, out_buffer);
     return 2;

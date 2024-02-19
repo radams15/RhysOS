@@ -1,7 +1,7 @@
 #include "stdlib.h"
-#include "syscall.h"
-#include "stdio.h"
 #include "malloc.h"
+#include "stdio.h"
+#include "syscall.h"
 
 void memset(int* buf, int val, int n) {
     for (; n != 0; n--)
@@ -17,4 +17,3 @@ void memcpy(uint8* dst, uint8* src, int n) {
 void abort() {
     fprintf(stderr, "Program abort!\n");
 }
-

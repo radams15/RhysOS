@@ -226,15 +226,15 @@ File_t* fopen(const char* fname, const char* mode) {
 
     int fh = open(fname, mode_val);
 
-    for(char* c=mode ; *c != NULL ; c++) {
-        if(*c == 'w')
+    for (char* c = mode; *c != NULL; c++) {
+        if (*c == 'w')
             mode_val |= O_CREAT;
-            mode_val &= ~O_RDONLY;
-        if(*c == 'a')
+        mode_val &= ~O_RDONLY;
+        if (*c == 'a')
             mode_val |= O_APPEND;
     }
 
-    if(fh == -1) {
+    if (fh == -1) {
         return NULL;
     }
 

@@ -10,7 +10,6 @@ typedef struct TimeDelta {
     int hr;
 } TimeDelta_t;
 
-
 void memset(int* buf, int val, int n);
 void memcpy(uint8* dst, uint8* src, int n);
 

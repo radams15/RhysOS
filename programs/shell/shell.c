@@ -128,7 +128,7 @@ int loop() {
 
     printf(prompt);
     int len = readline(line);
-    line[len-1] = 0;
+    line[len - 1] = 0;
 
     printf("\n");
 
@@ -146,8 +146,8 @@ int loop() {
 }
 
 int main(int argc, char** argv) {
-    if(argc > 1) {
-        for(int i=1 ; i<argc ; i++)
+    if (argc > 1) {
+        for (int i = 1; i < argc; i++)
             run_batch(argv[i]);
     } else {
         int ret = 0;

@@ -1,6 +1,6 @@
+#include <malloc.h>
 #include <stdio.h>
 #include <syscall.h>
-#include <malloc.h>
 
 typedef enum Command {
     CMD_ESC,
@@ -11,23 +11,20 @@ typedef enum Command {
     CMD_NL
 } Command_t;
 
-typedef enum Mode {
-    MODE_CMD,
-    MODE_EDIT
-} Mode_t;
+typedef enum Mode { MODE_CMD, MODE_EDIT } Mode_t;
 
 typedef struct Ctx {
     Mode_t mode;
     char line[8];
     char* lptr;
     int llength;
-    char* bufhead; 
-    char* bufptr; 
+    char* bufhead;
+    char* bufptr;
 } Ctx_t;
 
 Command_t parse(Ctx_t* ctx, char c) {
-    if(ctx->mode == MODE_EDIT) {
-        switch(c) {
+    if (ctx->mode == MODE_EDIT) {
+        switch (c) {
             case 0x1B:
                 return CMD_ESC;
             default:
@@ -37,9 +34,11 @@ Command_t parse(Ctx_t* ctx, char c) {
 
     // In CMD mode
 
-    switch(c) {
-        case 'n': return CMD_NL;
-        case 'p': return CMD_PL;
+    switch (c) {
+        case 'n':
+            return CMD_NL;
+        case 'p':
+            return CMD_PL;
 
         case 'i':
             return CMD_INSERT;
@@ -53,20 +52,20 @@ Command_t parse(Ctx_t* ctx, char c) {
 };
 
 int main(int argc, char** argv) {
-    if(argc != 2) {
+    if (argc != 2) {
         fprintf(stderr, "Usage: %s [FILE]\n", argv[0]);
         return 1;
     }
 
     File_t* file = fopen(argv[1], "r");
-    if(file == NULL) {
+    if (file == NULL) {
         fprintf(stderr, "Failed to open '%s'\n", argv[1]);
         return 1;
     }
 
     int fsize = 1024;
 
-    char* buffer = malloc(fsize*sizeof(char));
+    char* buffer = malloc(fsize * sizeof(char));
     fread(file, buffer, fsize);
     fclose(file);
 
@@ -78,25 +77,25 @@ int main(int argc, char** argv) {
     ctx.mode = MODE_CMD;
     char c = 0;
 
-    while(TRUE) {
+    while (TRUE) {
         putc('\r');
-        for(int i=0 ; i<ctx.llength ; i++)
+        for (int i = 0; i < ctx.llength; i++)
             putc(' ');
         putc('\r');
 
         ctx.llength = 0;
-        for(char* c=ctx.bufptr ; *c != '\n' && *c != 0 ; c++) {
+        for (char* c = ctx.bufptr; *c != '\n' && *c != 0; c++) {
             putc(*c);
             ctx.llength++;
         }
 
         c = ngetch() & 0xFF;
-        switch(parse(&ctx, c)) {
+        switch (parse(&ctx, c)) {
             case CMD_CHAR:
                 // Add char
                 break;
             case CMD_NL: {
-                while(*ctx.bufptr != '\n' && *ctx.bufptr != 0) {
+                while (*ctx.bufptr != '\n' && *ctx.bufptr != 0) {
                     ctx.bufptr++;
                 }
                 ctx.bufptr++;
@@ -104,7 +103,7 @@ int main(int argc, char** argv) {
             case CMD_PL: {
                 ctx.bufptr--;
                 ctx.bufptr--;
-                while(*ctx.bufptr != '\n' && ctx.bufptr != ctx.bufhead) {
+                while (*ctx.bufptr != '\n' && ctx.bufptr != ctx.bufhead) {
                     ctx.bufptr--;
                 }
                 ctx.bufptr++;
