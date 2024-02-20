@@ -11,10 +11,10 @@ int ypos = 0;
 #define VGA_HEIGHT 24
 
 #define VGA_BUF(x, y) ((y*VGA_WIDTH) + x)
-#define VGA_COLOUR(fg, bg) (((fg) | (bg)) << 4)
+#define VGA_COLOUR(fg, bg) (fg*0x10) | (bg)
 
-char text_bg = 0x0;
-char text_fg = 0xF;
+char text_bg = 0xF;
+char text_fg = 0x0;
 
 int interrupt(int number, int AX, int BX, int CX, int DX);
 
