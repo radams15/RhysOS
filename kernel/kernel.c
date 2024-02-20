@@ -143,7 +143,10 @@ int init(struct SystemInfo* info) {
     _lowmem = info->lowmem;
     _highmem = info->highmem;
 
+    graphics_init();
+
     a20_init();
+
 
     MUST_COMPLETE(memmgr_init, "Memory manager enabled\n",
                   "Memory manager failed to initialise\n");

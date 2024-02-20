@@ -4,11 +4,22 @@
 
 int graphics_mode = GRAPHICS_MONO_80x25;
 int font = FONT_8x16;
+int xpos = 0;
+int ypos = 0;
 
-char text_bg = 0xF;
-char text_fg = 0x0;
+#define VGA_WIDTH 80
+#define VGA_HEIGHT 24
+
+#define VGA_BUF(x, y) ((y*VGA_WIDTH) + x)
+#define VGA_CHR(uc, colour) ((unsigned char) (uc) | (unsigned char) (colour) << 8)
+#define VGA_COLOUR(fg, bg) (((fg) | (bg)) << 4)
+
+char text_bg = 0x0;
+char text_fg = 0xF;
 
 int interrupt(int number, int AX, int BX, int CX, int DX);
+
+int vga_setc(int pos, char c, char colour);
 
 void set_cursor(char row, char col) {
     interrupt(0x10, 0x0200, 0, 0, (row << 2) | (col & 0xFF));
@@ -41,34 +52,41 @@ void print_char(int c) {
 }
 
 void print_char_colour(int c, char fg, char bg) {
-    int colour;
-
-    colour = (fg << 2) | (bg & 0xF);
-
-    if (c == '\t') {
-        int col = get_cursor_col();
-        for (int i = 0; i < col % TAB_SIZE; i++)  // Round to nearest tab col
-            print_char(' ');
-        return;
+    if(ypos >= VGA_HEIGHT-1) {
+        // scroll();
     }
 
-    if (c == '\xC') {
-        cls();
-        return;
+    switch(c) {
+        case '\n':
+            ypos++;
+            xpos = 0;
+            break;
+
+        case '\t': {
+            int col = get_cursor_col();
+            for (int i = 0; i < col % TAB_SIZE; i++)  // Round to nearest tab col
+                print_char(' ');
+            break;
+        }
+
+        case '\xC':
+           cls();
+           break;
+
+        case '\x1':
+            set_cursor(get_cursor_row() - 1, get_cursor_col());
+            break;
+
+        default:
+            vga_setc(VGA_BUF(xpos, ypos), (char) c, VGA_COLOUR(fg, bg));
+            xpos++;
+            break;
     }
 
-    if (c == '\x1') {  // Cursor down
-        set_cursor(get_cursor_row() - 1, get_cursor_col());
-        return;
+    if(xpos >= VGA_WIDTH-1) {
+        ypos++;
+        xpos = 0;
     }
-
-    if (c == '\n')
-        print_char('\r');
-
-    if (c > 13)  // Only chars above 13 need colour
-        interrupt(0x10, 0x0900 + c, colour, 1, 0);
-
-    interrupt(0x10, 0x0E00 + c, 0, 0, 0);
 }
 
 void print_string(char* str) {
@@ -141,6 +159,9 @@ void set_graphics_mode(int mode, int fnt) {
     graphics_mode = mode;
     font = fnt;
 
+    interrupt(0x10, (0x11 << 8) + font, 0, 0, 0);
+    interrupt(0x10, graphics_mode, 0, 0,
+              0);  // TODO: Replace with screen scrolling
     cls();
 }
 
@@ -149,7 +170,13 @@ int get_graphics_mode() {
 }
 
 void cls() {
-    interrupt(0x10, (0x11 << 8) + font, 0, 0, 0);
-    interrupt(0x10, graphics_mode, 0, 0,
-              0);  // TODO: Replace with screen scrolling
+    xpos = 0;
+    ypos = 0;
+
+    for(int pos=0 ; pos<VGA_BUF(VGA_WIDTH, VGA_HEIGHT) ; pos++)
+        vga_setc(pos, ' ', VGA_COLOUR(text_fg, text_bg));
+}
+
+void graphics_init() {
+    set_graphics_mode(graphics_mode, font);
 }

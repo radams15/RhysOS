@@ -54,9 +54,6 @@ int print(char* str) {
 int fputc(int fh, char c) {
     char buf[2];
 
-    if (c == '\n')
-        fputc(fh, '\r');
-
     buf[1] = 0;
     buf[0] = c;
 
@@ -65,9 +62,6 @@ int fputc(int fh, char c) {
 
 int putc(char c) {
     char buf[2];
-
-    if (c == '\n')
-        putc('\r');
 
     buf[1] = 0;
     buf[0] = c;

@@ -38,4 +38,6 @@ void set_graphics_mode(int mode, int fnt);
 int get_graphics_mode();
 void cls();
 
+void graphics_init();
+
 #endif
