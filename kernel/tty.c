@@ -11,7 +11,6 @@ int ypos = 0;
 #define VGA_HEIGHT 24
 
 #define VGA_BUF(x, y) ((y*VGA_WIDTH) + x)
-#define VGA_CHR(uc, colour) ((unsigned char) (uc) | (unsigned char) (colour) << 8)
 #define VGA_COLOUR(fg, bg) (((fg) | (bg)) << 4)
 
 char text_bg = 0x0;
@@ -62,10 +61,19 @@ void print_char_colour(int c, char fg, char bg) {
             xpos = 0;
             break;
 
+        case '\r':
+            xpos = 0;
+            break;
+
+        case 0x08: // backspace
+            xpos--;
+            vga_setc(VGA_BUF(xpos, ypos), ' ', VGA_COLOUR(fg, bg));
+            break;
+
         case '\t': {
-            int col = get_cursor_col();
+            int col = xpos;
             for (int i = 0; i < col % TAB_SIZE; i++)  // Round to nearest tab col
-                print_char(' ');
+                print_char_colour(' ', fg, bg);
             break;
         }
 
@@ -74,18 +82,17 @@ void print_char_colour(int c, char fg, char bg) {
            break;
 
         case '\x1':
-            set_cursor(get_cursor_row() - 1, get_cursor_col());
+            ypos--;
             break;
 
         default:
-            vga_setc(VGA_BUF(xpos, ypos), (char) c, VGA_COLOUR(fg, bg));
+            vga_setc(VGA_BUF(xpos, ypos), (char) c & 0xFF, VGA_COLOUR(fg, bg));
             xpos++;
             break;
     }
 
     if(xpos >= VGA_WIDTH-1) {
-        ypos++;
-        xpos = 0;
+        print_char_colour('\n', fg, bg);
     }
 }
 
