@@ -19,6 +19,7 @@ char text_fg = 0x0;
 int interrupt(int number, int AX, int BX, int CX, int DX);
 
 int vga_setc(int pos, char c, char colour);
+int vga_scroll();
 
 void set_cursor(char row, char col) {
     interrupt(0x10, 0x0200, 0, 0, (row << 2) | (col & 0xFF));
@@ -44,6 +45,11 @@ void set_resolution(int mode) {
     interrupt(0x10, mode, 0, 0, 0);
 }
 
+void scroll() {
+    vga_scroll();
+    ypos--;
+}
+
 void print_char(int c) {
     print_char_colour(
         c, text_fg,
@@ -51,8 +57,8 @@ void print_char(int c) {
 }
 
 void print_char_colour(int c, char fg, char bg) {
-    if(ypos >= VGA_HEIGHT-1) {
-        // scroll();
+    if(ypos >= VGA_HEIGHT) {
+        scroll(); 
     }
 
     switch(c) {
