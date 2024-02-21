@@ -1,5 +1,6 @@
 #include "tty.h"
 #include "util.h"
+#include "type.h"
 
 #define TAB_SIZE 4
 
@@ -23,7 +24,12 @@ int vga_setc(int pos, char c, char colour);
 int vga_scroll();
 
 void set_cursor(char row, char col) {
-    interrupt(0x10, 0x0200, 0, 0, (row << 2) | (col & 0xFF));
+    uint16_t pos = col * VGA_WIDTH + row;
+
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, (uint8_t) (pos & 0xFF));
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
 }
 
 char get_cursor_row() {
@@ -101,6 +107,8 @@ void print_char_colour(int c, char fg, char bg) {
     if(xpos >= VGA_WIDTH-1) {
         print_char_colour('\n', fg, bg);
     }
+
+    set_cursor(xpos, ypos);
 }
 
 void print_string(char* str) {
@@ -198,5 +206,5 @@ void vga_disable_cursor() {
 
 void graphics_init() {
     set_graphics_mode(graphics_mode, font);
-    vga_disable_cursor();
+    // vga_disable_cursor(); 
 }
