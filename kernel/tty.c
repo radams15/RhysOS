@@ -9,6 +9,7 @@ int graphics_mode = GRAPHICS_MONO_80x25;
 int font = FONT_8x16;
 int xpos = 0;
 int ypos = 0;
+TTYDriver_t tty_driver;
 
 char text_bg = 0xF;
 char text_fg = 0x0;
@@ -37,7 +38,7 @@ void set_resolution(int mode) {
 }
 
 void scroll() {
-    vga_scroll();
+    tty_driver.tty_scroll_line();
     ypos--;
 }
 
@@ -64,7 +65,7 @@ void print_char_colour(int c, char fg, char bg) {
 
         case 0x08: // backspace
             xpos--;
-            vga_setc(VGA_BUF(xpos, ypos), ' ', VGA_COLOUR(fg, bg));
+            tty_driver.tty_setc(xpos, ypos, ' ', VGA_COLOUR(fg, bg));
             break;
 
         case '\t': {
@@ -83,7 +84,7 @@ void print_char_colour(int c, char fg, char bg) {
             break;
 
         default:
-            vga_setc(VGA_BUF(xpos, ypos), (char) c & 0xFF, VGA_COLOUR(fg, bg));
+            tty_driver.tty_setc(xpos, ypos, (char) c & 0xFF, VGA_COLOUR(fg, bg));
             xpos++;
             break;
     }
@@ -92,7 +93,7 @@ void print_char_colour(int c, char fg, char bg) {
         print_char_colour('\n', fg, bg);
     }
 
-    vga_set_cursor(xpos, ypos);
+    tty_driver.tty_set_cursor(xpos, ypos);
 }
 
 void print_string(char* str) {
@@ -179,11 +180,15 @@ void cls() {
     xpos = 0;
     ypos = 0;
 
-    for(int pos=0 ; pos<VGA_BUF(VGA_WIDTH, VGA_HEIGHT) ; pos++)
-        vga_setc(pos, ' ', VGA_COLOUR(text_fg, text_bg));
+    tty_driver.tty_clear(text_fg, text_bg);
 }
 
 
 void graphics_init() {
+    tty_driver.tty_setc = vga_setc;
+    tty_driver.tty_clear = vga_clear;
+    tty_driver.tty_scroll_line = vga_scroll;
+    tty_driver.tty_set_cursor = vga_set_cursor;
+
     set_graphics_mode(graphics_mode, font);
 }

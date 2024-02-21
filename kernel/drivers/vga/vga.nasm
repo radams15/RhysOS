@@ -1,9 +1,9 @@
 bits 16
 
-global _vga_setc
+global __vga_setc
 global _vga_scroll
 
-_vga_setc:
+__vga_setc:
     push bp
     mov bp, sp
 

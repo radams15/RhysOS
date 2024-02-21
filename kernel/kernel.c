@@ -138,13 +138,13 @@ void mouse_tick() {
 }
 
 int init(struct SystemInfo* info) {
-    cls();
-
     _lowmem = info->lowmem;
     _highmem = info->highmem;
 
     graphics_init();
 
+    cls();
+    
     a20_init();
 
 

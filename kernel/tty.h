@@ -9,6 +9,17 @@ enum {
     GRAPHICS_VGA_640x480 = 0x12
 } GraphicsMode;
 
+typedef int (*tty_setc_t)(int x, int y, char c, char colour);
+typedef int (*tty_clear_t)();
+typedef int (*tty_scroll_line_t)();
+typedef int (*tty_set_cursor_t)(int x, int y);
+typedef struct TTYDriver {
+    tty_setc_t tty_setc;
+    tty_clear_t tty_clear;
+    tty_scroll_line_t tty_scroll_line;
+    tty_set_cursor_t tty_set_cursor;
+} TTYDriver_t;
+
 enum { FONT_8x8 = 0x12, FONT_8x16 = 0x00 } Font;
 
 void clear_screen();
