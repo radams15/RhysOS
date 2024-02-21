@@ -1,6 +1,7 @@
 #include "tty.h"
 #include "util.h"
 #include "type.h"
+#include "drivers/vga/vga.h"
 
 #define TAB_SIZE 4
 
@@ -9,35 +10,18 @@ int font = FONT_8x16;
 int xpos = 0;
 int ypos = 0;
 
-#define VGA_WIDTH 80
-#define VGA_HEIGHT 24
-
-#define VGA_BUF(x, y) ((y*VGA_WIDTH) + x)
-#define VGA_COLOUR(fg, bg) (fg*0x10) | (bg)
-
 char text_bg = 0xF;
 char text_fg = 0x0;
 
 int interrupt(int number, int AX, int BX, int CX, int DX);
 
-int vga_setc(int pos, char c, char colour);
-int vga_scroll();
-
-void set_cursor(char row, char col) {
-    uint16_t pos = col * VGA_WIDTH + row;
-
-	outb(0x3D4, 0x0F);
-	outb(0x3D5, (uint8_t) (pos & 0xFF));
-	outb(0x3D4, 0x0E);
-	outb(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
-}
 
 char get_cursor_row() {
-    return (get_cursor() >> 2) & 0xFF;
+    return xpos;
 }
 
 char get_cursor_col() {
-    return get_cursor() & 0xFF;
+    return ypos;
 }
 
 void set_bg(char colour) {
@@ -108,7 +92,7 @@ void print_char_colour(int c, char fg, char bg) {
         print_char_colour('\n', fg, bg);
     }
 
-    set_cursor(xpos, ypos);
+    vga_set_cursor(xpos, ypos);
 }
 
 void print_string(char* str) {
@@ -199,12 +183,7 @@ void cls() {
         vga_setc(pos, ' ', VGA_COLOUR(text_fg, text_bg));
 }
 
-void vga_disable_cursor() {
-    outb(0x3D4, 0x0A);
-	outb(0x3D5, 0x20);
-}
 
 void graphics_init() {
     set_graphics_mode(graphics_mode, font);
-    // vga_disable_cursor(); 
 }
