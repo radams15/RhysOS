@@ -49,7 +49,7 @@ void print_char(int c) {
 }
 
 void print_char_colour(int c, char fg, char bg) {
-    if(ypos >= VGA_HEIGHT) {
+    if(ypos >= tty_driver.tty_get_height()) {
         scroll(); 
     }
 
@@ -89,7 +89,7 @@ void print_char_colour(int c, char fg, char bg) {
             break;
     }
 
-    if(xpos >= VGA_WIDTH-1) {
+    if(xpos >= tty_driver.tty_get_width()-1) {
         print_char_colour('\n', fg, bg);
     }
 
@@ -189,6 +189,8 @@ void graphics_init() {
     tty_driver.tty_clear = vga_clear;
     tty_driver.tty_scroll_line = vga_scroll;
     tty_driver.tty_set_cursor = vga_set_cursor;
+    tty_driver.tty_get_width = vga_get_width;
+    tty_driver.tty_get_height = vga_get_height;
 
     set_graphics_mode(graphics_mode, font);
 }

@@ -14,4 +14,7 @@ int vga_set_cursor(char x, char y);
 int vga_disable_cursor();
 int vga_clear(char fg, char bg);
 
+int vga_get_height();
+int vga_get_width();
+
 #endif

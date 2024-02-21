@@ -13,11 +13,14 @@ typedef int (*tty_setc_t)(int x, int y, char c, char colour);
 typedef int (*tty_clear_t)();
 typedef int (*tty_scroll_line_t)();
 typedef int (*tty_set_cursor_t)(int x, int y);
+typedef int (*tty_getint_t)();
 typedef struct TTYDriver {
     tty_setc_t tty_setc;
     tty_clear_t tty_clear;
     tty_scroll_line_t tty_scroll_line;
     tty_set_cursor_t tty_set_cursor;
+    tty_getint_t tty_get_width;
+    tty_getint_t tty_get_height;
 } TTYDriver_t;
 
 enum { FONT_8x8 = 0x12, FONT_8x16 = 0x00 } Font;

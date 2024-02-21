@@ -27,3 +27,11 @@ int vga_clear(char fg, char bg) {
         _vga_setc(pos, ' ', VGA_COLOUR(fg, bg));
     return 0;
 }
+
+int vga_get_height() {
+    return VGA_HEIGHT;
+}
+
+int vga_get_width() {
+    return VGA_WIDTH;
+}
