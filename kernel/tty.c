@@ -20,6 +20,7 @@ int interrupt(int number, int AX, int BX, int CX, int DX);
 
 int vga_setc(int pos, char c, char colour);
 int vga_scroll();
+void vga_disable_cursor();
 
 void set_cursor(char row, char col) {
     interrupt(0x10, 0x0200, 0, 0, (row << 2) | (col & 0xFF));
@@ -192,4 +193,5 @@ void cls() {
 
 void graphics_init() {
     set_graphics_mode(graphics_mode, font);
+    vga_disable_cursor();
 }
