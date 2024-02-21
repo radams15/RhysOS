@@ -2,6 +2,7 @@
 #include "util.h"
 #include "type.h"
 #include "drivers/vga/vga.h"
+#include "drivers/cga/cga.h"
 
 #define TAB_SIZE 4
 
