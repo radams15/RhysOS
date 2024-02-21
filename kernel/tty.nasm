@@ -1,25 +1,8 @@
 bits 16
 
-global _vga_disable_cursor
 global _get_cursor
 global _vga_setc
 global _vga_scroll
-
-_vga_disable_cursor:
-    push ax
-    push dx
-
-    mov dx, 0x3D4
-	mov al, 0xA	; low cursor shape register
-	out dx, al
-
-	inc dx
-	mov al, 0x20	; bits 6-7 unused, bit 5 disables the cursor, bits 0-4 control the cursor shape
-	out dx, al
-
-    pop dx
-    pop ax
-    ret
 
 _vga_setc:
     push bp

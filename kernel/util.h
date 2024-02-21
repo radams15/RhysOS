@@ -24,7 +24,7 @@ int strcmp(char* a, char* b);
 
 int oct2bin(unsigned char* str, int size);
 
-char* strtok(register char* s, register char* delim);
+char* strtok(char* s, char* delim);
 
 int seg_copy(char* src, char* dst, int len, int src_seg, int dst_seg);
 
