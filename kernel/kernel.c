@@ -4,7 +4,6 @@ void entry(int src_ds, void* boot_ptr) {
 }
 
 #include "fs/fs.h"
-#include "graphics.h"
 #include "interrupt.h"
 #include "malloc.h"
 #include "proc.h"
