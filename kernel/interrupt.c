@@ -1,6 +1,7 @@
 #include "interrupt.h"
 #include "fs/fs.h"
 #include "type.h"
+#include "keyboard.h"
 
 #define SYSCALL_BUF_SIZ 1024
 
@@ -143,6 +144,7 @@ void ctrl_break() {
 enum Interrupt {
     INTR_DIV0 = 0x00,
     INV_OPCODE = 0x06,
+    KBD = 0x24,
     INTR_BREAK = 0x6c,
     INTR_TICK = 0x70
 };
@@ -157,6 +159,15 @@ void handle_interrupt(enum Interrupt code) {
             break;
         case INTR_BREAK:
             ctrl_break();
+            break;
+
+        case KBD: {
+            char c = inb(0x60);
+
+            kbd_key_press(c);
+
+            outb(0x20, 0x61);
+          }
             break;
         case INTR_TICK:
             tick();
