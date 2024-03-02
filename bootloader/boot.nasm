@@ -46,7 +46,7 @@ FileSystem		db "FAT12   "	; File system type: don't change!
 
 print_str:
 	mov ah, 0Eh
-.top
+.top:
 	mov al, [si]
 	cmp al, 0
 	je .print_done
