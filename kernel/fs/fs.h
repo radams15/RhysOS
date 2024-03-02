@@ -1,7 +1,7 @@
 #ifndef RHYSOS_FS_H
 #define RHYSOS_FS_H
 
-#include "../type.h"
+#include "type.h"
 
 #define FILE_NAME_MAX 32
 #define SECTOR_SIZE 512
