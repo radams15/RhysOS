@@ -74,16 +74,18 @@ int interrupt(int number, int AX, int BX, int CX, int DX);
 int highmem();
 int lowmem();
 
+void printc(char c);
+
 void read_sector(int disk,
                  int track,
                  int head,
                  int sector,
-                 int dst_addr,
+                 char* dst_addr,
                  int dst_seg);
 
 void call_kernel(int ds, struct SystemInfo* info);
 
-void read_sector_lba(int disk, int lba, int dst_addr, int dst_seg) {
+void read_sector_lba(int disk, int lba, char* dst_addr, int dst_seg) {
     int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
     int track = (lba / (SECTORS_PER_TRACK * 2));
     int sector = (lba % SECTORS_PER_TRACK + 1);
@@ -99,7 +101,7 @@ void print(char* str) {
     }
 }
 
-int read_cluster(int disk, int cluster, int dst_addr, int dst_seg) {
+int read_cluster(int disk, int cluster, char* dst_addr, int dst_seg) {
     //  lba_addr = cluster_begin_lba + (cluster_number - 2) *
     //  sectors_per_cluster;
     // cluster_begin_lba = = (rsvd_secs + (num_fats * 32) + root_dir_sectors)
@@ -109,11 +111,11 @@ int read_cluster(int disk, int cluster, int dst_addr, int dst_seg) {
     int lba = cluster_start + (cluster - 2) * 1;
 
     read_sector_lba(disk, lba, dst_addr, dst_seg);
+
+    return 0;
 }
 
-int load_segment(int disk, int sect_start, int dst_addr, int dst_seg) {
-    int sect;
-    int addr = dst_addr;
+int load_segment(int disk, int sect_start, char* dst_addr, int dst_seg) {
     int cluster = sect_start;
 
     while (1) {
@@ -130,6 +132,8 @@ int load_segment(int disk, int sect_start, int dst_addr, int dst_seg) {
 
         cluster = fat_table[cluster];
     }
+
+    return 0;
 }
 
 int strncmp(char* a, char* b, int len) {
@@ -152,7 +156,7 @@ void splash() {
     print("\n\n");
 }
 
-int strcpy(char* dst, char* src) {
+int strcpy(char* dst, const char* src) {
     int len;
     for (len = 0; src[len] != 0; len++) {
         dst[len] = src[len];
@@ -167,11 +171,10 @@ int main() {
     unsigned char fat_sector[512];
 
     int sect = FS_SECT;
-    int rootfs_start;
 
-    read_sector_lba(0, sect, &bpb, 0x50);
-    read_sector_lba(0, sect + 1, &fat_sector, 0x50);
-    read_sector_lba(0, sect + 19, &root_dir, 0x50);
+    read_sector_lba(0, sect, (char*) &bpb, 0x50);
+    read_sector_lba(0, sect + 1, (char*) &fat_sector, 0x50);
+    read_sector_lba(0, sect + 19, (char*) &root_dir, 0x50);
 
     unsigned char frame[3];
     int i, f1, f2, curr;
@@ -208,7 +211,7 @@ int main() {
 #if ENABLE_SPLASH
             print("Loading kernel: [");
 #endif
-            load_segment(0, file->cluster, 0x1000, DATA_SEGMENT);
+            load_segment(0, file->cluster, (char*) 0x1000, DATA_SEGMENT);
 #if ENABLE_SPLASH
             print("]\n");
 #endif
