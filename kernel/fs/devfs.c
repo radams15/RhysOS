@@ -2,8 +2,11 @@
 
 #include "tty.h"
 #include "util.h"
-
+#include "malloc.h"
 #include "serial.h"
+#include "clock.h"
+#include "rand.h"
+#include "sysinfo.h"
 
 #define MAX_FILES 16
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -38,7 +41,7 @@ FsNode_t* devfs_finddir(FsNode_t* node, char* name) {
     return NULL;
 }
 
-void stdout_write(FsNode_t* node,
+unsigned int stdout_write(FsNode_t* node,
                   unsigned int offset,
                   unsigned int size,
                   unsigned char* buffer) {
@@ -47,9 +50,11 @@ void stdout_write(FsNode_t* node,
     for (i = offset; i < size; i++) {
         print_char(buffer[i]);
     }
+
+    return size;
 }
 
-void stderr_write(FsNode_t* node,
+unsigned int stderr_write(FsNode_t* node,
                   unsigned int offset,
                   unsigned int size,
                   unsigned char* buffer) {
@@ -58,9 +63,11 @@ void stderr_write(FsNode_t* node,
     for (i = offset; i < size; i++) {
         print_char_colour(buffer[i], 0x0, 0xC);
     }
+
+    return size;
 }
 
-int stdin_read(FsNode_t* node,
+unsigned int stdin_read(FsNode_t* node,
                unsigned int offset,
                unsigned int size,
                unsigned char* buffer) {
@@ -73,7 +80,7 @@ int stdin_read(FsNode_t* node,
     return size;
 }
 
-int com1_read(FsNode_t* node,
+unsigned int com1_read(FsNode_t* node,
               unsigned int offset,
               unsigned int size,
               unsigned char* buffer) {
@@ -86,7 +93,7 @@ int com1_read(FsNode_t* node,
     return size;
 }
 
-void com1_write(FsNode_t* node,
+unsigned int com1_write(FsNode_t* node,
                 unsigned int offset,
                 unsigned int size,
                 unsigned char* buffer) {
@@ -95,9 +102,11 @@ void com1_write(FsNode_t* node,
     for (i = offset; i < size; i++) {
         serial_putc(COM1, buffer[i]);
     }
+
+    return size;
 }
 
-int com2_read(FsNode_t* node,
+unsigned int com2_read(FsNode_t* node,
               unsigned int offset,
               unsigned int size,
               unsigned char* buffer) {
@@ -110,7 +119,7 @@ int com2_read(FsNode_t* node,
     return size;
 }
 
-void com2_write(FsNode_t* node,
+unsigned int com2_write(FsNode_t* node,
                 unsigned int offset,
                 unsigned int size,
                 unsigned char* buffer) {
@@ -119,6 +128,8 @@ void com2_write(FsNode_t* node,
     for (i = offset; i < size; i++) {
         serial_putc(COM2, buffer[i]);
     }
+
+    return size;
 }
 
 void int2chars(unsigned int in, unsigned char* buffer) {
@@ -130,7 +141,7 @@ int chars2int(unsigned char* buffer) {
     return (buffer[1] << 8) | buffer[0];
 }
 
-int lowmem_read(FsNode_t* node,
+unsigned int lowmem_read(FsNode_t* node,
                 unsigned int offset,
                 unsigned int size,
                 unsigned char* buffer) {
@@ -139,7 +150,7 @@ int lowmem_read(FsNode_t* node,
     return 2;
 }
 
-int highmem_read(FsNode_t* node,
+unsigned int highmem_read(FsNode_t* node,
                  unsigned int offset,
                  unsigned int size,
                  unsigned char* buffer) {
@@ -148,7 +159,7 @@ int highmem_read(FsNode_t* node,
     return 2;
 }
 
-int graphics_mode_read(FsNode_t* node,
+unsigned int graphics_mode_read(FsNode_t* node,
                        unsigned int byte_offset,
                        unsigned int byte_size,
                        unsigned char* out_buffer) {
@@ -157,36 +168,40 @@ int graphics_mode_read(FsNode_t* node,
     return 2;
 }
 
-void graphics_mode_write(FsNode_t* node,
+unsigned int graphics_mode_write(FsNode_t* node,
                          unsigned int offset,
                          unsigned int size,
                          unsigned char* buffer) {
     set_graphics_mode(buffer[0], buffer[1]);
-}
 
-int time_read(FsNode_t* node,
-              unsigned int byte_offset,
-              unsigned int byte_size,
-              unsigned char* out_buffer) {
-    time(out_buffer);
     return 2;
 }
 
-void tty_fg_write(FsNode_t* node,
+unsigned int time_read(FsNode_t* node,
+              unsigned int byte_offset,
+              unsigned int byte_size,
+              unsigned char* out_buffer) {
+    time((TimeDelta_t*) out_buffer);
+    return 2;
+}
+
+unsigned int tty_fg_write(FsNode_t* node,
                   unsigned int offset,
                   unsigned int size,
                   unsigned char* buffer) {
     set_fg(buffer[0]);
+    return size;
 }
 
-void tty_bg_write(FsNode_t* node,
+unsigned int tty_bg_write(FsNode_t* node,
                   unsigned int offset,
                   unsigned int size,
                   unsigned char* buffer) {
     set_bg(buffer[0]);
+    return size;
 }
 
-int rand_read(FsNode_t* node,
+unsigned int rand_read(FsNode_t* node,
               unsigned int byte_offset,
               unsigned int byte_size,
               unsigned char* out_buffer) {
