@@ -35,6 +35,8 @@ my $FLOPPY_SECTORS = 2880; # 1.44M floppy
 
 my $KERNEL_FLAGS = "-Wall -Werror -DSTACK_SEGMENT=$STACK_SEGMENT -DHEAP_ADDRESS=$HEAP_ADDR -DDATA_SEGMENT=$DATA_SEGMENT -DSHELL_SEGMENT=$SHELL_SEGMENT -DEXE_SEGMENT=$EXE_SEGMENT";
 
+my $KERNEL_NASM_FLAGS = '-W-gnu-elf-extensions';
+
 sub run {
 	my ($cmd) = @_;
 	
@@ -81,7 +83,7 @@ sub kernel {
 		my $folder = dirname($out);
 		make_path($folder) if !(-e $folder);
 		
-		&run("$ASM -felf $KERNEL_FLAGS $asm_file -o $out");
+		&run("$ASM -felf $KERNEL_FLAGS $KERNEL_NASM_FLAGS $asm_file -o $out");
 		(push @objs, $out);
 	}
 	
