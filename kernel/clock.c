@@ -1,11 +1,12 @@
 #include "clock.h"
 
 #include "tty.h"
+#include "util.h"
 
 TimeDelta_t counter;
 
 tick_callback_t callbacks[32];
-tick_callback_t* callback_ptr = &callbacks;
+tick_callback_t* callback_ptr = &callbacks[0];
 
 int add_tick_callback(tick_callback_t callback) {
     *callback_ptr = callback;
@@ -15,7 +16,7 @@ int add_tick_callback(tick_callback_t callback) {
 }
 
 int call_tick_handlers() {
-    for (tick_callback_t* c = &callbacks; c != callback_ptr; c++) {
+    for (tick_callback_t* c = &callbacks[0]; c != callback_ptr; c++) {
         (*c)();
     }
 
@@ -23,7 +24,7 @@ int call_tick_handlers() {
 }
 
 int time(struct TimeDelta* buf) {
-    memcpy(buf, &counter, sizeof(struct TimeDelta));
+    memcpy((void*) buf, (void*) &counter, sizeof(struct TimeDelta));
 
     return 0;
 }
@@ -56,7 +57,7 @@ int bcdToDecimal(int bcdValue) {
 int rtc_init() {
     unsigned int cmos_time[4] = {0, 0, 0, 0};
 
-    if (clock_time(&cmos_time)) {
+    if (clock_time((unsigned int*) &cmos_time)) {
         return 1;
     }
 
