@@ -174,6 +174,8 @@ void handle_interrupt(enum Interrupt code) {
         case KBD: {
             char c = inb(0x60);
 
+            print_char('c');
+
             kbd_key_press(c);
 
             outb(0x20, 0x61);

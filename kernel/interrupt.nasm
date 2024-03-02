@@ -57,43 +57,6 @@ handle_%1:
 	jmp ivt_handle_end
 %endmacro
 
-
-handle_0x24_old:
-    ; save our registers!
-    pusha
-
-    ; Read code
-    in al, 60h
-
-    ; Ignore codes with high bit set
-    test al, 80h
-    jnz .end
-
-    ; Read the ASCII code from the table
-    mov bl, al
-    xor bh, bh
-    mov al, 'k'
-
-    ; Print code
-    push di
-    mov di, [cs:cursor_pos]
-    push es
-    push word 0B000h
-    pop es
-    mov [es:di], al
-    pop es
-    pop di
-    add word [cs:cursor_pos], 2
-
-    .end:
-    ; Send EOI
-    mov al, 61h
-    out 20h, al
-    ; return
-    popa
-    iret
-
-
 INT_HANDLER_DEFN 0x00
 INT_HANDLER_DEFN 0x06
 INT_HANDLER_DEFN 0x24
