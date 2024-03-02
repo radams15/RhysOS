@@ -2,5 +2,6 @@
 #define KEYBOARD_H
 
 void kbd_key_press(char scan);
+char kbdbuf_get();
 
 #endif

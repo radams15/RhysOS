@@ -42,10 +42,52 @@ unsigned char kbd_mtrx[128] =
     0,	/* All other keys are undefined */
 };
 
+#define KBD_BUFFER_SIZE 4
+
+unsigned char buffer[KBD_BUFFER_SIZE];
+char front = -1;
+char rear = -1;
+
+int is_full() {
+  if ((front == rear + 1) || (front == 0 && rear == KBD_BUFFER_SIZE - 1)) return 1;
+  return 0;
+}
+
+int is_empty() {
+  if (front == -1) return 1;
+  return 0;
+}
+
 void kbd_key_press(char scan) {
     if((unsigned char) scan > 80)
         return;
 
     unsigned char c = kbd_mtrx[scan];
-    print_char(c);
+
+  if (is_full()) {
+      kbdbuf_get();
+  }
+
+  if (front == -1) front = 0;
+  rear = (rear + 1) % KBD_BUFFER_SIZE;
+  buffer[rear] = c;
+}
+
+char kbdbuf_get() {
+  if (is_empty()) {
+    return -1;
+  } else {
+      print_string("Dequeue");
+    int element = buffer[front];
+    if (front == rear) {
+      front = -1;
+      rear = -1;
+    }
+    // Q has only one element, so we reset the
+    // queue after dequeing it. ?
+    else {
+      front = (front + 1) % KBD_BUFFER_SIZE;
+    }
+    return element;
+  }
 }

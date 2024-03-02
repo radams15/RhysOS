@@ -149,15 +149,16 @@ int readline(char* buffer) {
 char ngetch() {
     char out;
 
-    out = interrupt(0x16, 0, 0, 0, 0);
+    while((out = kbdbuf_get()) == -1) {
+
+    }
 
     return out;
 }
 
 char getch() {
-    char out;
+    char out = ngetch();
 
-    out = interrupt(0x16, 0, 0, 0, 0);
     print_char(out);  // echo back char
 
     return out;
