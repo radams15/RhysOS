@@ -24,6 +24,8 @@ typedef enum FileMode {
     O_WRONLY = 0b00001000,
 } FileMode_t;
 
+struct FsNode;
+
 typedef struct Stat {
     char name[FILE_NAME_MAX];
     unsigned int flags;
