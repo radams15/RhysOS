@@ -10,9 +10,9 @@ enum {
 } GraphicsMode;
 
 typedef int (*tty_setc_t)(int x, int y, char c, char colour);
-typedef int (*tty_clear_t)();
+typedef int (*tty_clear_t)(char bg, char fg);
 typedef int (*tty_scroll_line_t)();
-typedef int (*tty_set_cursor_t)(int x, int y);
+typedef int (*tty_set_cursor_t)(char x, char y);
 typedef int (*tty_getint_t)();
 typedef struct TTYDriver {
     tty_setc_t tty_setc;
