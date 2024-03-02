@@ -139,15 +139,15 @@ _cli:
 	cli
 	ret
 	
-global _makeInterrupt21
-extern _handleInterrupt21
+global _make_interrupt_21
+extern _handle_interrupt_21
 
-_makeInterrupt21:
+_make_interrupt_21:
 	;get the address of the service routine
 	push dx
 	push ax
 	push si
-	mov dx, _interrupt21ServiceRoutine ; causes a crash
+	mov dx, int21_isr
 	
 	push ds
 	mov ax, 0	;interrupts are in lowest memory
@@ -165,7 +165,7 @@ _makeInterrupt21:
 	ret
 
 ;void handleInterrupt21 (int AX, int BX, int CX, int DX)
-_interrupt21ServiceRoutine:
+int21_isr:
 	cli
 
 	push ds ; push regs into program stack
@@ -184,7 +184,7 @@ _interrupt21ServiceRoutine:
 	push cx ; push ss in cx
 	push ax ; push ax as argument for function
 	
-	call _handleInterrupt21
+	call _handle_interrupt_21
 
 	pop ax
 	pop ss ; restore program stack from kernel stack

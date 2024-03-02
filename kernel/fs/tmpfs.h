@@ -1,5 +1,5 @@
-#ifndef DEVFS_H
-#define DEVFS_H
+#ifndef TMPFS_H
+#define TMPFS_H
 
 #include "fs/fs.h"
 

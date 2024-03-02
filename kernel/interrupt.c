@@ -135,7 +135,7 @@ int i21_handler(SyscallArgs_t* args) {
     return 0;
 }
 
-int handleInterrupt21(int* ax, int ss, int cx, int dx) {
+int handle_interrupt_21(int* ax, int ss, int cx, int dx) {
     SyscallArgs_t arg_data;
     seg_copy((char*) ax, (char*) &arg_data, sizeof(SyscallArgs_t), ss, DATA_SEGMENT);
 

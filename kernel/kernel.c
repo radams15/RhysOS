@@ -10,8 +10,10 @@ void entry(int src_ds, void* boot_ptr) {
 #include "sysinfo.h"
 #include "tty.h"
 #include "util.h"
+#include "rand.h"
 
 #include "fs/devfs.h"
+#include "fs/tmpfs.h"
 #include "fs/fat.h"
 
 #include "clock.h"
@@ -33,7 +35,7 @@ void main(int src_ds, void* boot_ptr) {
 
     struct SystemInfo info;
 
-    seg_copy(boot_ptr, &info, sizeof(struct SystemInfo), src_ds, DATA_SEGMENT);
+    seg_copy((char*) boot_ptr, (char*) &info, sizeof(struct SystemInfo), src_ds, DATA_SEGMENT);
 
     err = init(&info);
 
@@ -46,7 +48,7 @@ void main(int src_ds, void* boot_ptr) {
 }
 
 void debug(const char* label, int data) {
-    print_string(label);
+    print_string((char*) label);
     printi(data, 16);
     print_string("\n");
 }
@@ -59,7 +61,7 @@ void kdir(char* dir_name) {
 
     if (root == NULL) {
         print_string("Cannot find directory!\n");
-        return 0;
+        return;
     }
 
     while ((node = fs_readdir(root, i)) != NULL) {
@@ -84,7 +86,6 @@ void task() {}
 
 int a20_init() {
     if (a20_available()) {
-        int enable_fail;
         print_string("A20 line is available\n");
 
         MUST_COMPLETE(a20_enable, "A20 line successfully enabled\n",
@@ -120,7 +121,7 @@ int init(struct SystemInfo* info) {
     MUST_COMPLETE(memmgr_init, "Memory manager enabled\n",
                   "Memory manager failed to initialise\n");
 
-    makeInterrupt21();
+    make_interrupt_21();
     print_string("Int 21h enabled\n");
 
     MUST_COMPLETE(rtc_init, "RTC enabled\n", "Failed to initialise rtc\n");
