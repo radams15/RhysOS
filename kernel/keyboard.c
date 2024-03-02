@@ -45,8 +45,8 @@ unsigned char kbd_mtrx[128] =
 #define KBD_BUFFER_SIZE 4
 
 unsigned char buffer[KBD_BUFFER_SIZE];
-char front = -1;
-char rear = -1;
+int front = -1;
+int rear = -1;
 
 int is_full() {
   if ((front == rear + 1) || (front == 0 && rear == KBD_BUFFER_SIZE - 1)) return 1;
@@ -62,7 +62,7 @@ void kbd_key_press(char scan) {
     if((unsigned char) scan > 80)
         return;
 
-    unsigned char c = kbd_mtrx[scan];
+  unsigned char c = kbd_mtrx[(int) scan];
 
   if (is_full()) {
       kbdbuf_get();
