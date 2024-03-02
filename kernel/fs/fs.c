@@ -237,6 +237,36 @@ FsNode_t* fs_finddir(FsNode_t* node, char* name) {
     return 0;
 }
 
+int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
+    int i = 0;
+    int count = 0;
+    DirEnt_t* node = NULL;
+    FsNode_t* fsnode;
+    FsNode_t* root = get_dir(dir_name);
+
+    if (root == NULL) {
+        print_string("Cannot find directory!\n");
+        return 0;
+    }
+
+    while ((node = fs_readdir(root, i)) != NULL && count <= max) {
+        fsnode = fs_finddir(root, node->name);
+        if (fsnode != NULL) {
+            if (buf != NULL) {
+                buf++;
+                seg_copy(fsnode, buf, sizeof(FsNode_t), DATA_SEGMENT, ds);
+                seg_copy(fsnode->name, buf->name, strlen(fsnode->name),
+                         DATA_SEGMENT, ds);
+            }
+            count++;
+        }
+
+        i++;
+    }
+
+    return count;
+}
+
 void read_lba_to_segment(int disk, int lba, int dst_addr, int dst_seg) {
     int head = (lba % (SECTORS_PER_TRACK * 2)) / SECTORS_PER_TRACK;
     int track = (lba / (SECTORS_PER_TRACK * 2));

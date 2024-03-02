@@ -29,7 +29,7 @@ int time(struct TimeDelta* buf) {
     return 0;
 }
 
-void tick() {
+void clock_tick() {
     counter.tick = counter.tick + 1;
 
     if (counter.tick >= 18) {
