@@ -152,10 +152,18 @@ int init(struct SystemInfo* info) {
     stdout = open("/dev/stdout", O_WRONLY);
     stderr = open("/dev/stderr", O_WRONLY);
 
+    /*stdin = open("/dev/com1", O_RDONLY);
+    stdout = open("/dev/com1", O_WRONLY);
+    stderr = open("/dev/com1", O_WRONLY);*/
+
     // add_tick_callback(mouse_tick);
 
-    char* shell_argv[] = {"shell", "login.bat"};
-    exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
+    // char* shell_argv[] = {"shell", "login.bat"}; 
+    // exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE); 
+
+    for(;;){ 
+
+    }
 
     close(stdin);
     close(stdout);

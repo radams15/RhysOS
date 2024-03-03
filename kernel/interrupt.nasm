@@ -90,6 +90,8 @@ _init_interrupts:
     INT_HANDLER_DECL 0x6c
 	
 	pop ds
+
+    cli
 	
 	mov ax, 0
 	ret
