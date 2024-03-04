@@ -77,7 +77,7 @@ char kbdbuf_get() {
   if (is_empty()) {
     return -1;
   } else {
-      print_string("Dequeue");
+      // print_string("Dequeue"); 
     int element = buffer[front];
     if (front == rear) {
       front = -1;

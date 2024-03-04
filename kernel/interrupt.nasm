@@ -35,8 +35,8 @@ global _init_interrupts
 %macro INT_HANDLER_DECL 1
 	mov si, %1
 	mov dx, handle_%1
-	mov [si+2],ax
-	mov [si],dx	;set up our vector
+	mov [si+2],ax ; segment
+	mov [si],dx   ; handler address
 %endmacro
 
 %macro INT_HANDLER_DEFN 1
@@ -77,11 +77,14 @@ ivt_handle_end:
 	iret
 
 ; int init_interrupts()
-_init_interrupts:    
+_init_interrupts:
 	push ds
-	mov ax, 0	;interrupts are in lowest memory
-	mov ds,ax
-	mov ax,cs	;have interrupt go to the current segment
+
+	xor ax, ax
+	mov ds,ax   ; data segment = 0
+	mov ax,cs	; have interrupt go to the current segment
+
+    sti
 	
     INT_HANDLER_DECL 0x00
     INT_HANDLER_DECL 0x06
@@ -91,8 +94,6 @@ _init_interrupts:
 	
 	pop ds
 
-    cli
-	
 	mov ax, 0
 	ret
 
@@ -148,7 +149,7 @@ int21_isr:
 
 	push cx ; push ss in cx
 	push ax ; push ax as argument for function
-	
+
 	call _handle_interrupt_21
 
 	pop ax

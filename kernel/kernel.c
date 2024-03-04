@@ -75,8 +75,6 @@ void kdir(char* dir_name) {
     }
 }
 
-void task() {}
-
 #define MUST_COMPLETE(method, success, error, ...) \
     if (method(__VA_ARGS__)) {                     \
         print_string(error);                       \
@@ -160,9 +158,12 @@ int init(struct SystemInfo* info) {
 
     // char* shell_argv[] = {"shell", "login.bat"}; 
     // exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE); 
+    // exec("shell", 0, 0, stdin, stdout, stderr, FALSE); 
 
     for(;;){ 
+        char c = ngetch();
 
+        print_char(c);
     }
 
     close(stdin);

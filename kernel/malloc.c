@@ -64,8 +64,10 @@ BlkHeader_t* split(BlkHeader_t* block, unsigned int size) {
 }
 
 void* malloc(unsigned int size) {
-    if (size == 0)
+    if (size == 0) {
+        print_string("Attempt to malloc 0");
         return 0;
+    }
 
     size += sizeof(BlkHeader_t);
 
