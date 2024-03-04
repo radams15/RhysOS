@@ -136,7 +136,7 @@ int readline(char* buffer) {
 
     char* buf_start = buffer;
 
-    while ((c = getch()) != '\r') {
+    while ((c = getch()) != '\n') {
         if (c == 0x8) {  // backspace
             *(buffer--) = ' ';
         } else {
