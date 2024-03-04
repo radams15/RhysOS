@@ -2,7 +2,7 @@
 #include "util.h"
 #include "type.h"
 #include "drivers/vga/vga.h"
-#include "drivers/cga/cga.h"
+#include "keyboard.h"
 
 #define TAB_SIZE 4
 
@@ -134,7 +134,9 @@ void printi(unsigned int num, int base) {
 int readline(char* buffer) {
     char c;
 
-    while ((c = getch()) != '\r') {
+    char* buf_start = buffer;
+
+    while ((c = getch()) != '\n') {
         if (c == 0x8) {  // backspace
             *(buffer--) = ' ';
         } else {
@@ -143,6 +145,8 @@ int readline(char* buffer) {
     }
 
     *(buffer++) = 0;  // null-terminate
+
+    return buffer-buf_start;
 }
 
 // Getch without echo

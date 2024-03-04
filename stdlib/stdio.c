@@ -100,7 +100,7 @@ int freadline(int fh, char* buffer) {
     char* buffer_head = buffer;
     char c;
 
-    while ((c = fgetch(fh)) != '\r') {
+    while ((c = fgetch(fh)) != '\n') {
         *(buffer++) = c;
     }
 
@@ -113,7 +113,7 @@ int readline(char* buffer) {
     char c;
     int len = 0;
 
-    while ((c = getch()) != '\r') {
+    while ((c = getch()) != '\n') {
         if (c == 0x8 && buffer != buffer_head) {  // backspace
             len--;
             *(buffer--) = ' ';
@@ -126,7 +126,8 @@ int readline(char* buffer) {
         }
     }
 
-    *(buffer++) = 0;  // null-terminate
+
+    *buffer = 0;  // null-terminate, overwrite \n
 
     return len;
 }

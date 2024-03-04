@@ -22,6 +22,7 @@ _interrupt:
 	mov cx,[bp+10]
 	mov dx,[bp+12]
 
+    sti
 intr:
 	int 0x00	;call the interrupt (00 will be changed above)
 
@@ -35,13 +36,13 @@ global _init_interrupts
 %macro INT_HANDLER_DECL 1
 	mov si, %1
 	mov dx, handle_%1
-	mov [si+2],ax
-	mov [si],dx	;set up our vector
+	mov [si+2],ax ; segment
+	mov [si],dx   ; handler address
 %endmacro
 
 %macro INT_HANDLER_DEFN 1
 handle_%1:
-    cli
+    ;cli
 
 	push dx
 	push cx
@@ -56,43 +57,6 @@ handle_%1:
 	
 	jmp ivt_handle_end
 %endmacro
-
-
-handle_0x24_old:
-    ; save our registers!
-    pusha
-
-    ; Read code
-    in al, 60h
-
-    ; Ignore codes with high bit set
-    test al, 80h
-    jnz .end
-
-    ; Read the ASCII code from the table
-    mov bl, al
-    xor bh, bh
-    mov al, 'k'
-
-    ; Print code
-    push di
-    mov di, [cs:cursor_pos]
-    push es
-    push word 0B000h
-    pop es
-    mov [es:di], al
-    pop es
-    pop di
-    add word [cs:cursor_pos], 2
-
-    .end:
-    ; Send EOI
-    mov al, 61h
-    out 20h, al
-    ; return
-    popa
-    iret
-
 
 INT_HANDLER_DEFN 0x00
 INT_HANDLER_DEFN 0x06
@@ -114,11 +78,14 @@ ivt_handle_end:
 	iret
 
 ; int init_interrupts()
-_init_interrupts:    
+_init_interrupts:
 	push ds
-	mov ax, 0	;interrupts are in lowest memory
-	mov ds,ax
-	mov ax,cs	;have interrupt go to the current segment
+
+	xor ax, ax
+	mov ds,ax   ; data segment = 0
+	mov ax,cs	; have interrupt go to the current segment
+
+    sti
 	
     INT_HANDLER_DECL 0x00
     INT_HANDLER_DECL 0x06
@@ -127,7 +94,7 @@ _init_interrupts:
     INT_HANDLER_DECL 0x6c
 	
 	pop ds
-	
+
 	mov ax, 0
 	ret
 
@@ -139,15 +106,15 @@ _cli:
 	cli
 	ret
 	
-global _makeInterrupt21
-extern _handleInterrupt21
+global _make_interrupt_21
+extern _handle_interrupt_21
 
-_makeInterrupt21:
+_make_interrupt_21:
 	;get the address of the service routine
 	push dx
 	push ax
 	push si
-	mov dx, _interrupt21ServiceRoutine ; causes a crash
+	mov dx, int21_isr
 	
 	push ds
 	mov ax, 0	;interrupts are in lowest memory
@@ -160,13 +127,13 @@ _makeInterrupt21:
 	pop si
 	pop ax
 	pop dx
-	
+
 	mov ax, 0
 	ret
 
 ;void handleInterrupt21 (int AX, int BX, int CX, int DX)
-_interrupt21ServiceRoutine:
-	cli
+int21_isr:
+	;cli
 
 	push ds ; push regs into program stack
 	push dx
@@ -183,8 +150,9 @@ _interrupt21ServiceRoutine:
 
 	push cx ; push ss in cx
 	push ax ; push ax as argument for function
-	
-	call _handleInterrupt21
+
+    sti
+	call _handle_interrupt_21
 
 	pop ax
 	pop ss ; restore program stack from kernel stack

@@ -2,6 +2,8 @@
 
 #include "stdio.h"
 #include "util.h"
+#include "tty.h"
+#include "malloc.h"
 
 #define MAX_FILES 32
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -74,7 +76,6 @@ unsigned int fat_read(FsNode_t* node,
     unsigned int bytes_read = 0;
     unsigned int end_byte_offset;
     unsigned char temp_buffer[SECTOR_SIZE];
-    int i;
 
     end_byte_offset = byte_offset + byte_size;
 
@@ -103,11 +104,11 @@ unsigned int fat_read(FsNode_t* node,
         if (cluster >= 0xFF8)
             break;
 
-        read_sector(&temp_buffer, cluster_to_lba(cluster));
+        read_sector((int*) &temp_buffer, cluster_to_lba(cluster));
 
         sector_bytes = MIN(SECTOR_SIZE - sector_offset, byte_size - bytes_read);
 
-        memcpy(out_buffer + bytes_read, temp_buffer + sector_offset,
+        memcpy((char*) (out_buffer + bytes_read), (char*) (temp_buffer + sector_offset),
                sector_bytes);
 
         bytes_read += sector_bytes;
@@ -217,7 +218,7 @@ void fat_load_root(struct DirectoryEntry* root_dir) {
     for (int i = 0; i < MAX_FILES; i++) {
         struct DirectoryEntry* entry = &root_dir[i];
 
-        if (entry->name[0] != NULL) {
+        if (entry->name[0] != 0) {
             memcpy(root_nodes[i].name, entry->name, 8);
 
             int x;
@@ -272,13 +273,13 @@ FsNode_t* fat_init(int sector_start) {
     sector_start = 1;  // TODO: Fix
 
     for (int i = 0; i < MAX_FILES; i++) {
-        root_dir[i].name[0] = NULL;
-        root_nodes[i].name[0] = NULL;
+        root_dir[i].name[0] = 0;
+        root_nodes[i].name[0] = 0;
     }
 
-    read_lba_to_segment(0, sector_start, &fat_sector, DATA_SEGMENT);
-    read_lba_to_segment(0, sector_start + 18, &root_dir, DATA_SEGMENT);
-    read_lba_to_segment(0, sector_start + 19, &root_dir[16], DATA_SEGMENT);
+    read_lba_to_segment(0, sector_start, (int) &fat_sector, DATA_SEGMENT);
+    read_lba_to_segment(0, sector_start + 18, (int) &root_dir, DATA_SEGMENT);
+    read_lba_to_segment(0, sector_start + 19, (int) &root_dir[16], DATA_SEGMENT);
 
     unsigned char frame[3];
     unsigned int i, f1, f2, curr;
@@ -320,7 +321,7 @@ FsNode_t* fat_init(int sector_start) {
     root_node.finddir = fat_finddir;
     root_node.ref = 0;
 
-    fat_load_root(&root_dir);
+    fat_load_root((struct DirectoryEntry*) &root_dir);
 
     return &root_node;
 }

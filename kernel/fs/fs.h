@@ -24,6 +24,8 @@ typedef enum FileMode {
     O_WRONLY = 0b00001000,
 } FileMode_t;
 
+struct FsNode;
+
 typedef struct Stat {
     char name[FILE_NAME_MAX];
     unsigned int flags;
@@ -95,11 +97,13 @@ DirEnt_t* fs_readdir(FsNode_t* node, unsigned int index);
 FsNode_t* fs_finddir(FsNode_t* node, char* name);
 
 FsNode_t* get_dir(char* name);
+int write(int fh, unsigned char* buffer, unsigned int size);
 int open(char* name, FileMode_t mode);
 void close(int fh);
 void seek(int fh, unsigned int location);
 int stat(const char* name, Stat_t* stat);
 int read(int fh, unsigned char* buffer, unsigned int size);
+int list_directory(char* dir_name, FsNode_t* buf, int max, int ds);
 
 int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child);
 

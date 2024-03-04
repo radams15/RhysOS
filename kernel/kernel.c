@@ -10,8 +10,10 @@ void entry(int src_ds, void* boot_ptr) {
 #include "sysinfo.h"
 #include "tty.h"
 #include "util.h"
+#include "rand.h"
 
 #include "fs/devfs.h"
+#include "fs/tmpfs.h"
 #include "fs/fat.h"
 
 #include "clock.h"
@@ -33,7 +35,7 @@ void main(int src_ds, void* boot_ptr) {
 
     struct SystemInfo info;
 
-    seg_copy(boot_ptr, &info, sizeof(struct SystemInfo), src_ds, DATA_SEGMENT);
+    seg_copy((char*) boot_ptr, (char*) &info, sizeof(struct SystemInfo), src_ds, DATA_SEGMENT);
 
     err = init(&info);
 
@@ -46,7 +48,7 @@ void main(int src_ds, void* boot_ptr) {
 }
 
 void debug(const char* label, int data) {
-    print_string(label);
+    print_string((char*) label);
     printi(data, 16);
     print_string("\n");
 }
@@ -59,7 +61,7 @@ void kdir(char* dir_name) {
 
     if (root == NULL) {
         print_string("Cannot find directory!\n");
-        return 0;
+        return;
     }
 
     while ((node = fs_readdir(root, i)) != NULL) {
@@ -73,38 +75,6 @@ void kdir(char* dir_name) {
     }
 }
 
-int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
-    int i = 0;
-    int count = 0;
-    DirEnt_t* node = NULL;
-    FsNode_t* fsnode;
-    FsNode_t* root = get_dir(dir_name);
-
-    if (root == NULL) {
-        print_string("Cannot find directory!\n");
-        return 0;
-    }
-
-    while ((node = fs_readdir(root, i)) != NULL && count <= max) {
-        fsnode = fs_finddir(root, node->name);
-        if (fsnode != NULL) {
-            if (buf != NULL) {
-                buf++;
-                seg_copy(fsnode, buf, sizeof(FsNode_t), DATA_SEGMENT, ds);
-                seg_copy(fsnode->name, buf->name, strlen(fsnode->name),
-                         DATA_SEGMENT, ds);
-            }
-            count++;
-        }
-
-        i++;
-    }
-
-    return count;
-}
-
-void task() {}
-
 #define MUST_COMPLETE(method, success, error, ...) \
     if (method(__VA_ARGS__)) {                     \
         print_string(error);                       \
@@ -114,7 +84,6 @@ void task() {}
 
 int a20_init() {
     if (a20_available()) {
-        int enable_fail;
         print_string("A20 line is available\n");
 
         MUST_COMPLETE(a20_enable, "A20 line successfully enabled\n",
@@ -150,7 +119,7 @@ int init(struct SystemInfo* info) {
     MUST_COMPLETE(memmgr_init, "Memory manager enabled\n",
                   "Memory manager failed to initialise\n");
 
-    makeInterrupt21();
+    make_interrupt_21();
     print_string("Int 21h enabled\n");
 
     MUST_COMPLETE(rtc_init, "RTC enabled\n", "Failed to initialise rtc\n");
@@ -181,10 +150,15 @@ int init(struct SystemInfo* info) {
     stdout = open("/dev/stdout", O_WRONLY);
     stderr = open("/dev/stderr", O_WRONLY);
 
+    /*stdin = open("/dev/com1", O_RDONLY);
+    stdout = open("/dev/com1", O_WRONLY);
+    stderr = open("/dev/com1", O_WRONLY);*/
+
     // add_tick_callback(mouse_tick);
 
-    char* shell_argv[] = {"shell", "login.bat"};
-    exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
+    // char* shell_argv[] = {"shell", "login.bat"}; 
+    // exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE); 
+    exec("shell", 0, 0, stdin, stdout, stderr, FALSE);
 
     close(stdin);
     close(stdout);
