@@ -22,6 +22,7 @@ _interrupt:
 	mov cx,[bp+10]
 	mov dx,[bp+12]
 
+    sti
 intr:
 	int 0x00	;call the interrupt (00 will be changed above)
 
@@ -41,7 +42,7 @@ global _init_interrupts
 
 %macro INT_HANDLER_DEFN 1
 handle_%1:
-    cli
+    ;cli
 
 	push dx
 	push cx
@@ -126,13 +127,13 @@ _make_interrupt_21:
 	pop si
 	pop ax
 	pop dx
-	
+
 	mov ax, 0
 	ret
 
 ;void handleInterrupt21 (int AX, int BX, int CX, int DX)
 int21_isr:
-	cli
+	;cli
 
 	push ds ; push regs into program stack
 	push dx
@@ -150,6 +151,7 @@ int21_isr:
 	push cx ; push ss in cx
 	push ax ; push ax as argument for function
 
+    sti
 	call _handle_interrupt_21
 
 	pop ax

@@ -83,7 +83,7 @@ int exec(char* file_name,
         return 1;
     }
 
-    // cli();  // Disable interrupts as atomic
+    cli();  // Disable interrupts as atomic
     int segment_index = get_segment();
     if (segment_index == -1) {
         print_string("Segment allocation error in `exec`\n");
@@ -91,7 +91,7 @@ int exec(char* file_name,
     }
     int segment = segment_top + (0x1000 * segment_index);
     segments[segment_index] = 1;
-    // sti();  // Enable interrupts
+    sti();  // Enable interrupts
 
     int addr = 0x1000;
     addr -= 10;  // Remove the header.
@@ -104,9 +104,9 @@ int exec(char* file_name,
 
     ret = call_far(argc, argv, in, out, err, should_free, segment, segment);
 
-    // cli();  // Atomic again
+    cli();  // Atomic again
     segments[segment_index] = 0;
-    // sti();
+    sti();
 
     return ret;
 }

@@ -158,13 +158,7 @@ int init(struct SystemInfo* info) {
 
     // char* shell_argv[] = {"shell", "login.bat"}; 
     // exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE); 
-    // exec("shell", 0, 0, stdin, stdout, stderr, FALSE); 
-
-    for(;;){ 
-        char c = ngetch();
-
-        print_char(c);
-    }
+    exec("shell", 0, 0, stdin, stdout, stderr, FALSE);
 
     close(stdin);
     close(stdout);

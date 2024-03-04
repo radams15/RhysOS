@@ -68,7 +68,8 @@ void kbd_key_press(char scan) {
       kbdbuf_get();
   }
 
-  if (front == -1) front = 0;
+  if (front == -1)
+      front = 0;
   rear = (rear + 1) % KBD_BUFFER_SIZE;
   buffer[rear] = c;
 }
@@ -77,14 +78,12 @@ char kbdbuf_get() {
   if (is_empty()) {
     return -1;
   } else {
-      // print_string("Dequeue"); 
     int element = buffer[front];
     if (front == rear) {
       front = -1;
       rear = -1;
     }
-    // Q has only one element, so we reset the
-    // queue after dequeing it. ?
+
     else {
       front = (front + 1) % KBD_BUFFER_SIZE;
     }
