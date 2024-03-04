@@ -1,13 +1,25 @@
 #include "util.h"
+
 #include "type.h"
+#include "tty.h"
 
 void memset(int* dest, int val, int len) {
+    if(dest == NULL) {
+        print_string("Memset write to 0x00 denied\n");
+        return;
+    }
+
     int* temp = (int*)dest;
     for (; len != 0; len--)
         *temp++ = val;
 }
 
 void memcpy(char* dest, char* src, unsigned int n) {
+    if(dest == NULL) {
+        print_string("Memcpy write to 0x00 denied\n");
+        return;
+    }
+
     for (int i = 0; i < n; i++)
         dest[i] = src[i];
 }
