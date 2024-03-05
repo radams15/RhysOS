@@ -42,11 +42,54 @@ unsigned char kbd_mtrx[128] =
     0,	/* All other keys are undefined */
 };
 
+
+unsigned char kbd_mtrx_shifted[128] =
+{
+    0,  27, '!', '@', '#', '$', '%', '^', '&', '*',	/* 9 */
+  '(', ')', '+', /*'´' */0, '\b',	/* Backspace */
+  '\t',			/* Tab */
+  'Q', 'W', 'E', 'R',	/* 19 */
+  'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n',	/* Enter key */
+    0,			/* 29   - Control */
+  'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':',	/* 39 */
+ '"', '<',   0,		/* Left shift */
+ '|', 'Z', 'X', 'C', 'V', 'B', 'N',			/* 49 */
+  'M', '<', '>', '_',   0,				/* Right shift */
+  '*',
+    0,	/* Alt */
+  ' ',	/* Space bar */
+    0,	/* Caps lock */
+    0,	/* 59 - F1 key ... > */
+    0,   0,   0,   0,   0,   0,   0,   0,
+    0,	/* < ... F10 */
+    0,	/* 69 - Num lock*/
+    0,	/* Scroll Lock */
+    0,	/* Home key */
+    0,	/* Up Arrow */
+    0,	/* Page Up */
+  '-',
+    0,	/* Left Arrow */
+    0,
+    0,	/* Right Arrow */
+  '+',
+    0,	/* 79 - End key*/
+    0,	/* Down Arrow */
+    0,	/* Page Down */
+    0,	/* Insert Key */
+    0,	/* Delete Key */
+    0,   0,  '<',
+    0,	/* F11 Key */
+    0,	/* F12 Key */
+    0,	/* All other keys are undefined */
+};
+
 #define KBD_BUFFER_SIZE 4
 
 unsigned char buffer[KBD_BUFFER_SIZE];
 int front = -1;
 int rear = -1;
+
+unsigned char shift = 0;
 
 int is_full() {
   if ((front == rear + 1) || (front == 0 && rear == KBD_BUFFER_SIZE - 1)) return 1;
@@ -58,20 +101,30 @@ int is_empty() {
   return 0;
 }
 
-void kbd_key_press(char scan) {
-    if((unsigned char) scan > 80)
-        return;
+void kbd_key_press(unsigned char scan) {
+    if(scan == 0x2a)
+        shift = 1;
+    else if(scan == 0xaa)
+        shift = 0;
+    else {
+      if(scan > 80)
+          return;
 
-  unsigned char c = kbd_mtrx[(int) scan];
+      unsigned char c;
+      if(shift)
+          c = kbd_mtrx_shifted[(int) scan];
+      else
+          c = kbd_mtrx[(int) scan];
 
-  if (is_full()) {
-      kbdbuf_get();
-  }
+      if (is_full()) {
+          kbdbuf_get();
+      }
 
-  if (front == -1)
-      front = 0;
-  rear = (rear + 1) % KBD_BUFFER_SIZE;
-  buffer[rear] = c;
+      if (front == -1)
+          front = 0;
+      rear = (rear + 1) % KBD_BUFFER_SIZE;
+      buffer[rear] = c;
+    }
 }
 
 char kbdbuf_get() {
