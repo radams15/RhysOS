@@ -1,9 +1,9 @@
 #include "devfs.h"
 
-#include "tty.h"
-#include "util.h"
 #include "malloc.h"
 #include "serial.h"
+#include "tty.h"
+#include "util.h"
 
 #define MAX_FILES 2
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -52,20 +52,20 @@ unsigned int tmpfs_write(FsNode_t* node,
     Content_t* content = &contents[node->inode];
     content->length += size;
     content->data = realloc(content->data, content->length);
-    memcpy(content->data + node->offset, (char*) buffer, size);
+    memcpy(content->data + node->offset, (char*)buffer, size);
     node->offset += size;
 
     return 0;
 }
 
 unsigned int tmpfs_read(FsNode_t* node,
-               unsigned int offset,
-               unsigned int size,
-               unsigned char* buffer) {
+                        unsigned int offset,
+                        unsigned int size,
+                        unsigned char* buffer) {
     Content_t* content = &contents[node->inode];
     if (size > content->length)
         size = content->length;
-    memcpy((char*) buffer, content->data, size);
+    memcpy((char*)buffer, content->data, size);
 
     return 0;
 }
@@ -73,7 +73,7 @@ unsigned int tmpfs_read(FsNode_t* node,
 FsNode_t* tmpfs_create(FsNode_t* parent, const char* name) {
     int i = num_root_nodes;
 
-    strcpyz(root_nodes[i].name, (char*) name);
+    strcpyz(root_nodes[i].name, (char*)name);
     root_nodes[i].flags = FS_FILE;
     root_nodes[i].inode = i;
     root_nodes[i].length = 1;

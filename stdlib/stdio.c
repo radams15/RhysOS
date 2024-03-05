@@ -126,7 +126,6 @@ int readline(char* buffer) {
         }
     }
 
-
     *buffer = 0;  // null-terminate, overwrite \n
 
     return len;

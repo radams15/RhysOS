@@ -1,8 +1,8 @@
 #include "fs.h"
 
 #include "proc.h"
-#include "util.h"
 #include "tty.h"
+#include "util.h"
 
 #define MAX_OPEN_FILES 64
 #define MAX_MOUNTS 4
@@ -21,7 +21,7 @@ FsNode_t* fh_get_node(int fh) {
 int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child) {
     for (int i = 0; i < MAX_MOUNTS; i++) {
         if (mounts[i].parent == NULL && mounts[i].child == NULL) {
-            strcpy(mounts[i].name, (char*) name);
+            strcpy(mounts[i].name, (char*)name);
             mounts[i].parent = parent;
             mounts[i].child = child;
             return 0;
@@ -58,7 +58,7 @@ FsNode_t* create_file(char* name) {
     FsNode_t* fsnode = fs_root;
 
     char buf[256];
-    memcpy((char*) &buf, name, 100);
+    memcpy((char*)&buf, name, 100);
     buf[strlen(name)] = 0;
 
     char* last_slash = NULL;
@@ -81,7 +81,7 @@ int open(char* name, FileMode_t mode) {
     int i;
     FsNode_t* handle;
 
-    handle = get_dir((char*) name);
+    handle = get_dir((char*)name);
 
     if (handle == NULL) {
         if (mode & O_CREAT) {
@@ -90,7 +90,7 @@ int open(char* name, FileMode_t mode) {
             return -1;
         }
 
-        if ((int) handle == -1) {
+        if ((int)handle == -1) {
             print_string("Could not find directory: '");
             print_string(name);
             print_string("'\n");
@@ -126,7 +126,7 @@ int open(char* name, FileMode_t mode) {
 int stat(const char* name, Stat_t* stat) {
     FsNode_t* handle;
 
-    handle = get_dir((char*) name);
+    handle = get_dir((char*)name);
 
     if (handle == NULL) {
         return 1;
@@ -150,7 +150,7 @@ FsNode_t* get_dir(char* name) {
     char* tok;
 
     char buf[256];
-    memcpy((char*) &buf, name, strlen(name));
+    memcpy((char*)&buf, name, strlen(name));
     buf[strlen(name)] = 0;
 
     tok = strtok(buf, "/");
@@ -252,7 +252,8 @@ int list_directory(char* dir_name, FsNode_t* buf, int max, int ds) {
         if (fsnode != NULL) {
             if (buf != NULL) {
                 buf++;
-                seg_copy((char*) fsnode, (char*) buf, sizeof(FsNode_t), DATA_SEGMENT, ds);
+                seg_copy((char*)fsnode, (char*)buf, sizeof(FsNode_t),
+                         DATA_SEGMENT, ds);
                 seg_copy(fsnode->name, buf->name, strlen(fsnode->name),
                          DATA_SEGMENT, ds);
             }

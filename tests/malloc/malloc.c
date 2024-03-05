@@ -1,19 +1,17 @@
+//
+// Created by rhys on 05/03/24.
+//
+
+#include <malloc.h>
 #include "malloc.h"
-#include "interrupt.h"
-#include "tty.h"
-#include "type.h"
-#include "util.h"
-
-unsigned int heap_begin_addr;
-unsigned int heap_end_addr;
-
 
 unsigned char* heap_begin;
 unsigned char* heap_end;
 unsigned char* heap;
-unsigned int heap_size;
 
 const static unsigned char magic = 0xBE;
+
+unsigned int heap_size = 640*1024; // 640k memory
 
 struct BlkHeader {
     unsigned char magic;
@@ -23,8 +21,7 @@ struct BlkHeader {
 };
 
 void error(const char* msg) {
-    print_string((char*) msg);
-    print_char('\n');
+    fprintf(stderr, "%s\n", msg);
 }
 
 int defn_header(unsigned char* ptr, unsigned len, unsigned char* next, unsigned char free) {
@@ -68,7 +65,7 @@ struct BlkHeader* split(struct BlkHeader* block, unsigned int size) {
     return out;
 }
 
-void* malloc(unsigned int size) {
+unsigned char* kmalloc(unsigned int size) {
     if(size == 0) {
         return NULL;
     }
@@ -93,6 +90,8 @@ found_block:
         header = split(header, size);
     }
 
+    printf("%d blocks\n", i);
+
     defn_header((unsigned char*) header, header->length, header->next, 0);
 
     unsigned char* out = ((unsigned char*) header) + sizeof(struct BlkHeader);
@@ -101,7 +100,7 @@ found_block:
 }
 
 // int defn_header(unsigned char* ptr, unsigned len, unsigned char* next, unsigned char free)
-void free(void* ptr) {
+void kfree(unsigned char *ptr) {
     ptr -= sizeof(struct BlkHeader);
 
     struct BlkHeader* header = parse_block(ptr);
@@ -121,8 +120,7 @@ void free(void* ptr) {
 }
 
 int memmgr_init() {
-    heap = (unsigned char*) &heap_begin_addr;
-    heap_size = (unsigned char*) &heap_end_addr - (unsigned char*) &heap_begin_addr;
+    heap = malloc(heap_size * sizeof(char));
 
     heap_begin = heap;
     heap_end = heap_begin + heap_size;
@@ -130,64 +128,4 @@ int memmgr_init() {
     defn_header(heap_begin, heap_size-sizeof(struct BlkHeader), NULL, 1);
 
     return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-void* realloc(void* ptr, unsigned int size) {
-    /*if (ptr == NULL)
-        return malloc(size);
-    else if (size == 0) {
-        free(ptr);
-        return NULL;
-    }
-
-    BlkHeader_t* header =
-        (BlkHeader_t*)((unsigned int*)ptr - sizeof(BlkHeader_t));
-
-    int extra = size - header->length;
-
-    BlkHeader_t* new_header;
-    if (header->next->length >= extra) {
-        new_header = split(header->next, size);
-        header->length += new_header->length;
-    } else {
-        new_header = malloc(size);
-        unsigned int dst =
-            (unsigned int)(((unsigned int*)new_header) + sizeof(BlkHeader_t));
-        memcpy((char*)dst, ptr, header->length);
-        free(ptr);
-    }
-
-    return (void*)new_header;*/
-    error("Realloc unimplemented!");
-    return NULL;
-}
-
-
-int a20_available() {
-    return interrupt(0x15, 0x2403, 0, 0, 0);
-}
-
-int a20_enable() {
-    int enabled;
-
-    enabled = interrupt(0x15, 0x2402, 0, 0, 0);  // is the gate enabled?
-
-    if (enabled)  // Already enabled!
-        return 0;
-
-    interrupt(0x15, 0x2401, 0, 0, 0);  // Enable a20
-
-    enabled = interrupt(0x15, 0x2402, 0, 0, 0);  // is the gate enabled?
-
-    return enabled != 0;
 }

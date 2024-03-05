@@ -24,7 +24,7 @@ int call_tick_handlers() {
 }
 
 int time(struct TimeDelta* buf) {
-    memcpy((void*) buf, (void*) &counter, sizeof(struct TimeDelta));
+    memcpy((void*)buf, (void*)&counter, sizeof(struct TimeDelta));
 
     return 0;
 }
@@ -57,7 +57,7 @@ int bcdToDecimal(int bcdValue) {
 int rtc_init() {
     unsigned int cmos_time[4] = {0, 0, 0, 0};
 
-    if (clock_time((unsigned int*) &cmos_time)) {
+    if (clock_time((unsigned int*)&cmos_time)) {
         return 1;
     }
 
