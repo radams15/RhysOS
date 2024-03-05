@@ -1,10 +1,10 @@
 #include "util.h"
 
-#include "type.h"
 #include "tty.h"
+#include "type.h"
 
 void memset(int* dest, int val, int len) {
-    if(dest == NULL) {
+    if (dest == NULL) {
         print_string("Memset write to 0x00 denied\n");
         return;
     }
@@ -15,7 +15,7 @@ void memset(int* dest, int val, int len) {
 }
 
 void memcpy(char* dest, char* src, unsigned int n) {
-    if(dest == NULL) {
+    if (dest == NULL) {
         print_string("Memcpy write to 0x00 denied\n");
         return;
     }

@@ -4,8 +4,8 @@
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 24
 
-#define VGA_BUF(x, y) ((y*VGA_WIDTH) + x)
-#define VGA_COLOUR(fg, bg) (fg*0x10) | (bg)
+#define VGA_BUF(x, y) ((y * VGA_WIDTH) + x)
+#define VGA_COLOUR(fg, bg) (fg * 0x10) | (bg)
 
 int _vga_setc(int pos, char c, char colour);
 int vga_setc(int x, int y, char c, char colour);

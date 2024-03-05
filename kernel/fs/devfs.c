@@ -1,12 +1,12 @@
 #include "devfs.h"
 
+#include "clock.h"
+#include "malloc.h"
+#include "rand.h"
+#include "serial.h"
+#include "sysinfo.h"
 #include "tty.h"
 #include "util.h"
-#include "malloc.h"
-#include "serial.h"
-#include "clock.h"
-#include "rand.h"
-#include "sysinfo.h"
 
 #define MAX_FILES 16
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -42,9 +42,9 @@ FsNode_t* devfs_finddir(FsNode_t* node, char* name) {
 }
 
 unsigned int stdout_write(FsNode_t* node,
-                  unsigned int offset,
-                  unsigned int size,
-                  unsigned char* buffer) {
+                          unsigned int offset,
+                          unsigned int size,
+                          unsigned char* buffer) {
     int i;
 
     for (i = offset; i < size; i++) {
@@ -55,9 +55,9 @@ unsigned int stdout_write(FsNode_t* node,
 }
 
 unsigned int stderr_write(FsNode_t* node,
-                  unsigned int offset,
-                  unsigned int size,
-                  unsigned char* buffer) {
+                          unsigned int offset,
+                          unsigned int size,
+                          unsigned char* buffer) {
     int i;
 
     for (i = offset; i < size; i++) {
@@ -68,9 +68,9 @@ unsigned int stderr_write(FsNode_t* node,
 }
 
 unsigned int stdin_read(FsNode_t* node,
-               unsigned int offset,
-               unsigned int size,
-               unsigned char* buffer) {
+                        unsigned int offset,
+                        unsigned int size,
+                        unsigned char* buffer) {
     int i;
 
     for (i = 0; i < size; i++) {
@@ -81,9 +81,9 @@ unsigned int stdin_read(FsNode_t* node,
 }
 
 unsigned int com1_read(FsNode_t* node,
-              unsigned int offset,
-              unsigned int size,
-              unsigned char* buffer) {
+                       unsigned int offset,
+                       unsigned int size,
+                       unsigned char* buffer) {
     int i;
 
     for (i = 0; i < size; i++) {
@@ -94,9 +94,9 @@ unsigned int com1_read(FsNode_t* node,
 }
 
 unsigned int com1_write(FsNode_t* node,
-                unsigned int offset,
-                unsigned int size,
-                unsigned char* buffer) {
+                        unsigned int offset,
+                        unsigned int size,
+                        unsigned char* buffer) {
     int i;
 
     for (i = offset; i < size; i++) {
@@ -107,9 +107,9 @@ unsigned int com1_write(FsNode_t* node,
 }
 
 unsigned int com2_read(FsNode_t* node,
-              unsigned int offset,
-              unsigned int size,
-              unsigned char* buffer) {
+                       unsigned int offset,
+                       unsigned int size,
+                       unsigned char* buffer) {
     int i;
 
     for (i = 0; i < size; i++) {
@@ -120,9 +120,9 @@ unsigned int com2_read(FsNode_t* node,
 }
 
 unsigned int com2_write(FsNode_t* node,
-                unsigned int offset,
-                unsigned int size,
-                unsigned char* buffer) {
+                        unsigned int offset,
+                        unsigned int size,
+                        unsigned char* buffer) {
     int i;
 
     for (i = offset; i < size; i++) {
@@ -142,69 +142,69 @@ int chars2int(unsigned char* buffer) {
 }
 
 unsigned int lowmem_read(FsNode_t* node,
-                unsigned int offset,
-                unsigned int size,
-                unsigned char* buffer) {
+                         unsigned int offset,
+                         unsigned int size,
+                         unsigned char* buffer) {
     int mem = lowmem();
     int2chars(mem, buffer);
     return 2;
 }
 
 unsigned int highmem_read(FsNode_t* node,
-                 unsigned int offset,
-                 unsigned int size,
-                 unsigned char* buffer) {
+                          unsigned int offset,
+                          unsigned int size,
+                          unsigned char* buffer) {
     int mem = highmem();
     int2chars(mem, buffer);
     return 2;
 }
 
 unsigned int graphics_mode_read(FsNode_t* node,
-                       unsigned int byte_offset,
-                       unsigned int byte_size,
-                       unsigned char* out_buffer) {
+                                unsigned int byte_offset,
+                                unsigned int byte_size,
+                                unsigned char* out_buffer) {
     int mode = get_graphics_mode();
     int2chars(mode, out_buffer);
     return 2;
 }
 
 unsigned int graphics_mode_write(FsNode_t* node,
-                         unsigned int offset,
-                         unsigned int size,
-                         unsigned char* buffer) {
+                                 unsigned int offset,
+                                 unsigned int size,
+                                 unsigned char* buffer) {
     set_graphics_mode(buffer[0], buffer[1]);
 
     return 2;
 }
 
 unsigned int time_read(FsNode_t* node,
-              unsigned int byte_offset,
-              unsigned int byte_size,
-              unsigned char* out_buffer) {
-    time((TimeDelta_t*) out_buffer);
+                       unsigned int byte_offset,
+                       unsigned int byte_size,
+                       unsigned char* out_buffer) {
+    time((TimeDelta_t*)out_buffer);
     return 2;
 }
 
 unsigned int tty_fg_write(FsNode_t* node,
-                  unsigned int offset,
-                  unsigned int size,
-                  unsigned char* buffer) {
+                          unsigned int offset,
+                          unsigned int size,
+                          unsigned char* buffer) {
     set_fg(buffer[0]);
     return size;
 }
 
 unsigned int tty_bg_write(FsNode_t* node,
-                  unsigned int offset,
-                  unsigned int size,
-                  unsigned char* buffer) {
+                          unsigned int offset,
+                          unsigned int size,
+                          unsigned char* buffer) {
     set_bg(buffer[0]);
     return size;
 }
 
 unsigned int rand_read(FsNode_t* node,
-              unsigned int byte_offset,
-              unsigned int byte_size,
-              unsigned char* out_buffer) {
+                       unsigned int byte_offset,
+                       unsigned int byte_size,
+                       unsigned char* out_buffer) {
     int out = rand();
     int2chars(out, out_buffer);
     return 2;

@@ -1,8 +1,8 @@
 #include "malloc.h"
-#include "type.h"
-#include "tty.h"
-#include "util.h"
 #include "interrupt.h"
+#include "tty.h"
+#include "type.h"
+#include "util.h"
 
 extern unsigned int heap_begin;
 extern unsigned int heap_end;
@@ -32,7 +32,7 @@ typedef struct BlkHeader {
 } BlkHeader_t;
 
 int memmgr_init() {
-    heap = (unsigned int) &heap_begin;
+    heap = (unsigned int)&heap_begin;
 
     BlkHeader_t* header = (BlkHeader_t*)&heap_begin;
 
@@ -115,7 +115,8 @@ void* realloc(void* ptr, unsigned int size) {
         return NULL;
     }
 
-    BlkHeader_t* header = (BlkHeader_t*) ((unsigned int*)ptr - sizeof(BlkHeader_t));
+    BlkHeader_t* header =
+        (BlkHeader_t*)((unsigned int*)ptr - sizeof(BlkHeader_t));
 
     int extra = size - header->length;
 
@@ -127,7 +128,7 @@ void* realloc(void* ptr, unsigned int size) {
         new_header = malloc(size);
         unsigned int dst =
             (unsigned int)(((unsigned int*)new_header) + sizeof(BlkHeader_t));
-        memcpy((char*) dst, ptr, header->length);
+        memcpy((char*)dst, ptr, header->length);
         free(ptr);
     }
 
@@ -139,7 +140,8 @@ void free(void* ptr) {
     // printi(ptr, 16);
     // print_string("\n");
 
-    BlkHeader_t* header = (BlkHeader_t*) ((unsigned int)ptr - sizeof(BlkHeader_t));
+    BlkHeader_t* header =
+        (BlkHeader_t*)((unsigned int)ptr - sizeof(BlkHeader_t));
 
     if (header->magic != HEAP_MAGIC) {
         print_string("Invalid kernel free!\n");

@@ -1,10 +1,10 @@
 #include "proc.h"
 
-#include "util.h"
 #include "fs/fat.h"
 #include "fs/fs.h"
-#include "tty.h"
 #include "serial.h"
+#include "tty.h"
+#include "util.h"
 
 int segments[3] = {0};  // bitmap of the segments to use in parallel
 
@@ -76,7 +76,7 @@ int exec(char* file_name,
 
     int cluster = fs_node->start_sector;
 
-    read_lba_to_segment(0, cluster_to_lba(cluster), (int) &header, DATA_SEGMENT);
+    read_lba_to_segment(0, cluster_to_lba(cluster), (int)&header, DATA_SEGMENT);
 
     if (header.magic[0] != 'R' || header.magic[1] != 'Z') {
         print_string("Invalid header magic!\n");

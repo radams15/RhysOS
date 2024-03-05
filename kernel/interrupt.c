@@ -1,12 +1,12 @@
 #include "interrupt.h"
+#include "clock.h"
 #include "fs/fs.h"
-#include "type.h"
 #include "keyboard.h"
-#include "util.h"
 #include "malloc.h"
 #include "proc.h"
 #include "tty.h"
-#include "clock.h"
+#include "type.h"
+#include "util.h"
 
 #define SYSCALL_BUF_SIZ 1024
 
@@ -25,20 +25,25 @@ int i21_handler(SyscallArgs_t* args) {
 
             // argc = args->b, argv = args->c
 
-            char** argv = malloc(args->b * sizeof(char)); // array of args to populate
+            char** argv =
+                malloc(args->b * sizeof(char));  // array of args to populate
 
-            seg_copy((char*) args->c, (char*) argv, args->b * sizeof(char*), args->ds,
-                     DATA_SEGMENT); // copy argv pointers themselves, i.e. addresses of the argv elements
+            seg_copy((char*)args->c, (char*)argv, args->b * sizeof(char*),
+                     args->ds,
+                     DATA_SEGMENT);  // copy argv pointers themselves, i.e.
+                                     // addresses of the argv elements
 
             for (int i = 0; i < args->b; i++) {
-                char* addr = argv[i]; // address in calling segment
-                argv[i] = malloc(argv_item_size * sizeof(char)); // allocate space for the argument in kernel segment
+                char* addr = argv[i];  // address in calling segment
+                argv[i] = malloc(argv_item_size *
+                                 sizeof(char));  // allocate space for the
+                                                 // argument in kernel segment
 
-                seg_copy(addr, argv[i], argv_item_size, args->ds,
-                         DATA_SEGMENT);
+                seg_copy(addr, argv[i], argv_item_size, args->ds, DATA_SEGMENT);
             }
 
-            seg_copy((char*) args->a, (char*) name, sizeof(name), args->ds, DATA_SEGMENT);
+            seg_copy((char*)args->a, (char*)name, sizeof(name), args->ds,
+                     DATA_SEGMENT);
             int ret =
                 exec(name, args->b, argv, args->d, args->e, args->f, TRUE);
 
@@ -52,15 +57,16 @@ int i21_handler(SyscallArgs_t* args) {
 
         case 2: {
             char name[128];
-            seg_copy((char*) args->a, (char*) name, sizeof(name), args->ds, DATA_SEGMENT);
+            seg_copy((char*)args->a, (char*)name, sizeof(name), args->ds,
+                     DATA_SEGMENT);
 
-            return list_directory(name, (FsNode_t*) args->b, args->c, args->ds);
+            return list_directory(name, (FsNode_t*)args->b, args->c, args->ds);
         }
 
         case 3: {
             int read_len = args->c;
             char buf[SYSCALL_BUF_SIZ];
-            char* dst = (char*) args->b;
+            char* dst = (char*)args->b;
 
             int ret = 0;
             int len;
@@ -68,18 +74,18 @@ int i21_handler(SyscallArgs_t* args) {
             while (read_len >= SYSCALL_BUF_SIZ) {
                 read_len -= SYSCALL_BUF_SIZ;
 
-                len = read(args->a, (unsigned char*) buf, SYSCALL_BUF_SIZ);
+                len = read(args->a, (unsigned char*)buf, SYSCALL_BUF_SIZ);
                 ret += len;
 
-                seg_copy((char*) buf, dst, len, DATA_SEGMENT, args->ds);
+                seg_copy((char*)buf, dst, len, DATA_SEGMENT, args->ds);
 
                 dst += ret;
             }
 
             if (read_len) {
-                len = read(args->a, (unsigned char*) buf, read_len);
+                len = read(args->a, (unsigned char*)buf, read_len);
                 ret += len;
-                seg_copy((char*) buf, dst, read_len, DATA_SEGMENT, args->ds);
+                seg_copy((char*)buf, dst, read_len, DATA_SEGMENT, args->ds);
             }
 
             return ret;
@@ -87,13 +93,15 @@ int i21_handler(SyscallArgs_t* args) {
 
         case 4: {
             char text[SYSCALL_BUF_SIZ];
-            seg_copy((char*) args->b, (char*) text, sizeof(text), args->ds, DATA_SEGMENT);
-            return write(args->a, (unsigned char*) text, args->c);
+            seg_copy((char*)args->b, (char*)text, sizeof(text), args->ds,
+                     DATA_SEGMENT);
+            return write(args->a, (unsigned char*)text, args->c);
         }
 
         case 5: {
             char name[SYSCALL_BUF_SIZ];
-            seg_copy((char*) args->a, (char*) name, sizeof(name), args->ds, DATA_SEGMENT);
+            seg_copy((char*)args->a, (char*)name, sizeof(name), args->ds,
+                     DATA_SEGMENT);
             return open(name, args->b);
         }
 
@@ -106,19 +114,21 @@ int i21_handler(SyscallArgs_t* args) {
             break;
 
         case 8:
-            free((void*) args->a);
+            free((void*)args->a);
             break;
 
         case 9: {
             char name[SYSCALL_BUF_SIZ];
             Stat_t dst;
 
-            seg_copy((char*) args->a, (char*) name, sizeof(name), args->ds, DATA_SEGMENT);
+            seg_copy((char*)args->a, (char*)name, sizeof(name), args->ds,
+                     DATA_SEGMENT);
 
             int ret = stat(name, &dst);
 
             if (ret == 0) {
-                seg_copy((char*) &dst, (char*) args->b, sizeof(Stat_t), DATA_SEGMENT, args->ds);
+                seg_copy((char*)&dst, (char*)args->b, sizeof(Stat_t),
+                         DATA_SEGMENT, args->ds);
             }
 
             return ret;
@@ -137,11 +147,13 @@ int i21_handler(SyscallArgs_t* args) {
 
 int handle_interrupt_21(int* ax, int ss, int cx, int dx) {
     SyscallArgs_t arg_data;
-    seg_copy((char*) ax, (char*) &arg_data, sizeof(SyscallArgs_t), ss, DATA_SEGMENT);
+    seg_copy((char*)ax, (char*)&arg_data, sizeof(SyscallArgs_t), ss,
+             DATA_SEGMENT);
 
     arg_data.num = i21_handler(&arg_data);
 
-    seg_copy((char*) &arg_data, (char*) ax, sizeof(SyscallArgs_t), DATA_SEGMENT, ss);
+    seg_copy((char*)&arg_data, (char*)ax, sizeof(SyscallArgs_t), DATA_SEGMENT,
+             ss);
 
     return 0;
 }
@@ -177,8 +189,7 @@ void handle_interrupt(enum Interrupt code) {
             kbd_key_press(c);
 
             outb(0x20, 0x61);
-          }
-            break;
+        } break;
         case INTR_TICK:
             clock_tick();
             break;

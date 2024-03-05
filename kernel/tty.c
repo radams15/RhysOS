@@ -1,8 +1,8 @@
 #include "tty.h"
-#include "util.h"
-#include "type.h"
 #include "drivers/vga/vga.h"
 #include "keyboard.h"
+#include "type.h"
+#include "util.h"
 
 #define TAB_SIZE 4
 
@@ -16,7 +16,6 @@ char text_bg = 0xF;
 char text_fg = 0x0;
 
 int interrupt(int number, int AX, int BX, int CX, int DX);
-
 
 char get_cursor_row() {
     return xpos;
@@ -50,11 +49,11 @@ void print_char(int c) {
 }
 
 void print_char_colour(int c, char fg, char bg) {
-    if(ypos >= tty_driver.tty_get_height()) {
-        scroll(); 
+    if (ypos >= tty_driver.tty_get_height()) {
+        scroll();
     }
 
-    switch(c) {
+    switch (c) {
         case '\n':
             ypos++;
             xpos = 0;
@@ -64,33 +63,34 @@ void print_char_colour(int c, char fg, char bg) {
             xpos = 0;
             break;
 
-        case 0x08: // backspace
+        case 0x08:  // backspace
             xpos--;
             tty_driver.tty_setc(xpos, ypos, ' ', VGA_COLOUR(fg, bg));
             break;
 
         case '\t': {
             int col = xpos;
-            for (int i = 0; i < col % TAB_SIZE; i++)  // Round to nearest tab col
+            for (int i = 0; i < col % TAB_SIZE;
+                 i++)  // Round to nearest tab col
                 print_char_colour(' ', fg, bg);
             break;
         }
 
         case '\xC':
-           cls();
-           break;
+            cls();
+            break;
 
         case '\x1':
             ypos--;
             break;
 
         default:
-            tty_driver.tty_setc(xpos, ypos, (char) c & 0xFF, VGA_COLOUR(fg, bg));
+            tty_driver.tty_setc(xpos, ypos, (char)c & 0xFF, VGA_COLOUR(fg, bg));
             xpos++;
             break;
     }
 
-    if(xpos >= tty_driver.tty_get_width()-1) {
+    if (xpos >= tty_driver.tty_get_width() - 1) {
         print_char_colour('\n', fg, bg);
     }
 
@@ -146,15 +146,14 @@ int readline(char* buffer) {
 
     *(buffer++) = 0;  // null-terminate
 
-    return buffer-buf_start;
+    return buffer - buf_start;
 }
 
 // Getch without echo
 char ngetch() {
     char out;
 
-    while((out = kbdbuf_get()) == -1) {
-
+    while ((out = kbdbuf_get()) == -1) {
     }
 
     return out;
@@ -188,7 +187,6 @@ void cls() {
 
     tty_driver.tty_clear(text_fg, text_bg);
 }
-
 
 void graphics_init() {
     tty_driver.tty_setc = vga_setc;

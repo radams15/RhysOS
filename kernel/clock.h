@@ -8,7 +8,6 @@ typedef struct TimeDelta {
     int hr;
 } TimeDelta_t;
 
-
 int time(struct TimeDelta* buf);
 int rtc_init();
 
