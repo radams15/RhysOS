@@ -4,6 +4,8 @@
 
 Releases: https://jenkins.therhys.co.uk/view/all/job/RhysOS/
 
+Latest release floppy: https://jenkins.therhys.co.uk/job/RhysOS/lastSuccessfulBuild/artifact/build/system.img
+
 ## 16-bit kernel inspired by DOS.
 
 This is my kernel/OS, written in mainly C with some assembler.
