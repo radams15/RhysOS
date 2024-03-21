@@ -4,7 +4,7 @@
 
 unsigned char kbd_mtrx[128] = {
     0,    27,  '1', '2',        '3',  '4', '5', '6', '7',  '8', /* 9 */
-    '9',  '0', '+', /*'´' */ 0, '\b',                           /* Backspace */
+    '9',  '0', '-', /*'´' */ '=', '\b',                           /* Backspace */
     '\t',                                                       /* Tab */
     'q',  'w', 'e', 'r',                                        /* 19 */
     't',  'y', 'u', 'i',        'o',  'p', '[', ']', '\n',      /* Enter key */
@@ -12,7 +12,7 @@ unsigned char kbd_mtrx[128] = {
     'a',  's', 'd', 'f',        'g',  'h', 'j', 'k', 'l',  ';', /* 39 */
     '\'', '<', 0,                                               /* Left shift */
     '\\', 'z', 'x', 'c',        'v',  'b', 'n',                 /* 49 */
-    'm',  ',', '.', '-',        0,                      /* Right shift */
+    'm',  ',', '.', '/',        0,                      /* Right shift */
     '*',  0,                                            /* Alt */
     ' ',                                                /* Space bar */
     0,                                                  /* Caps lock */
@@ -37,7 +37,7 @@ unsigned char kbd_mtrx[128] = {
 
 unsigned char kbd_mtrx_shifted[128] = {
     0,    27,  '!', '@',        '#',  '$', '%', '^', '&',  '*', /* 9 */
-    '(',  ')', '+', /*'´' */ 0, '\b',                           /* Backspace */
+    '(',  ')', '_', /*'´' */ '+', '\b',                           /* Backspace */
     '\t',                                                       /* Tab */
     'Q',  'W', 'E', 'R',                                        /* 19 */
     'T',  'Y', 'U', 'I',        'O',  'P', '{', '}', '\n',      /* Enter key */
@@ -45,7 +45,7 @@ unsigned char kbd_mtrx_shifted[128] = {
     'A',  'S', 'D', 'F',        'G',  'H', 'J', 'K', 'L',  ':', /* 39 */
     '"',  '<', 0,                                               /* Left shift */
     '|',  'Z', 'X', 'C',        'V',  'B', 'N',                 /* 49 */
-    'M',  '<', '>', '_',        0,                      /* Right shift */
+    'M',  '<', '>', '?',        0,                      /* Right shift */
     '*',  0,                                            /* Alt */
     ' ',                                                /* Space bar */
     0,                                                  /* Caps lock */
