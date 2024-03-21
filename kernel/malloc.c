@@ -15,13 +15,6 @@ unsigned int heap_size;
 
 const static unsigned char magic = 0xBE;
 
-struct BlkHeader {
-    unsigned char magic;
-    unsigned int length;
-    unsigned char* next;
-    unsigned char free;
-};
-
 void error(const char* msg) {
     print_string((char*) msg);
     print_char('\n');
@@ -52,6 +45,10 @@ struct BlkHeader* parse_block(unsigned char* ptr) {
     }
 
     return header;
+}
+
+struct BlkHeader* mem_get_header(void* ptr) {
+    return parse_block(ptr - sizeof(struct BlkHeader));
 }
 
 struct BlkHeader* split(struct BlkHeader* block, unsigned int size) {
@@ -100,11 +97,8 @@ found_block:
     return out;
 }
 
-// int defn_header(unsigned char* ptr, unsigned len, unsigned char* next, unsigned char free)
 void free(void* ptr) {
-    ptr -= sizeof(struct BlkHeader);
-
-    struct BlkHeader* header = parse_block(ptr);
+    struct BlkHeader* header = mem_get_header(ptr);
 
     if(header == NULL) {
         error("Invalid kernel free");
