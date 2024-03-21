@@ -35,12 +35,12 @@ struct BlkHeader* parse_block(unsigned char* ptr) {
     struct BlkHeader* header = (struct BlkHeader*) ptr;
 
     if(ptr == NULL) {
-        error("Invalid block parse (NULL)");
+        // error("Invalid block parse (NULL)");
         return NULL;
     }
 
     if(header->magic != magic) {
-        error("Invalid block magic!");
+        // error("Invalid block magic!");
         return NULL;
     }
 

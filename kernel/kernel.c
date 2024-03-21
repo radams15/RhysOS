@@ -135,9 +135,11 @@ int init(struct SystemInfo* info) {
     MUST_COMPLETE(init_interrupts, "Interrupts enabled\n",
                   "Interrupts failed to initialise\n");
 
+
     struct TimeDelta time_val;
     time(&time_val);
     srand(time_val.tick + time_val.sec + time_val.min + time_val.hr);
+
 
     fs_root = fat_init(info->rootfs_start);
     FsNode_t* fs_dev = devfs_init();
@@ -156,9 +158,9 @@ int init(struct SystemInfo* info) {
 
     add_tick_callback(mouse_tick);
 
-    // char* shell_argv[] = {"shell", "login.bat"};
-    // exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
-    exec("shell", 0, NULL, stdin, stdout, stderr, FALSE);
+    char* shell_argv[] = {"shell", "login.bat"};
+    exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
+    // exec("shell", 0, NULL, stdin, stdout, stderr, FALSE);
 
     close(stdin);
     close(stdout);

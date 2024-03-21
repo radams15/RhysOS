@@ -281,6 +281,7 @@ FsNode_t* fat_init(int sector_start) {
     read_lba_to_segment(0, sector_start + 18, (int)&root_dir, DATA_SEGMENT);
     read_lba_to_segment(0, sector_start + 19, (int)&root_dir[16], DATA_SEGMENT);
 
+
     unsigned char frame[3];
     unsigned int i, f1, f2, curr;
     curr = 0;

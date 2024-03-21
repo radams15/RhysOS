@@ -1,5 +1,6 @@
 #include "util.h"
 
+#include "malloc.h"
 #include "tty.h"
 #include "type.h"
 
@@ -18,6 +19,17 @@ void memcpy(char* dest, char* src, unsigned int n) {
     if (dest == NULL) {
         print_string("Memcpy write to 0x00 denied\n");
         return;
+    }
+
+    struct BlkHeader* header; 
+    if((header = mem_get_header(dest)) != NULL) {
+        if(n > header->length) {
+            print_string("Memcpy out of bounds write\n");
+            printi(n, 16);
+            print_string(" ");
+            printi(header->length, 16);
+            return;
+        }
     }
 
     for (int i = 0; i < n; i++)
