@@ -1,8 +1,3 @@
-void main(int src_ds, void* boot_ptr);
-void entry(int src_ds, void* boot_ptr) {
-    main(src_ds, boot_ptr);
-}
-
 #include "fs/fs.h"
 #include "interrupt.h"
 #include "malloc.h"
