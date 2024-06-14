@@ -4,7 +4,7 @@ ENTRY(_crt0);
 
 SECTIONS
 {
-    . = 0x3000;
+    . = 0x1000;
     .text :
     {
         *(.text);

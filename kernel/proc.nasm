@@ -8,7 +8,7 @@ global stackseg
 _call_far:
 	push bp
 	mov bp, sp
-	
+
 	mov ax, [bp+4]
 	mov [argc], ax
 	mov ax, [bp+6]
@@ -41,17 +41,17 @@ _call_far:
     push WORD [argv]
     mov ds, ax
     
-	push cs
-	push .ret
-	push bx
-	push 0x1000
+	push cs ; segment to return to
+	push .ret ; address to return to
+	push bx ; segment to jump to
+    push 0x1000 ; address to jump to
 	
 	retf ; call function
 .ret:
 	add sp, 12 ; pop all of the program args
 	pop bp ; restore stack frame for call_far
 	
-    mov ax, DATA_SEGMENT ; restore kernel data segment
+    mov ax, KERNEL_SEGMENT ; restore kernel data segment
     mov ds, ax
 
     mov ax, [stackseg] ; restore kernel stack

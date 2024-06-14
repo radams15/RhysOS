@@ -31,7 +31,7 @@ void main(int src_ds, void* boot_ptr) {
     struct SystemInfo info;
 
     seg_copy((char*)boot_ptr, (char*)&info, sizeof(struct SystemInfo), src_ds,
-             DATA_SEGMENT);
+             KERNEL_SEGMENT);
 
     err = init(&info);
 
@@ -151,11 +151,11 @@ int init(struct SystemInfo* info) {
     stdout = open("/dev/com1", O_WRONLY);
     stderr = open("/dev/com1", O_WRONLY);*/
 
-    add_tick_callback(mouse_tick);
-
-    char* shell_argv[] = {"shell", "login.bat"};
-    exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
-    // exec("shell", 0, NULL, stdin, stdout, stderr, FALSE);
+    // add_tick_callback(mouse_tick);
+    
+    // char* shell_argv[] = {"shell", "login.bat"}; 
+    // exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE); 
+    exec("shell", 0, NULL, stdin, stdout, stderr, FALSE);
 
     close(stdin);
     close(stdout);

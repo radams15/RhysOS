@@ -88,6 +88,7 @@ static int run_external(char* exe, char* rest) {
         }
 
         argv[argc++] = tok;
+        tok++;
         tok = strtok(NULL, " ");
     }
 
