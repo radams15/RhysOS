@@ -31,9 +31,9 @@ _crt0:
     mov al, [bp+14]
     mov [_stderr], al
     
-    push DWORD dx ; should_free
-    push DWORD cx ; argv
-    push DWORD bx ; argc
+    push dx ; should_free
+    push cx ; argv
+    push bx ; argc
     call _start
     add sp, 6
     

@@ -8,7 +8,7 @@ global stackseg
 _call_far:
 	push bp
 	mov bp, sp
-	
+
 	mov ax, [bp+4]
 	mov [argc], ax
 	mov ax, [bp+6]

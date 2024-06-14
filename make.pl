@@ -19,7 +19,7 @@ my $CXX = 'ia16-elf-g++ -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fl
 my $LD = 'ia16-elf-ld';
 
 # Must be strings for some reason
-my $KERNEL_SEGMENT = '0x3000';
+my $KERNEL_SEGMENT = '0x1000';
 
 my $BOOT2_SEG = '0x9000';
 my $STACK_SEG = $BOOT2_SEG;
@@ -29,6 +29,7 @@ my $HEAP_ADDR = '0x9000';
 my $FLOPPY_SECTORS = 2880; # 1.44M floppy
 
 my $KERNEL_FLAGS = "-Wall -Werror -DSTACK_SEG=$STACK_SEG -DBOOT2_SEG=$BOOT2_SEG -DHEAP_ADDRESS=$HEAP_ADDR -DKERNEL_SEGMENT=$KERNEL_SEGMENT";
+my $PROGRAM_FLAGS = "-Wall -DKERNEL_SEGMENT=$KERNEL_SEGMENT";
 
 my $KERNEL_NASM_FLAGS = '-W-gnu-elf-extensions';
 
@@ -95,21 +96,21 @@ sub stdlib {
 	
 	for my $c_file (&find('stdlib/*.c')) {		
 		(my $out = $c_file) =~ s:stdlib/(.*)\.c:build/stdlib/$1.o:;
-		&run("$CC -c $c_file -Istdlib/ -o $out");
+		&run("$CC -c $c_file -Istdlib/ -o $out $PROGRAM_FLAGS");
 		
 		push @objs, $out;
 	}
 	
 	for my $c_file (&find('stdlib/*.cpp')) {		
 		(my $out = $c_file) =~ s:stdlib/(.*)\.cpp:build/stdlib/$1.mm.o:;
-		&run("$CXX -c $c_file -Istdlib/ -o $out");
+		&run("$CXX -c $c_file -Istdlib/ -o $out $PROGRAM_FLAGS");
 		
 		push @objs, $out;
 	}
 	
 	for my $asm_file (&find('stdlib/*.nasm')) {
 		(my $out = $asm_file) =~ s:stdlib/(.*)\.nasm:build/stdlib/$1_nasm.o:;
-		&run("$ASM -felf $asm_file -Istdlib/ -o $out");
+		&run("$ASM -felf $asm_file -Istdlib/ -o $out $PROGRAM_FLAGS -W-gnu-elf-extensions");
 		push @objs, $out;
 	}
 	
@@ -119,9 +120,9 @@ sub stdlib {
 }
 
 sub runtime {
-	&run("$ASM -felf runtime/crt0.nasm -Istdlib/ -o build/crt0_nasm.o");
+	&run("$ASM -felf runtime/crt0.nasm -Istdlib/ -o build/crt0_nasm.o $PROGRAM_FLAGS -W-gnu-elf-extensions");
 	
-	&run("$CC -c runtime/crt0.c -Istdlib/ -o build/crt0.o");
+	&run("$CC -c runtime/crt0.c -Istdlib/ -o build/crt0.o $PROGRAM_FLAGS");
 	
 	"build/crt0_nasm.o", "build/crt0.o";
 }
@@ -159,14 +160,14 @@ sub programs {
 		for my $file ( ($conf->param('main')), $conf->param('files') ) {
 			if ($file =~ /\.c$/) {
 				(my $out_obj = $file) =~ s:(.*)\.c:$folder/$1.o:;
-				&run("$CC -c $program/$file -I$program/ -Istdlib -o $out_obj");
+				&run("$CC -c $program/$file -I$program/ -Istdlib -o $out_obj $PROGRAM_FLAGS");
 				
 				push @objs, $out_obj;
 			}
 			
 			if ($file =~ /\.cpp$/) {
 				(my $out_obj = $file) =~ s:(.*)\.cpp:$folder/$1.o:;
-				&run("$CXX -c $program/$file -I$program/ -Istdlib -o $out_obj");
+				&run("$CXX -c $program/$file -I$program/ -Istdlib -o $out_obj $PROGRAM_FLAGS");
 				
 				push @objs, $out_obj;
 			}
@@ -174,7 +175,7 @@ sub programs {
 			if ($file =~ /\.nasm$/) {
 				(my $out_obj = $file) =~ s:(.*)\.nasm:$folder/$1.o:;
 				
-				&run("$ASM -felf $program/$file -I$program/ -Istdlib -o $out_obj");
+				&run("$ASM -felf $program/$file -I$program/ -Istdlib -o $out_obj $PROGRAM_FLAGS");
 				
 				push @objs, $out_obj;
 			}
