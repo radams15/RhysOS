@@ -24,16 +24,13 @@ my $KERNEL_SEGMENT = '0x3000';
 my $SHELL_ADDR = '0x6000';
 my $EXE_ADDR = '0x6000';
 
-my $SHELL_SEGMENT = '0x8000';
-my $EXE_SEGMENT = '0x5000';
-
 my $STACK_SEGMENT = '0xfff0';
 
 my $HEAP_ADDR = '0x9000';
 
 my $FLOPPY_SECTORS = 2880; # 1.44M floppy
 
-my $KERNEL_FLAGS = "-Wall -Werror -DSTACK_SEGMENT=$STACK_SEGMENT -DHEAP_ADDRESS=$HEAP_ADDR -DKERNEL_SEGMENT=$KERNEL_SEGMENT -DSHELL_SEGMENT=$SHELL_SEGMENT -DEXE_SEGMENT=$EXE_SEGMENT";
+my $KERNEL_FLAGS = "-Wall -Werror -DSTACK_SEGMENT=$STACK_SEGMENT -DHEAP_ADDRESS=$HEAP_ADDR -DKERNEL_SEGMENT=$KERNEL_SEGMENT";
 
 my $KERNEL_NASM_FLAGS = '-W-gnu-elf-extensions';
 
@@ -158,20 +155,7 @@ sub programs {
 		
 		next if $conf->param('ignore');
 		
-		my $load_addr = $conf->param('shell') ? $SHELL_ADDR : $EXE_ADDR;
-		my $segment = $conf->param('shell') ? $SHELL_SEGMENT : $EXE_SEGMENT;
-		
 		my $load_script = "$folder/link.ld";
-		
-		# Make new linker script with desired address.
-		open FH, '<', "programs/link.ld";
-		my $load_script_content = join '', <FH>;
-		close FH;
-		$load_script_content =~ s/ADDRESS/$load_addr/g;
-		
-		open FH, '>', $load_script;
-		print FH $load_script_content;
-		close FH;
 		
 		my @objs;
 		for my $file ( ($conf->param('main')), $conf->param('files') ) {
@@ -201,7 +185,7 @@ sub programs {
 		
 		my $out = "$folder/".$conf->param('name');
 		
-		&run("$LD -o $out.elf -d -T$load_script ".($conf->param('stdlib')? " @$runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
+		&run("$LD -o $out.elf -d -Tprograms/link.ld ".($conf->param('stdlib')? " @$runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
 
         &run("objcopy -O binary $out.elf $out.bin");
 
@@ -221,7 +205,7 @@ sub programs {
 		}
 =cut
 		
-		my $header = pack('A2SSSS', 'RZ', eval($load_addr), eval($segment), 0, 0);
+		my $header = pack('A2SSSS', 'RZ', 0, 0, 0, 0);
 		print FH $header;
 		print FH $text;
 		close FH;
