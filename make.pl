@@ -19,7 +19,7 @@ my $CXX = 'ia16-elf-g++ -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fl
 my $LD = 'ia16-elf-ld';
 
 # Must be strings for some reason
-my $DATA_SEGMENT = '0x3000';
+my $DATA_SEGMENT = '0x0000';
 
 my $SHELL_ADDR = '0x6000';
 my $EXE_ADDR = '0x6000';
