@@ -1,0 +1,4 @@
+name: pmode
+main: main.c
+stdlib: true
+files: pmode.nasm
