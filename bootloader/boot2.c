@@ -211,7 +211,7 @@ int main() {
 #if ENABLE_SPLASH
             print("Loading kernel: [");
 #endif
-            load_segment(0, file->cluster, (char*)0x1000, DATA_SEGMENT);
+            load_segment(0, file->cluster, (char*)0x1000, KERNEL_SEGMENT);
 #if ENABLE_SPLASH
             print("]\n");
 #endif
