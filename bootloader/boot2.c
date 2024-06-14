@@ -172,9 +172,9 @@ int main() {
 
     int sect = FS_SECT;
 
-    read_sector_lba(0, sect, (char*)&bpb, 0x50);
-    read_sector_lba(0, sect + 1, (char*)&fat_sector, 0x50);
-    read_sector_lba(0, sect + 19, (char*)&root_dir, 0x50);
+    read_sector_lba(0, sect, (char*)&bpb, BOOT2_SEG);
+    read_sector_lba(0, sect + 1, (char*)&fat_sector, BOOT2_SEG);
+    read_sector_lba(0, sect + 19, (char*)&root_dir, BOOT2_SEG);
 
     unsigned char frame[3];
     int i, f1, f2, curr;

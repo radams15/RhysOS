@@ -41,10 +41,10 @@ _call_far:
     push WORD [argv]
     mov ds, ax
     
-	push cs
-	push .ret
-	push bx
-	push 0x1000
+	push cs ; segment to return to
+	push .ret ; address to return to
+	push bx ; segment to jump to
+    push 0x1000 ; address to jump to
 	
 	retf ; call function
 .ret:
