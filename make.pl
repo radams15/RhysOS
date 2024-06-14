@@ -19,7 +19,7 @@ my $CXX = 'ia16-elf-g++ -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fl
 my $LD = 'ia16-elf-ld';
 
 # Must be strings for some reason
-my $KERNEL_SEGMENT = '0x1000';
+my $KERNEL_SEGMENT = '0x0000';
 
 my $BOOT2_SEG = '0x9000';
 my $STACK_SEG = $BOOT2_SEG;
