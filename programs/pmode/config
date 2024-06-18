@@ -1,4 +1,3 @@
 name: pmode
-main: main.c
-stdlib: true
-files: pmode.nasm
+main: pmode.nasm
+stdlib: 0

@@ -6,6 +6,7 @@
 #include "sysinfo.h"
 #include "tty.h"
 #include "util.h"
+#include "pmode.h"
 
 #include "fs/devfs.h"
 #include "fs/fat.h"
@@ -155,7 +156,9 @@ int init(struct SystemInfo* info) {
     
     // char* shell_argv[] = {"shell", "login.bat"}; 
     // exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE); 
-    exec("shell", 0, NULL, stdin, stdout, stderr, FALSE);
+    // exec("shell", 0, NULL, stdin, stdout, stderr, FALSE);
+    
+    pmode_exec("pmode");
 
     close(stdin);
     close(stdout);

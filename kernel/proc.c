@@ -8,17 +8,6 @@
 
 int segments[3] = {0};  // bitmap of the segments to use in parallel
 
-typedef union ExeHeader {
-    struct {
-        char magic[2];
-        short load_address;
-        short segment;
-        short text_size;
-        short data_size;
-    };
-    char buf[512];
-} ExeHeader_t;
-
 int memcmp(char* a, char* b, int n) {
     int i;
 

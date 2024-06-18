@@ -18,8 +18,7 @@ my $CC = 'ia16-elf-gcc -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fle
 my $CXX = 'ia16-elf-g++ -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore -fno-unwind-tables -fno-rtti -fno-exceptions -DRHYSOS';
 my $LD = 'ia16-elf-ld';
 
-# Must be strings for some reason
-my $KERNEL_SEGMENT = '0x0000';
+my $KERNEL_SEGMENT = '0x3000';
 
 my $BOOT2_SEG = '0x9000';
 my $STACK_SEG = $BOOT2_SEG;
