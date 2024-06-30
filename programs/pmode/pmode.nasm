@@ -1,9 +1,11 @@
-bits 32
+bits 16
 
 global _main
 
 _main:
-    call pmode
+    xchg bx, bx
+    jmp $
+    ;call pmode
     ret
 
 unreal:

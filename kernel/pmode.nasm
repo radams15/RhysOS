@@ -12,6 +12,7 @@ _call_pmode:
    or al,1                ; set pmode bit
    mov  cr0, eax
    xchg bx, bx
+
    jmp 0x8:0x1000
 
 gdtinfo:
