@@ -5,19 +5,9 @@
 #include "serial.h"
 #include "tty.h"
 #include "util.h"
+#include "pmode.h"
 
 int segments[3] = {0};  // bitmap of the segments to use in parallel
-
-typedef union ExeHeader {
-    struct {
-        char magic[2];
-        short load_address;
-        short segment;
-        short text_size;
-        short data_size;
-    };
-    char buf[512];
-} ExeHeader_t;
 
 int memcmp(char* a, char* b, int n) {
     int i;
@@ -76,11 +66,15 @@ int exec(char* file_name,
 
     int cluster = fs_node->start_sector;
 
-    read_lba_to_segment(0, cluster_to_lba(cluster), (int)&header, DATA_SEGMENT);
+    read_lba_to_segment(0, cluster_to_lba(cluster), (int)&header, KERNEL_SEGMENT);
 
     if (header.magic[0] != 'R' || header.magic[1] != 'Z') {
         print_string("Invalid header magic!\n");
         return 1;
+    }
+
+    if (header.protected_mode) {
+        return pmode_exec(fs_node);
     }
 
     cli();  // Disable interrupts as atomic

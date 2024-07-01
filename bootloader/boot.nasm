@@ -1,8 +1,8 @@
 bits 16
 org 7c00h
 
-BOOT2_SEG	equ 0x0050
 BOOT2_ADDR	equ	0 ; address to place kernel in
+STACK_ADDR  equ 0xfff0
 SECT_PER_TRACK equ 18
 
 jmp short boot
@@ -60,10 +60,12 @@ print_str:
 boot:
 	mov ax, BOOT2_SEG ; setup segmentation
 	mov ds, ax
-	mov ss, ax
-	mov es, ax
+	mov es, ax ; segment to read to
 
-	mov ax, STACK_SEGMENT ; setup stack
+	mov ax, STACK_SEG ; setup segmentation
+	mov ss, ax
+
+	mov ax, STACK_ADDR ; setup stack
 	mov sp, ax
 	mov bp, ax
 	

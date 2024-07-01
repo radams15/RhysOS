@@ -143,7 +143,7 @@ int21_isr:
 	
 	mov cx, ss ; program ss in cx
 	
-    mov bx, DATA_SEGMENT ; restore kernel ds, ss
+    mov bx, KERNEL_SEGMENT ; restore kernel ds, ss
     mov ds, bx
     mov bx, [stackseg]
     mov ss, bx
