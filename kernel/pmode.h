@@ -1,6 +1,9 @@
 #ifndef PMODE_H
 #define PMODE_H
 
-int pmode_exec(const char* file_name);
+#include "proc.h"
+#include "fs/fs.h"
+
+int pmode_exec(struct FsNode* fs_node);
 
 #endif

@@ -196,14 +196,16 @@ sub programs {
 		
 =pod
 		struct Header {
-			char magic[2];
-			short load_address;
-			short text_size;
-			short data_size;
+            char magic[2];
+            char protected_mode;
+            char unused_1;
+            short unused_2;
+            short unused_3;
+            short unused_4;
 		}
 =cut
 		
-		my $header = pack('A2SSSS', 'RZ', 0, 0, 0, 0);
+		my $header = pack('A2SSSS', 'RZ', !!$conf->param('protected_mode'), 0, 0, 0);
 		print FH $header;
 		print FH $text;
 		close FH;

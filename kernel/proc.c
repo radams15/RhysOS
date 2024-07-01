@@ -5,6 +5,7 @@
 #include "serial.h"
 #include "tty.h"
 #include "util.h"
+#include "pmode.h"
 
 int segments[3] = {0};  // bitmap of the segments to use in parallel
 
@@ -70,6 +71,10 @@ int exec(char* file_name,
     if (header.magic[0] != 'R' || header.magic[1] != 'Z') {
         print_string("Invalid header magic!\n");
         return 1;
+    }
+
+    if (header.protected_mode) {
+        return pmode_exec(fs_node);
     }
 
     cli();  // Disable interrupts as atomic

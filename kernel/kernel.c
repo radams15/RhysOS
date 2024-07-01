@@ -154,8 +154,6 @@ int init(struct SystemInfo* info) {
 
     // add_tick_callback(mouse_tick);
 
-    pmode_exec("pmode");
-    
     char* shell_argv[] = {"shell", "login.bat"};
     exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
 

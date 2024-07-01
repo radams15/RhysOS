@@ -6,10 +6,11 @@
 typedef union ExeHeader {
     struct {
         char magic[2];
-        short load_address;
-        short segment;
-        short text_size;
-        short data_size;
+        char protected_mode;
+        char unused_1;
+        short unused_2;
+        short unused_3;
+        short unused_4;
     };
     char buf[512];
 } ExeHeader_t;

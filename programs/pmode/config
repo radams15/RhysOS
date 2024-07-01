@@ -1,3 +1,4 @@
 name: pmode
 main: pmode.nasm
 stdlib: 0
+protected_mode: true

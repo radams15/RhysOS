@@ -2,22 +2,13 @@
 #include "tty.h"
 #include "fs/fs.h"
 #include "fs/fat.h"
-#include "proc.h"
 
 int call_pmode();
 
-int pmode_exec(const char* file_name) {
-    struct FsNode* fs_node;
+int pmode_exec(struct FsNode* fs_node) {
     ExeHeader_t header;
 
-    fs_node = get_dir((char*) file_name);
-
     if (fs_node == NULL) {
-        if (file_name != NULL) {
-            print_string((char*) file_name);
-            print_string(
-                " is not recognised as an internal or external command.\n");
-        }
         return 2;
     }
 
