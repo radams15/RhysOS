@@ -1,3 +1,5 @@
 name: get
 main: main.c
 stdlib: true
+runtime: true
+

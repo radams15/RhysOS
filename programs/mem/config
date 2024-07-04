@@ -1,3 +1,5 @@
 name: mem
 main: main.c
 stdlib: true
+runtime: true
+

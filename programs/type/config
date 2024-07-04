@@ -1,3 +1,5 @@
 name: type
 main: type.c
 stdlib: true
+runtime: true
+
