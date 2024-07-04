@@ -120,10 +120,11 @@ sub stdlib {
 
 sub runtime {
 	&run("$ASM -felf runtime/crt0.nasm -Istdlib/real/ -o build/crt0_nasm.o $PROGRAM_FLAGS -W-gnu-elf-extensions");
+	&run("$ASM -felf runtime/crt0.pmode.nasm -Istdlib/protected/ -o build/crt0_pmode_nasm.o $PROGRAM_FLAGS -W-gnu-elf-extensions");
 	
 	&run("$CC -c runtime/crt0.c -Istdlib/real -o build/crt0.o $PROGRAM_FLAGS");
 	
-	"build/crt0_nasm.o", "build/crt0.o";
+	["build/crt0_nasm.o", "build/crt0.o"], ["build/crt0_pmode_nasm.o"];
 }
 
 sub padding {
@@ -180,10 +181,13 @@ sub programs {
 			}
 			
 		}
+
+        my @runtime = @{ ($conf->param('protected_mode')? $runtime->[1] : $runtime->[0]) };
+        $stdlib = $conf->param('pmode')? '' : $stdlib;
 		
 		my $out = "$folder/".$conf->param('name');
 		
-		&run("$LD -o $out.elf -d -Tprograms/link.ld ".($conf->param('stdlib')? " @$runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
+		&run("$LD -o $out.elf -d -Tprograms/link.ld ".($conf->param('runtime')? " @runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
 
         &run("objcopy -O binary $out.elf $out.bin");
 
