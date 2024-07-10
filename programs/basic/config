@@ -1,0 +1,4 @@
+name: basic
+main: basic.c
+stdlib: true
+runtime: true
