@@ -4,7 +4,11 @@ times 8 nop
 
 jmp _crt0
 
+
 global _crt0
+global _exit
+global _seg_copy
+
 extern _start
 extern _main
 
@@ -34,7 +38,14 @@ _crt0:
     push dx ; should_free
     push cx ; argv
     push bx ; argc
+
+    mov [bp_], bp
+    mov [sp_], sp
     call _start
+
+_exit:
+    mov bp, [bp_]
+    mov sp, [sp_]
     add sp, 6
     
     pop bp
@@ -74,3 +85,9 @@ _seg_copy:
 	
 	pop bp
 	ret
+
+
+section .data
+
+bp_: dw 0
+sp_: dw 0

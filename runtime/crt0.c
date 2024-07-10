@@ -8,9 +8,11 @@ extern int stdin, stdout, stderr;
 
 const int argv_item_size = 128;
 
+extern void exit(unsigned char ret);
+
 extern void kfree(void* ptr);
 
-int start(int argc, char** argv_ext, int should_free) {
+void start(int argc, char** argv_ext, int should_free) {
     char** argv_in;
 
     int my_ds = ds();
@@ -42,5 +44,5 @@ int start(int argc, char** argv_ext, int should_free) {
         free(argv);
     }
 
-    return ret;
+    exit(ret);
 }
