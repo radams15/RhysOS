@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <syscall.h>
+
+#define NUM_VARS 64
 
 int slen(const char* s) { int i=0;for (; s[i]; i++); return i; }
 int scmp(const char* s1, const char* s2) {
@@ -45,19 +48,19 @@ unsigned int time(unsigned int * time_t) {
     return 1;
 }
 
-char varnames[64][8];
+char varnames[NUM_VARS][8];
 int  varcontent[64];
-void initvars() { srand(time(NULL)); for(int i=0; i<64; ++i) varnames[i][0] = 0; }
+void initvars() { srand(time(NULL)); for(int i=0; i<NUM_VARS; ++i) varnames[i][0] = 0; }
 int getvar(const char* s) {
 	if (scmp(s, "RANDOM")) return rand();
-	for (int i=0; i<64; ++i)
+	for (int i=0; i<NUM_VARS; ++i)
 		if (scmp(s, varnames[i])) return varcontent[i];
 	return 0;
 }
 int setvar(const char* s, int v) {
-	for (int i=0; i<64; ++i)
+	for (int i=0; i<NUM_VARS; ++i)
 		if (scmp(s, varnames[i])) { varcontent[i] = v; return 1; }
-	for (int i=0; i<64; ++i)
+	for (int i=0; i<NUM_VARS; ++i)
 		if (!varnames[i][0]) {
 			scpy(varnames[i], s); varcontent[i] = v;
 			return 1;
@@ -68,7 +71,7 @@ int setvar(const char* s, int v) {
 #define PRGM_SIZ 256 // 2000
 
 // init program memory
-char prgm[PRGM_SIZ][64];
+char prgm[PRGM_SIZ][NUM_VARS];
 
 void initprgm() { for(int i=0; i<PRGM_SIZ; ++i) prgm[i][0] = 0; }
 // GOSUB stack
@@ -174,17 +177,34 @@ int emath(char* s) {
 }
 //////////////////////////////////////////////////////////////////////
 
+int fread_int(int fh, char* buffer, int len) {
+    char c;
+    int n = 0;
+
+    while ((c = fgetch(fh)) != '\n' && n <= len) {
+        buffer[n] = c;
+        putc(c);
+        n++;
+    }
+
+    buffer[n+1] = 0;  // null-terminate
+    return n;
+}
+
 void run_basic()
 {
-	for (int i = 0; i < 2000; ++i)
+	for (int i = 0; i < PRGM_SIZ; ++i)
 		i = runcmd(i, prgm[i]);
 }
 void read_program(int stream)
 {
 	char buffer[64], *bptr, *token;
 	int ln, pln;
-	while (fread(stream, (bptr=buffer), 63))
+    int n;
+    getch();
+	while (n=(fread_int(stream, (bptr=buffer), 63)))
 	{
+        getch();
 		++ln; for (;*bptr && isspc(*(bptr)); ++bptr);
 		if (!*bptr || *bptr == '#') continue;
 		if (!isdg(*bptr)) berror(ln, "PARSER: MISSING NUMBER");
@@ -201,7 +221,7 @@ int emath_test()
 	printf("Math evaluation mode.");
 
 	char buffer[64];
-	while (fread(stdin, buffer, 63)) printf(" = %d\n", emath(buffer));
+	while (read(stdin, buffer, 63)) printf(" = %d\n", emath(buffer));
 	return 0;
 }
 
@@ -212,7 +232,7 @@ int main(int argc, char** argv)
 	int f;
 
     if(argc == 2) {
-        f = fopen(argv[1], "r");
+        f = open(argv[1], O_RDONLY);
         if (!f)
             berror(-1, "FILE UNREADABLE");
     } else {

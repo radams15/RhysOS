@@ -105,7 +105,7 @@ int freadline(int fh, char* buffer) {
     }
 
     *(buffer++) = 0;  // null-terminate
-    return buffer - buffer_head;
+    return buffer - buffer_head - 1;
 }
 
 int readline(char* buffer) {
