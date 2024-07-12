@@ -18,11 +18,16 @@
         http://www.jamesmolloy.co.uk/tutorial_html/8.-The%20VFS%20and%20the%20initrd.html
 */
 typedef enum FileMode {
-    O_CREAT = 0b00000001,
+    O_CREAT  = 0b00000001,
     O_APPEND = 0b00000010,
     O_RDONLY = 0b00000100,
     O_WRONLY = 0b00001000,
 } FileMode_t;
+
+typedef enum SeekMode {
+    SEEK_SET = 0b00000001,
+    SEEK_CUR = 0b00000010,
+} SeekMode_t;
 
 struct FsNode;
 
@@ -100,7 +105,7 @@ FsNode_t* get_dir(char* name);
 int write(int fh, unsigned char* buffer, unsigned int size);
 int open(char* name, FileMode_t mode);
 void close(int fh);
-void seek(int fh, unsigned int location);
+int seek(int fh, unsigned int location, SeekMode_t mode);
 int stat(const char* name, Stat_t* stat);
 int read(int fh, unsigned char* buffer, unsigned int size);
 int list_directory(char* dir_name, FsNode_t* buf, int max, int ds);

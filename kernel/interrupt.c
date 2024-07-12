@@ -110,7 +110,7 @@ int i21_handler(SyscallArgs_t* args) {
             break;
 
         case 7:
-            seek(args->a, args->b);
+            return seek(args->a, args->b, args->c);
             break;
 
         case 8:

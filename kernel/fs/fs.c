@@ -31,17 +31,6 @@ int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child) {
     return 1;
 }
 
-// FsNode_t* get_mount(FsNode_t* fsnode, char* name) {
-// for (int i = 0; i < MAX_MOUNTS; i++) {
-// if (fsnode == mounts[i].parent &&
-// mounts[i].child != NULL && strcmp(name, mounts[i].name) == 0) {
-// return mounts[i].child;
-// }
-// }
-//
-// return NULL;
-// }
-
 int write(int fh, unsigned char* buffer, unsigned int size) {
     return fs_write(fh_get_node(fh), fh_get_node(fh)->offset, size, buffer);
 }
@@ -50,8 +39,26 @@ int read(int fh, unsigned char* buffer, unsigned int size) {
     return fs_read(fh_get_node(fh), fh_get_node(fh)->offset, size, buffer);
 }
 
-void seek(int fh, unsigned int location) {
-    fh_get_node(fh)->offset = location;
+int seek(int fh, unsigned int location, SeekMode_t mode) {
+    FsNode_t* node = fh_get_node(fh);
+    unsigned int start = node->offset;
+
+    if(mode == SEEK_SET) {
+       node->offset = location;
+    } else if(mode == SEEK_CUR) {
+        node->offset += location;
+    } else {
+        print_string("Error, invalid seek mode\n");
+    }
+
+    if(node->offset >= node->length) {
+        node->offset = node->length-1;
+    }
+
+    if(node->offset == start)
+       return 0;
+
+    return node->offset-start;
 }
 
 FsNode_t* create_file(char* name) {
@@ -102,7 +109,7 @@ int open(char* name, FileMode_t mode) {
         if (open_files[i] == NULL) {
             open_files[i] = handle;
 
-            seek(i, 0);  // Go to start of file
+            seek(i, 0, SEEK_SET);  // Go to start of file
 
             if (mode & O_RDONLY) {
                 open_files[i]->write = NULL;

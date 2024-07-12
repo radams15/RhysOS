@@ -117,7 +117,7 @@ int cprint(int ln, char* s) {
 int cinput(int ln, char* s) {
 	char vs[16], vn[16]; scpy(vn, strtok_int(s));
 	if (!vn) berror(ln, "INVALID ARGS");
-	printf("%s? ", vn); fread(stdin, vs, 15);
+	printf("%s? ", vn); fread_int(stdin, vs, 15);
 	setvar(vn, atoi(vs));
 	return ln;
 }
@@ -186,14 +186,20 @@ int fread_int(int fh, char* buffer, int len) {
     char c;
     int n = 0;
 
-    while (read(fh, &c, 1) && c != '\n' && n <= len) {
+    while ((c = fgetch(fh)) != '\n' && n <= len) {
         buffer[n] = c;
         putc(c);
         n++;
+
+        seek(fh, 1, SEEK_CUR);
     }
 
-    buffer[n] = 0;  // null-terminate
-    printf("fread: '%s'\n", buffer);
+    buffer[n] = '\n';
+    buffer[n+1] = 0;  // null-terminate
+
+    if(seek(fh, 1, SEEK_CUR) == 0)
+        return 0;
+
     return n;
 }
 
@@ -209,7 +215,6 @@ void read_program(int stream)
     int n;
 	while (n=(fread_int(stream, (bptr=buffer), 63)))
 	{
-        printf("\nRead: '%s'\n", buffer);
 		++ln; for (;*bptr && isspc(*(bptr)); ++bptr);
 		if (!*bptr || *bptr == '#') continue;
 		if (!isdg(*bptr)) berror(ln, "PARSER: MISSING NUMBER");

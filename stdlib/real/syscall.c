@@ -47,8 +47,8 @@ int close(int fh) {
     return syscall(6, fh, 0, 0, 0, 0, 0);
 }
 
-int seek(int fh, unsigned int location) {
-    return syscall(7, fh, location, 0, 0, 0, 0);
+int seek(int fh, unsigned int location, SeekMode_t mode) {
+    return syscall(7, fh, location, (int) mode, 0, 0, 0);
 }
 
 int kfree(void* ptr) {

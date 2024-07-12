@@ -2,6 +2,7 @@
 #define STDIO_H
 
 #include "stddef.h"
+#include "syscall.h"
 
 enum {
     GRAPHICS_MONO_80x25 = 0x3,
@@ -36,7 +37,7 @@ File_t* fopen(const char* fname, const char* mode);
 int fwrite(File_t* file, unsigned char* buffer, unsigned int size);
 int fclose(File_t* file);
 int fread(File_t* file, unsigned char* buffer, unsigned int size);
-int fseek(File_t* file, int pos);
+int fseek(File_t* file, int pos, SeekMode_t mode);
 
 void term_set_bg(char colour);
 void term_set_fg(char colour);

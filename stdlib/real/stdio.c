@@ -254,8 +254,8 @@ int fclose(File_t* file) {
     return out;
 }
 
-int fseek(File_t* file, int pos) {
-    return seek(file->fh, pos);
+int fseek(File_t* file, int pos, SeekMode_t mode) {
+    return seek(file->fh, pos, mode);
 }
 
 int __mkargv() {}
