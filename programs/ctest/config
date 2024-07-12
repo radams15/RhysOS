@@ -1,5 +1,0 @@
-name: ctest
-main: main.c
-stdlib: true
-runtime: true
-

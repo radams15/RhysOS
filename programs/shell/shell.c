@@ -38,7 +38,7 @@ static int run_batch(char* path) {
             run_line(linebuf, len);
         }
 
-        seek(fh, totalread + len);
+        seek(fh, totalread + len, SEEK_SET);
     }
 
     close(fh);

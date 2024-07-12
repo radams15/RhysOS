@@ -19,7 +19,7 @@ int dump(char* file) {
     }
 
     do {
-        seek(fh, total_read);
+        seek(fh, total_read, SEEK_SET);
 
         bytes_read = read(fh, &buffer, CHUNK_SIZE);
 

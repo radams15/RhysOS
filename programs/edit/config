@@ -1,5 +1,0 @@
-name: edit
-main: main.c
-stdlib: true
-runtime: true
-
