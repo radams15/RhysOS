@@ -1,6 +1,5 @@
 # Game of guess the number
 10 PRINT "Guess the number!"
-20 PRINT "Written in mbasic by matthilde"
 30 VAR X RANDOM%100
 50 INPUT NUMBER
 60 IF X>NUMBER GOTO 100

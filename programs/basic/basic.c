@@ -3,7 +3,8 @@
 
 #define atoi atoi_int
 
-#define NUM_VARS 64
+#define NUM_VARS 64  // 64
+#define PRGM_SIZ 256 // 2000
 
 int slen(const char* s) { int i=0;for (; s[i]; i++); return i; }
 int scmp(const char* s1, const char* s2) {
@@ -46,7 +47,7 @@ void srand(unsigned int seed) {
 
 }
 
-unsigned int time(unsigned int * time_t) {
+unsigned int time(unsigned int* time_t) {
     return 1;
 }
 
@@ -70,7 +71,6 @@ int setvar(const char* s, int v) {
 	return 0; // returns 0 if it can't find a free variable slot
 }
 
-#define PRGM_SIZ 256 // 2000
 
 // init program memory
 char prgm[PRGM_SIZ][NUM_VARS];
@@ -122,10 +122,13 @@ int cinput(int ln, char* s) {
 	return ln;
 }
 int cvar(int ln, char *s) {
+    printf("VAR0: '%s'\n", s);
 	char *tok = strtok_int(s);
 	if (!tok) berror(ln, "INVALID ARGS");
 	char vn[16]; scpy(vn, tok);
+    printf("VAR1: '%s'\n", tok);
 	tok = strtok_int(NULL);
+    printf("VAR2: '%s'\n", tok);
 	if (!tok) berror(ln, "INVALID ARGS");
 	setvar(vn, emath(tok));
 	return ln;
@@ -194,8 +197,8 @@ int fread_int(int fh, char* buffer, int len) {
         seek(fh, 1, SEEK_CUR);
     }
 
-    buffer[n] = '\n';
-    buffer[n+1] = 0;  // null-terminate
+    putc('\n');
+    buffer[n] = 0;  // null-terminate
 
     if(seek(fh, 1, SEEK_CUR) == 0)
         return 0;
@@ -228,7 +231,7 @@ void read_program(int stream)
 // Used for testing
 int emath_test()
 {
-	printf("Math evaluation mode.");
+	printf("Math evaluation mode.\n");
 
 	char buffer[64];
 	while (read(stdin, buffer, 63)) printf(" = %d\n", emath(buffer));
