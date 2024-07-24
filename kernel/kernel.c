@@ -131,11 +131,9 @@ int init(struct SystemInfo* info) {
     MUST_COMPLETE(init_interrupts, "Interrupts enabled\n",
                   "Interrupts failed to initialise\n");
 
-
     struct TimeDelta time_val;
     time(&time_val);
     srand(time_val.tick + time_val.sec + time_val.min + time_val.hr);
-
 
     fs_root = fat_init(info->rootfs_start);
     FsNode_t* fs_dev = devfs_init();
