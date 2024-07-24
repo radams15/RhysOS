@@ -1,4 +1,5 @@
 #include "stdlib.h"
+
 #include "malloc.h"
 #include "stdio.h"
 #include "syscall.h"
@@ -16,4 +17,5 @@ void memcpy(uint8* dst, uint8* src, int n) {
 
 void abort() {
     fprintf(stderr, "Program abort!\n");
+    // exit(1); 
 }

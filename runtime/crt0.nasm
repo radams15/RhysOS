@@ -4,7 +4,6 @@ times 8 nop
 
 jmp _crt0
 
-
 global _crt0
 global _exit
 global _seg_copy

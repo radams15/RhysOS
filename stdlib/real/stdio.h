@@ -31,13 +31,14 @@ int putc(char c);
 int fputc(int fh, char c);
 int readline(char* buffer);
 int freadline(int fh, char* buffer);
-void exit(char code);  // Defined in crt0.c
+extern void exit(char code); // Defined in crt0.c
 
 File_t* fopen(const char* fname, const char* mode);
 int fwrite(File_t* file, unsigned char* buffer, unsigned int size);
 int fclose(File_t* file);
 int fread(File_t* file, unsigned char* buffer, unsigned int size);
 int fseek(File_t* file, int pos, SeekMode_t mode);
+int fgets(char* buffer, int len, int fh);
 
 void term_set_bg(char colour);
 void term_set_fg(char colour);

@@ -1,31 +1,30 @@
 #include <stdio.h>
-#include <syscall.h>
-
-#define atoi atoi_int
+#include <string.h>
 
 #define NUM_VARS 64  // 64
 #define PRGM_SIZ 256 // 2000
 
-int slen(const char* s) { int i=0;for (; s[i]; i++); return i; }
-int scmp(const char* s1, const char* s2) {
-	if (slen(s1) != slen(s2)) return 0;
-	for (int i=0; s1[i]; i++) if (s1[i] != s2[i]) return 0;
-	return 1;
-}
-void scpy(char* d, const char* s) { int i=0;for(;s[i];i++) d[i]=s[i]; d[i]=0; }
+#define slen(s) strlen(s)
+#define scmp(s1, s2) (strcmp(s1, s2) == 0)
+#define scpy(d, s) strcpy(d, s)
+
 int isspc(char c) { return c == ' ' || c == '\n' || c == '\t'; }
 int isdg(char c) { return c >= '0' && c <= '9'; }
-int atoi(const char* s) { int i=0; for(;*s && isdg(*s);s++) i=i*10+(*s-'0'); return i; }
+int atoi_int(const char* s) { int i=0; for(;*s && isdg(*s);s++) i=i*10+(*s-'0'); return i; }
+
 char* _CURTOK = NULL;
+
 char* strtok_int(char* s) {
-	if  (s != NULL) _CURTOK = s;
-	if  (!(*_CURTOK)) return NULL;
-	for (;*_CURTOK && isspc(*_CURTOK);++_CURTOK); s = _CURTOK;
-	for (;*_CURTOK && !isspc(*_CURTOK);++_CURTOK);
+	if  (s != NULL) _CURTOK = s; // s=NULL, continue from last position
+	if  (!(*_CURTOK)) return NULL; // Next char is NULL, return NULL
+	for (;*_CURTOK && isspc(*_CURTOK);++_CURTOK); // cut off preceding spaces
+	s = _CURTOK; // s=start of string
+	for (;*_CURTOK && !isspc(*_CURTOK);++_CURTOK); // Advance to next space while there is next char that is not a space
 	if  (!(*_CURTOK)) return NULL;
 	*(_CURTOK++) = 0;
 	return s;
 }
+
 // variation of strtok that can detect strings
 char* sstrtok(char* s) {
 	int a=0;
@@ -43,17 +42,21 @@ int rand() {
     return 3;
 }
 
-void srand(unsigned int seed) {
-
-}
+void srand(unsigned int seed) { }
 
 unsigned int time(unsigned int* time_t) {
     return 1;
 }
 
 char varnames[NUM_VARS][8];
-int  varcontent[64];
-void initvars() { srand(time(NULL)); for(int i=0; i<NUM_VARS; ++i) varnames[i][0] = 0; }
+int  varcontent[NUM_VARS];
+
+void initvars() {
+    srand(time(NULL));
+    for(int i=0; i<NUM_VARS; ++i)
+        varnames[i][0] = 0;
+}
+
 int getvar(const char* s) {
 	if (scmp(s, "RANDOM")) return rand();
 	for (int i=0; i<NUM_VARS; ++i)
@@ -75,7 +78,11 @@ int setvar(const char* s, int v) {
 // init program memory
 char prgm[PRGM_SIZ][NUM_VARS];
 
-void initprgm() { for(int i=0; i<PRGM_SIZ; ++i) prgm[i][0] = 0; }
+void initprgm() {
+    for(int i=0; i<PRGM_SIZ; ++i)
+        prgm[i][0] = 0;
+}
+
 // GOSUB stack
 int _linestack[16];
 int _linestackpos = 0;
@@ -117,19 +124,16 @@ int cprint(int ln, char* s) {
 int cinput(int ln, char* s) {
 	char vs[16], vn[16]; scpy(vn, strtok_int(s));
 	if (!vn) berror(ln, "INVALID ARGS");
-	printf("%s? ", vn); fread_int(stdin, vs, 15);
-	setvar(vn, atoi(vs));
+	printf("%s? ", vn); fgets(vs, 15, stdin);
+	setvar(vn, atoi_int(vs));
 	return ln;
 }
 int cvar(int ln, char *s) {
-    printf("VAR0: '%s'\n", s);
 	char *tok = strtok_int(s);
-	if (!tok) berror(ln, "INVALID ARGS");
+	if (!tok) berror(ln, "INVALID ARGS (1)");
 	char vn[16]; scpy(vn, tok);
-    printf("VAR1: '%s'\n", tok);
 	tok = strtok_int(NULL);
-    printf("VAR2: '%s'\n", tok);
-	if (!tok) berror(ln, "INVALID ARGS");
+	if (!tok) berror(ln, "INVALID ARGS (2)");
 	setvar(vn, emath(tok));
 	return ln;
 }
@@ -149,12 +153,23 @@ int cgosub(int ln, char* s) {
 }
 int cret(int ln, char* s) { return lnpop(); }
 int crem(int ln, char* s) { exit(0); }
+
 BasicCmd bfuncs[] = {cprint,cinput,cvar,cif,cgoto,cgosub,cret,crem};
+
 int runcmd(int ln, char* s) {
-	char buf[64]; scpy(buf, s);
+    if(*s == 0)
+        return ln;
+
+	char buf[NUM_VARS];
+    scpy(buf, s);
 	char* token = sstrtok(buf);
-	if (!token) return ln;
-	int cmd; if ((cmd=getbcmd(token)) == -1) berror(ln, "INVALID COMMAND");
+    printf("Token: %x\n", token[0]);
+	if (!token)
+        return ln;
+	int cmd;
+    if ((cmd=getbcmd(token)) == -1) {
+        berror(ln, "INVALID COMMAND");
+    }
 	return bfuncs[cmd](ln, _CURTOK);
 }
 // math operators
@@ -180,51 +195,35 @@ int emath(char* s) {
 				s[j] = 0;
 				return mathfuncs[i](emath(s), emath(s+j+1));
 			}
-	return isdg(*s) ? atoi(s) : getvar(s);
+	return isdg(*s) ? atoi_int(s) : getvar(s);
 }
 
 //////////////////////////////////////////////////////////////////////
-
-int fread_int(int fh, char* buffer, int len) {
-    char c;
-    int n = 0;
-
-    while ((c = fgetch(fh)) != '\n' && n <= len) {
-        buffer[n] = c;
-        putc(c);
-        n++;
-
-        seek(fh, 1, SEEK_CUR);
-    }
-
-    putc('\n');
-    buffer[n] = 0;  // null-terminate
-
-    if(seek(fh, 1, SEEK_CUR) == 0)
-        return 0;
-
-    return n;
-}
-
+///
 void run_basic()
 {
 	for (int i = 0; i < PRGM_SIZ; ++i)
 		i = runcmd(i, prgm[i]);
 }
+
 void read_program(int stream)
 {
-	char buffer[64], *bptr, *token;
-	int ln, pln;
-    int n;
-	while (n=(fread_int(stream, (bptr=buffer), 63)))
+	char buffer[NUM_VARS], *bptr, *token;
+	int ln=0, pln=0;
+
+	while (fgets(bptr=buffer, NUM_VARS-1, stream))
 	{
-		++ln; for (;*bptr && isspc(*(bptr)); ++bptr);
-		if (!*bptr || *bptr == '#') continue;
+		++ln;
+        for (;*bptr && isspc(*(bptr)); ++bptr);
+		if (!*bptr || *bptr == '#')
+            continue;
+
 		if (!isdg(*bptr)) berror(ln, "PARSER: MISSING NUMBER");
 
 		token = strtok_int(bptr);
-		pln = atoi(token);
+		pln = atoi_int(token);
 		scpy(prgm[pln], _CURTOK);
+        printf("Ln: %d\n", pln);
 	}
 }
 
@@ -233,8 +232,8 @@ int emath_test()
 {
 	printf("Math evaluation mode.\n");
 
-	char buffer[64];
-	while (read(stdin, buffer, 63)) printf(" = %d\n", emath(buffer));
+	char buffer[NUM_VARS];
+	while (read(stdin, buffer, NUM_VARS-1)) printf(" = %d\n", emath(buffer));
 	return 0;
 }
 
@@ -246,7 +245,7 @@ int main(int argc, char** argv)
 
     if(argc == 2) {
         f = open(argv[1], O_RDONLY);
-        if (!f)
+        if (!f || f == -1)
             berror(-1, "FILE UNREADABLE");
     } else {
         f = stdin;

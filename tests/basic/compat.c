@@ -44,8 +44,6 @@ int fgets_int(char* buffer, int len, int fh) {
         return 0;
     }
 
-    printf("%d\n", n);
-
     lseek(fh, -1, SEEK_CUR);
 
     return n;

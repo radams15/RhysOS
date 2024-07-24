@@ -258,4 +258,28 @@ int fseek(File_t* file, int pos, SeekMode_t mode) {
     return seek(file->fh, pos, mode);
 }
 
+int fgets(char* buffer, int len, int fh) {
+    char c;
+    int n = 0;
+
+    do {
+        c = fgetch(fh);
+        buffer[n] = c;
+        putc(c);
+        n++;
+
+        seek(fh, 1, SEEK_CUR);
+    } while (c != '\n' && n<len-1);
+
+    buffer[n] = 0;  // null-terminate
+
+    if(seek(fh, 1, SEEK_CUR) == 0 || (strlen(buffer) > 0 && buffer[0] == '\n')) {
+        return 0;
+    }
+
+    seek(fh, -1, SEEK_CUR);
+
+    return n;
+}
+
 int __mkargv() {}
