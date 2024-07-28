@@ -74,6 +74,7 @@ void* malloc(unsigned int size) {
     int i=0;
     while(header != NULL) {
         i++;
+        print_string("Block ");printi(header, 16); print_string("\n");
         if(header->length >= size && header->free) {
             goto found_block;
         }
@@ -81,7 +82,6 @@ void* malloc(unsigned int size) {
         header = parse_block(header->next);
     }
 
-    error("Unable to malloc");
 
     return NULL;
 
