@@ -28,6 +28,11 @@ int i21_handler(SyscallArgs_t* args) {
             char** argv =
                 malloc(args->b * sizeof(char));  // array of args to populate
 
+            if(argv == NULL) {
+                print_string("Unable to malloc argv[i]\n");
+                return 2;
+            }
+
             seg_copy((char*)args->c, (char*)argv, args->b * sizeof(char*),
                      args->ds,
                      KERNEL_SEGMENT);  // copy argv pointers themselves, i.e.
@@ -38,6 +43,10 @@ int i21_handler(SyscallArgs_t* args) {
                 argv[i] = malloc(argv_item_size *
                                  sizeof(char));  // allocate space for the
                                                  // argument in kernel segment
+                if(argv[i] == NULL) {
+                    print_string("Unable to malloc argv[i]\n");
+                    return 2;
+                }
 
                 seg_copy(addr, argv[i], argv_item_size, args->ds, KERNEL_SEGMENT);
             }
