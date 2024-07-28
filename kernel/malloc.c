@@ -4,8 +4,7 @@
 #include "type.h"
 #include "util.h"
 
-unsigned int heap_begin_addr;
-unsigned int heap_end_addr;
+
 
 
 unsigned char* heap_begin;
@@ -35,12 +34,12 @@ struct BlkHeader* parse_block(unsigned char* ptr) {
     struct BlkHeader* header = (struct BlkHeader*) ptr;
 
     if(ptr == NULL) {
-        // error("Invalid block parse (NULL)");
+        error("Invalid block parse (NULL)");
         return NULL;
     }
 
     if(header->magic != magic) {
-        // error("Invalid block magic!");
+        // error("Invalid block magic!"); 
         return NULL;
     }
 
@@ -82,6 +81,8 @@ void* malloc(unsigned int size) {
         header = parse_block(header->next);
     }
 
+    error("Unable to malloc");
+
     return NULL;
 
 found_block:
@@ -101,6 +102,7 @@ void free(void* ptr) {
     struct BlkHeader* header = mem_get_header(ptr);
 
     if(header == NULL) {
+        printi(ptr, 16);
         error("Invalid kernel free");
         return;
     }

@@ -22,7 +22,7 @@ void memcpy(char* dest, char* src, unsigned int n) {
     }
 
     struct BlkHeader* header; 
-    if((header = mem_get_header(dest)) != NULL) {
+    if((uint16_t) dest >= (uint16_t) &heap_begin_addr && (header = mem_get_header(dest)) != NULL) {
         if(n > header->length) {
             print_string("Memcpy out of bounds write\n");
             printi(n, 16);

@@ -110,7 +110,7 @@ int init(struct SystemInfo* info) {
 
     cls();
 
-    a20_init();
+    // a20_init(); 
 
     MUST_COMPLETE(memmgr_init, "Memory manager enabled\n",
                   "Memory manager failed to initialise\n");
@@ -124,12 +124,12 @@ int init(struct SystemInfo* info) {
                   "Failed to initialise /dev/com1\n", COM1, BAUD_9600,
                   PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 
-    // MUST_COMPLETE(serial_init, "Enabled /dev/com2\n",
-    //               "Failed to initialise /dev/com2\n", COM2, BAUD_9600,
-    //               PARITY_NONE, STOPBITS_ONE, DATABITS_8);
+    MUST_COMPLETE(serial_init, "Enabled /dev/com2\n",
+                  "Failed to initialise /dev/com2\n", COM2, BAUD_9600,
+                  PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 
-    MUST_COMPLETE(init_interrupts, "Interrupts enabled\n",
-                  "Interrupts failed to initialise\n");
+    MUST_COMPLETE(init_interrupts, "Interrupts enabled\n", 
+                  "Interrupts failed to initialise\n"); 
 
 
     struct TimeDelta time_val;
@@ -147,12 +147,6 @@ int init(struct SystemInfo* info) {
     stdin = open("/dev/stdin", O_RDONLY);
     stdout = open("/dev/stdout", O_WRONLY);
     stderr = open("/dev/stderr", O_WRONLY);
-
-    /*stdin = open("/dev/com1", O_RDONLY);
-    stdout = open("/dev/com1", O_WRONLY);
-    stderr = open("/dev/com1", O_WRONLY);*/
-
-    // add_tick_callback(mouse_tick);
 
     char* shell_argv[] = {"shell", "login.bat"};
     exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);

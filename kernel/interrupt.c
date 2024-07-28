@@ -45,7 +45,7 @@ int i21_handler(SyscallArgs_t* args) {
             seg_copy((char*)args->a, (char*)name, sizeof(name), args->ds,
                      KERNEL_SEGMENT);
             int ret =
-                exec(name, args->b, argv, args->d, args->e, args->f, TRUE);
+                exec(name, args->b, argv, args->d, args->e, args->f, FALSE);
 
             for (int i = 0; i < args->b; i++) {
                 free(argv[i]);
@@ -114,6 +114,7 @@ int i21_handler(SyscallArgs_t* args) {
             break;
 
         case 8:
+            print_string("Free: ");printi(args->a, 16);print_char('\n');
             free((void*)args->a);
             break;
 
