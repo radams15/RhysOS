@@ -34,7 +34,7 @@ struct BlkHeader* parse_block(unsigned char* ptr) {
     struct BlkHeader* header = (struct BlkHeader*) ptr;
 
     if(ptr == NULL) {
-        error("Invalid block parse (NULL)");
+        // error("Invalid block parse (NULL)"); 
         return NULL;
     }
 
@@ -74,7 +74,7 @@ void* malloc(unsigned int size) {
     int i=0;
     while(header != NULL) {
         i++;
-        print_string("Block ");printi(header, 16); print_string("\n");
+        // print_string("Block ");printi(header, 16); print_string("\n"); 
         if(header->length >= size && header->free) {
             goto found_block;
         }
@@ -82,11 +82,9 @@ void* malloc(unsigned int size) {
         header = parse_block(header->next);
     }
 
-
     return NULL;
 
 found_block:
-
     if(header->length > size) {
         header = split(header, size);
     }
@@ -95,7 +93,30 @@ found_block:
 
     unsigned char* out = ((unsigned char*) header) + sizeof(struct BlkHeader);
 
+    print_string("Malloc: ");printi(header, 16); print_string("\n"); 
     return out;
+}
+
+void condense_memory() {
+    struct BlkHeader* header = parse_block(heap_begin);
+    struct BlkHeader* next;
+    unsigned int length;
+
+    while(header != NULL) {
+        next = parse_block(header->next);
+
+        if(header->free && next->free) {
+            print_string("Condense "); printi(header, 16); print_string(", "); printi(next, 16); print_string("; ");
+            length = header->length + next->length + (2 * sizeof(struct BlkHeader));
+        
+            defn_header((unsigned char*) header, length, (unsigned char*) next->next, 1);
+        } else {
+            print_string("No; ");
+        }
+
+        header = next;
+    }
+    print_string("\n");
 }
 
 void free(void* ptr) {
@@ -107,13 +128,19 @@ void free(void* ptr) {
         return;
     }
 
-    struct BlkHeader* next = parse_block(header->next);
-    unsigned int length = header->length;
-    if(next->free) {
-        length += next->length + sizeof(struct BlkHeader);
-    }
+    print_string("Free: ");printi(ptr, 16); print_string("\n"); 
 
-    defn_header((unsigned char*) header, length, (unsigned char*) next, 1);
+    header->free = TRUE;
+
+    condense_memory();
+
+    // struct BlkHeader* next = parse_block(header->next); 
+    // unsigned int length = header->length; 
+    // if(next->free) { 
+        // length += next->length + sizeof(struct BlkHeader); 
+    // } 
+//  
+    // defn_header((unsigned char*) header, length, (unsigned char*) next, 1); 
 }
 
 int memmgr_init() {

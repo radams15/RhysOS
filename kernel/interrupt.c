@@ -58,7 +58,9 @@ int i21_handler(SyscallArgs_t* args) {
 
             for (int i = 0; i < args->b; i++) {
                 free(argv[i]);
+                // print_string("Free argv[]: ");printi(argv[i], 16);print_char('\n'); 
             }
+            // print_string("Free argv: ");printi(argv, 16);print_char('\n'); 
             free(argv);
 
             return ret;
