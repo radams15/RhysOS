@@ -15,6 +15,9 @@
 #include "clock.h"
 #include "serial.h"
 
+#define _STRINGIZE(x) #x
+#define STRINGIZE(x) _STRINGIZE(x)
+
 struct SystemInfo {
     int rootfs_start;
     int highmem;
@@ -109,6 +112,10 @@ int init(struct SystemInfo* info) {
     graphics_init();
 
     cls();
+
+    print_string("Booting RhysOS, version ");
+    print_string(STRINGIZE(RELEASE_VERSION));
+    print_string("\n");
 
     a20_init();
 
