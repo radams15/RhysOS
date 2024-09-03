@@ -16,6 +16,8 @@ typedef struct File {
     int fh;
 } File_t;
 
+typedef File_t FILE;
+
 extern int stdout, stdin, stderr;
 
 void fprintf(int fd, char* text, ...);

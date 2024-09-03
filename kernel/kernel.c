@@ -132,16 +132,16 @@ int init(struct SystemInfo* info) {
                   "Interrupts failed to initialise\n"); 
 
 
-    struct TimeDelta time_val;
-    time(&time_val);
-    srand(time_val.tick + time_val.sec + time_val.min + time_val.hr);
+    // struct TimeDelta time_val; 
+    // time(&time_val); 
+    // srand(time_val.tick + time_val.sec + time_val.min + time_val.hr); 
 
 
     fs_root = fat_init(info->rootfs_start);
     FsNode_t* fs_dev = devfs_init();
-    FsNode_t* fs_tmp = tmpfs_init();
+    // FsNode_t* fs_tmp = tmpfs_init(); 
     fs_mount("dev", fs_root, fs_dev);
-    fs_mount("tmp", fs_root, fs_tmp);
+    // fs_mount("tmp", fs_root, fs_tmp); 
     print_string("Root filesystem mounted\n");
 
     stdin = open("/dev/stdin", O_RDONLY);
@@ -149,8 +149,9 @@ int init(struct SystemInfo* info) {
     stderr = open("/dev/stderr", O_WRONLY);
 
     char* shell_argv[] = {"shell", "login.bat"};
-    exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
-
+    // exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE); 
+    exec("shell", 0, NULL, stdin, stdout, stderr, FALSE);
+    
     close(stdin);
     close(stdout);
     close(stderr);

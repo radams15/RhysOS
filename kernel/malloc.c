@@ -105,6 +105,12 @@ void condense_memory() {
     while(header != NULL) {
         next = parse_block(header->next);
 
+        if(next == NULL) {
+            break;
+        }
+
+        printi(header->length, 16);
+
         if(header->free && next->free) {
             print_string("Condense "); printi(header, 16); print_string(", "); printi(next, 16); print_string("; ");
             length = header->length + next->length + (2 * sizeof(struct BlkHeader));

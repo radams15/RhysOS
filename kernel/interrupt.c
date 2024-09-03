@@ -29,7 +29,7 @@ int i21_handler(SyscallArgs_t* args) {
                 malloc(args->b * sizeof(char));  // array of args to populate
 
             if(argv == NULL) {
-                print_string("Unable to malloc argv[i]\n");
+                print_string("Unable to malloc argv: ");printi(args->b*sizeof(char), 10);print_string("\n");
                 return 2;
             }
 
@@ -58,7 +58,7 @@ int i21_handler(SyscallArgs_t* args) {
 
             for (int i = 0; i < args->b; i++) {
                 free(argv[i]);
-                // print_string("Free argv[]: ");printi(argv[i], 16);print_char('\n'); 
+                // print_string("Free argv[i]: ");printi(argv[i], 16);print_char('\n'); 
             }
             // print_string("Free argv: ");printi(argv, 16);print_char('\n'); 
             free(argv);
