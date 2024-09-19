@@ -71,6 +71,11 @@ void* malloc(unsigned int size) {
 
     struct BlkHeader* header = parse_block(heap_begin);
 
+    if(header == NULL) {
+        print_string("Malloc error: failed to find initial header\n");
+        return NULL;
+    }
+
     int i=0;
     while(header != NULL) {
         i++;
