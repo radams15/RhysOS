@@ -34,3 +34,9 @@ build_bootloader:
 	${CC} ${BOOTLOADER_CFLAGS} ${C_FLAGS} -c bootloader/boot2.c -o build/boot2.o
 	${ASM} ${BOOTLOADER_CFLAGS} ${ASM_FLAGS} -f elf bootloader/boot2.nasm -o build/boot2_asm.o
 	${LD} -T bootloader/link.ld -o build/boot2.bin -d build/boot2.o build/boot2_asm.o
+
+build_runtime:
+	mkdir -p ${BUILD_DIR}
+	${ASM} -felf runtime/crt0.nasm -Istdlib/real/ -o build/crt0_nasm.o ${PROGRAM_CFLAGS} -W-gnu-elf-extensions
+	${ASM} -felf runtime/crt0.pmode.nasm -Istdlib/protected/ -o build/crt0_pmode_nasm.o ${PROGRAM_CFLAGS} -W-gnu-elf-extensions
+	${CC} -c runtime/crt0.c -Istdlib/real -o build/crt0.o ${PROGRAM_CFLAGS}
