@@ -1,5 +1,0 @@
-name: lisp
-main: tinylisp.c
-stdlib: true
-runtime: true
-
