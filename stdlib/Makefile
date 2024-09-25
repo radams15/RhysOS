@@ -7,14 +7,16 @@ STDLIB_OBJS := $(STDLIB_SRCS:%=${BUILD_DIR}/%.o)
 stdlib: $(STDLIB_OBJS)
 	ar -rcs $(BUILD_DIR)/stdlib/real/libstdlib.a $(STDLIB_OBJS)
 
-$(BUILD_DIR)/%.c.o: %.c
+$(BUILD_DIR)/%.c.o: %.c forcestdlib
 	mkdir -p $(dir $@)
 	${CC} -Istdlib/real ${STDLIB_CFLAGS} ${C_FLAGS} -c $< -o $@
 
-$(BUILD_DIR)/%.cpp.o: %.cpp
+$(BUILD_DIR)/%.cpp.o: %.cpp forcestdlib
 	mkdir -p $(dir $@)
 	${CXX} -Istdlib/real ${STDLIB_CXXFLAGS} ${C_FLAGS} -c $< -o $@
 
-$(BUILD_DIR)/%.nasm.o: %.nasm
+$(BUILD_DIR)/%.nasm.o: %.nasm forcestdlib
 	mkdir -p $(dir $@)
 	${ASM} -f elf -Istdlib/real ${ASM_FLAGS} $< -o $@
+
+forcestdlib: ;
