@@ -19,6 +19,7 @@ PROGRAM_CFLAGS ?= -Wall -DKERNEL_SEGMENT=${KERNEL_SEGMENT}
 
 include kernel/Makefile
 include stdlib/Makefile
+include programs/Makefile
 
 all: clean build_bootloader $(KERNEL_OBJS)
 	@echo "All done"
@@ -39,4 +40,6 @@ build_runtime:
 	mkdir -p ${BUILD_DIR}
 	${ASM} -felf runtime/crt0.nasm -Istdlib/real/ -o build/crt0_nasm.o ${PROGRAM_CFLAGS} -W-gnu-elf-extensions
 	${ASM} -felf runtime/crt0.pmode.nasm -Istdlib/protected/ -o build/crt0_pmode_nasm.o ${PROGRAM_CFLAGS} -W-gnu-elf-extensions
-	${CC} -c runtime/crt0.c -Istdlib/real -o build/crt0.o ${PROGRAM_CFLAGS}
+	${CC} -c runtime/crt0.c -Istdlib/real -o build/crt0.o ${PROGRAM_CFLAGS} ${C_FLAGS}
+	ar -rcs $(BUILD_DIR)/crt0.a build/crt0_nasm.o build/crt0.o
+	ar -rcs $(BUILD_DIR)/crt0.pmode.a build/crt0_pmode_nasm.o
