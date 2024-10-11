@@ -87,6 +87,7 @@ void* malloc(unsigned int size) {
         header = parse_block(header->next);
     }
 
+    printf("Malloc: failed to allocate memory\n");
     return NULL;
 
 found_block:

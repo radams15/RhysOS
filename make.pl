@@ -14,8 +14,8 @@ use Data::Dumper;
 use Config::Simple;
 
 my $ASM = 'nasm';
-my $CC = 'ia16-elf-gcc -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore -DRHYSOS';
-my $CXX = 'ia16-elf-g++ -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore -fno-unwind-tables -fno-rtti -fno-exceptions -DRHYSOS';
+my $CC = 'ia16-elf-gcc -fno-inline -nostdlib -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore -DRHYSOS';
+my $CXX = 'ia16-elf-g++ -fno-inline -nostdlib -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore -fno-unwind-tables -fno-rtti -fno-exceptions -DRHYSOS';
 my $LD = 'ia16-elf-ld';
 
 my $KERNEL_SEGMENT = '0x3000';

@@ -1,7 +1,6 @@
 #include "fat.h"
 
 #include "malloc.h"
-#include "stdio.h"
 #include "tty.h"
 #include "util.h"
 

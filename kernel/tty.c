@@ -188,7 +188,7 @@ int get_graphics_mode() {
 }
 
 
-void vfprintf(int fh, register char* text, register va_list args) {
+void vprintf(register char* text, register va_list args) {
     BOOL skip_next = FALSE;
     int i;
     char formatter;
@@ -234,11 +234,11 @@ void vfprintf(int fh, register char* text, register va_list args) {
     }
 }
 
-void fprintf(int fd, char* text, ...) {
+void printf(char* text, ...) {
     va_list ptr;
-    va_start(ptr, fd);
+    va_start(ptr, text);
 
-    vfprintf(fd, text, ptr);
+    vprintf(text, ptr);
 
     va_end(ptr);
 }
