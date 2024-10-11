@@ -52,6 +52,8 @@ void set_graphics_mode(int mode, int fnt);
 int get_graphics_mode();
 void cls();
 
+void fprintf(int fd, char* text, ...);
+
 void graphics_init();
 
 #endif

@@ -4,7 +4,11 @@
 #include "type.h"
 #include "util.h"
 
+#include <stdarg.h>
+
 #define TAB_SIZE 4
+
+#define FORMAT_MARK '%'
 
 int graphics_mode = GRAPHICS_MONO_80x25;
 int font = FONT_8x16;
@@ -41,6 +45,8 @@ void scroll() {
     tty_driver.tty_scroll_line();
     ypos--;
 }
+
+void abort(){}
 
 void print_char(int c) {
     print_char_colour(
@@ -180,6 +186,64 @@ void set_graphics_mode(int mode, int fnt) {
 int get_graphics_mode() {
     return graphics_mode;
 }
+
+
+void vfprintf(int fh, register char* text, register va_list args) {
+    BOOL skip_next = FALSE;
+    int i;
+    char formatter;
+
+    for (i = 0; text[i] != NULL; i++) {
+        if (skip_next) {
+            skip_next = FALSE;
+            continue;
+        }
+
+        if (text[i] == FORMAT_MARK) {
+            formatter = text[i + 1];
+
+            switch (formatter) {
+                case 'd':  // int
+                    printi(va_arg(args, int), 10);
+                    break;
+
+                case 'c':  // char
+                    print_char(va_arg(args, char));
+                    break;
+
+                case 's':  // string
+                    print_string(va_arg(args, char*));
+                    break;
+
+                case 'x':  // hex int
+                    printi(va_arg(args, int), 16);
+                    break;
+
+                case FORMAT_MARK:
+                    print_char(FORMAT_MARK);
+                    break;
+
+                default:
+                    break;
+            }
+
+            skip_next = TRUE;
+        } else {
+            print_char(text[i]);
+        }
+    }
+}
+
+void fprintf(int fd, char* text, ...) {
+    va_list ptr;
+    va_start(ptr, fd);
+
+    vfprintf(fd, text, ptr);
+
+    va_end(ptr);
+}
+
+
 
 void cls() {
     xpos = 0;
