@@ -72,14 +72,14 @@ void* malloc(unsigned int size) {
     struct BlkHeader* header = parse_block(heap_begin);
 
     if(header == NULL) {
-        print_string("Malloc error: failed to find initial header\n");
+        printf("Malloc error: failed to find initial header\n");
         return NULL;
     }
 
     int i=0;
     while(header != NULL) {
         i++;
-        // print_string("Block ");printi(header, 16); print_string("\n"); 
+        printf("Block: %x\n", header);
         if(header->length >= size && header->free) {
             goto found_block;
         }
@@ -99,7 +99,7 @@ found_block:
 
     unsigned char* out = ((unsigned char*) header) + sizeof(struct BlkHeader);
 
-    print_string("Malloc: ");printi(header, 16); print_string("\n"); 
+    printf("Malloc: %x\n", header);
     return out;
 }
 
@@ -115,20 +115,20 @@ void condense_memory() {
             break;
         }
 
-        printi(header->length, 16);
+        printf("%x\n", header->length);
 
         if(header->free && next->free) {
-            print_string("Condense "); printi(header, 16); print_string(", "); printi(next, 16); print_string("; ");
+            printf("Consense %x, %x; ", header, next);
             length = header->length + next->length + (2 * sizeof(struct BlkHeader));
         
             defn_header((unsigned char*) header, length, (unsigned char*) next->next, 1);
         } else {
-            print_string("No; ");
+            printf("No (%d, %d); ", header->free, next->free);
         }
 
         header = next;
     }
-    print_string("\n");
+    printf("\n");
 }
 
 void free(void* ptr) {
@@ -140,7 +140,7 @@ void free(void* ptr) {
         return;
     }
 
-    print_string("Free: ");printi(ptr, 16); print_string("\n"); 
+    printf("Free: %x\n", ptr);
 
     header->free = TRUE;
 
