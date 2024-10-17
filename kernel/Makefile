@@ -5,6 +5,8 @@ KERNEL_SRCS := $(shell find * -name '*.cpp' -or -name '*.c' -or -name '*.nasm')
 KERNEL_OBJS := $(KERNEL_SRCS:%=../${BUILD_DIR}/%.o)
 
 all: $(KERNEL_OBJS)
+	${LD} -Tlink.ld -nostdlib -o ../$(BUILD_DIR)/kernel.elf $(KERNEL_OBJS)
+	objcopy -O binary ../$(BUILD_DIR)/kernel.elf ../$(BUILD_DIR)/kernel.bin
 
 ../$(BUILD_DIR)/%.c.o: %.c
 	mkdir -p $(dir $@)
