@@ -1,6 +1,6 @@
 OUTPUT_FORMAT("elf32-i386");
 
-ENTRY(_main);
+ENTRY(kentry);
 
 SECTIONS
 {

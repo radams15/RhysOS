@@ -17,6 +17,8 @@ export C_FLAGS ?= -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading
 BOOTLOADER_CFLAGS ?= -Wall -Werror -Ibootloader -DKERNEL_SEGMENT=${KERNEL_SEGMENT} -DSTACK_SEG=${STACK_SEGMENT} -DBOOT2_SEG=${BOOT2_SEGMENT}
 RUNTIME_CFLAGS ?= -DKERNEL_SEGMENT=${KERNEL_SEGMENT}
 
+EXTRA_FILES ?= docs/syscalls.md $(shell echo root/*)
+
 all: clean build_bootloader build_kernel build_runtime build_stdlib build_programs
 	@echo "All done"
 
@@ -48,3 +50,10 @@ build_runtime:
 	${CC} -c runtime/crt0.c -Istdlib/real -o build/crt0.o ${RUNTIME_CFLAGS} ${C_FLAGS}
 	ar -rcs $(BUILD_DIR)/crt0.a build/crt0_nasm.o build/crt0.o
 	ar -rcs $(BUILD_DIR)/crt0.pmode.a build/crt0_pmode_nasm.o
+
+build_image:
+	rm -f $(BUILD_DIR)/system.img
+	dd if=/dev/zero of=$(BUILD_DIR)/system.img bs=512 count=2880
+	mkdosfs -F12 $(BUILD_DIR)/system.img
+	mcopy -i $(BUILD_DIR)/system.img build/boot2.bin build/kernel.bin $(shell find build/programs/ -type f ! -name "*.*") ${EXTRA_FILES} ::
+	dd if=$(BUILD_DIR)/boot.bin of=$(BUILD_DIR)/system.img bs=512 count=1 conv=notrunc

@@ -1,6 +1,7 @@
 bits 16
 
 extern _main
+global kentry
 
-_entry:
+kentry:
     jmp _main
