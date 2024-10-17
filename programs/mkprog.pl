@@ -14,8 +14,8 @@ sub unset_env_err { sprintf "Error, %s is unset\n", $_[0] }
 
 my $program = abs_path(shift or die $usage);
 my $folder = shift or die $usage;
-my @runtime = ('build/crt0.a', 'build/crt0.pmode.a');
-my $stdlib = 'build/stdlib/real/libstdlib.a';
+my @runtime = ('../build/crt0.a', '../build/crt0.pmode.a');
+my $stdlib = '../build/stdlib/real/libstdlib.a';
 
 my $CC = $ENV{CC} or die unset_env_err "CC";
 my $CXX = $ENV{CXX} or die unset_env_err "CXX";
@@ -46,14 +46,14 @@ my @objs;
 for my $file ( ($conf->param('main')), $conf->param('files') ) {
     if ($file =~ /\.c$/) {
         (my $out_obj = $file) =~ s:(.*)\.c:$folder/$1.o:;
-        &run("$CC -c $program/$file -I$program/ -Istdlib/real -o $out_obj $PROGRAM_FLAGS");
+        &run("$CC -c $program/$file -I$program/ -I../stdlib/real -o $out_obj $PROGRAM_FLAGS");
 
         push @objs, $out_obj;
     }
 
     if ($file =~ /\.cpp$/) {
         (my $out_obj = $file) =~ s:(.*)\.cpp:$folder/$1.o:;
-        &run("$CXX -c $program/$file -I$program/ -Istdlib/real -o $out_obj $PROGRAM_FLAGS");
+        &run("$CXX -c $program/$file -I$program/ -I../stdlib/real -o $out_obj $PROGRAM_FLAGS");
 
         push @objs, $out_obj;
     }
@@ -61,7 +61,7 @@ for my $file ( ($conf->param('main')), $conf->param('files') ) {
     if ($file =~ /\.nasm$/) {
         (my $out_obj = $file) =~ s:(.*)\.nasm:$folder/$1.o:;
 
-        &run("$ASM -felf $program/$file -I$program/ -Istdlib/real -o $out_obj");
+        &run("$ASM -felf $program/$file -I$program/ -I../stdlib/real -o $out_obj");
 
         push @objs, $out_obj;
     }
@@ -73,7 +73,7 @@ $stdlib = $conf->param('pmode')? '' : $stdlib;
 
 my $out = "$folder/".$conf->param('name');
 
-&run("$LD -o $out.elf -d -Tprograms/link.ld ".($conf->param('runtime')? " @selected_runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
+&run("$LD -o $out.elf -d -Tlink.ld ".($conf->param('runtime')? " @selected_runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
 
 &run("objcopy -O binary $out.elf $out.bin");
 

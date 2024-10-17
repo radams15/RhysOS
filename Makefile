@@ -1,28 +1,33 @@
-ASM = nasm
-CC = ia16-elf-gcc
-CXX = ia16-elf-g++
-LD = ia16-elf-ld
+export ASM = nasm
+export CC = ia16-elf-gcc
+export CXX = ia16-elf-g++
+export LD = ia16-elf-ld
 
-BUILD_DIR ?= build/
+export BUILD_DIR ?= build/
 
-KERNEL_SEGMENT = 0x3000
-BOOT2_SEGMENT = 0x9000
-STACK_SEGMENT = ${KERNEL_SEGMENT}
+export KERNEL_SEGMENT = 0x3000
+export BOOT2_SEGMENT = 0x9000
+export STACK_SEGMENT = ${KERNEL_SEGMENT}
 
-HEAP_ADDR = 0x9000
-FLOPPY_SECTORS = 2880
+export HEAP_ADDR = 0x9000
+export FLOPPY_SECTORS = 2880
 
-ASM_FLAGS ?= -W-gnu-elf-extensions
-C_FLAGS ?= -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore
+export ASM_FLAGS ?= -W-gnu-elf-extensions
+export C_FLAGS ?= -fno-inline -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore
 BOOTLOADER_CFLAGS ?= -Wall -Werror -Ibootloader -DKERNEL_SEGMENT=${KERNEL_SEGMENT} -DSTACK_SEG=${STACK_SEGMENT} -DBOOT2_SEG=${BOOT2_SEGMENT}
 RUNTIME_CFLAGS ?= -DKERNEL_SEGMENT=${KERNEL_SEGMENT}
 
-include kernel/Makefile
-include stdlib/Makefile
-include programs/Makefile
-
-all: clean build_bootloader kernel build_runtime stdlib programs
+all: clean build_bootloader build_kernel build_runtime build_stdlib build_programs
 	@echo "All done"
+
+build_kernel:
+	make -C kernel
+
+build_stdlib:
+	make -C stdlib
+
+build_programs:
+	make -C programs
 
 clean:
 	rm -rf build/
