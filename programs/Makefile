@@ -1,7 +1,7 @@
 PROGRAM_FLAGS ?= -Wall -DKERNEL_SEGMENT=$KERNEL_SEGMENT
 
 PROGRAM_DIRS := $(shell echo */)
-PROGRAM_BINS := $(PROGRAM_DIRS:%=../${BUILD_DIR}/%)
+PROGRAM_BINS := $(PROGRAM_DIRS:%=../${BUILD_DIR}/programs/%)
 
 MKPROG?=./mkprog.pl
 
@@ -11,6 +11,6 @@ all: make_folder $(PROGRAM_BINS)
 make_folder:
 	mkdir -p ../$(BUILD_DIR)/programs
 
-../$(BUILD_DIR)/%:%
+../$(BUILD_DIR)/programs/%:%
 	CC=${CC} CXX=${CXX} LD=${LD} ASM=${ASM} PROGRAM_FLAGS="${C_FLAGS} ${PROGRAM_FLAGS}" \
  		${MKPROG} $< $@
