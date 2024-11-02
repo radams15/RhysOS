@@ -12,12 +12,11 @@
 int interrupt(int number, int AX, int BX, int CX, int DX);
 
 #if BIOS_SERIAL
-
-int serial_init(Port_t port,
-                Baud_t baud,
-                Parity_t parity,
-                StopBits_t stop_bits,
-                DataBits_t data_bits) {
+int serial_init(int port,
+                int baud,
+                int parity,
+                int stop_bits,
+                int data_bits) {
     int code;
     code = (baud << 4) + (parity << 2) + (stop_bits << 1) + (data_bits);
 
@@ -26,14 +25,14 @@ int serial_init(Port_t port,
     return 0;
 }
 
-void serial_putc(Port_t port, char c) {
+void serial_putc(int port, char c) {
     if (c == '\n')
         serial_putc(port, '\r');
 
     interrupt(0x14, (0x01 << 8) + c, 0, 0, port);
 }
 
-char serial_getc(Port_t port) {
+char serial_getc(int port) {
     int out;
 
     do {
@@ -51,11 +50,11 @@ char serial_getc(Port_t port) {
 
 unsigned int port_map[] = {0x3f8, 0x2F8, 0x3E8};
 
-int serial_init(Port_t port,
-                Baud_t baud,
-                Parity_t parity,
-                StopBits_t stop_bits,
-                DataBits_t data_bits) {
+int serial_init(int port,
+                int baud,
+                int parity,
+                int stop_bits,
+                int data_bits) {
     unsigned int portnum = port_map[port];
 
     outb(portnum + 0, 0x03);  // Set divisor to 3 (low byte) 38400 baud
@@ -80,14 +79,14 @@ int serial_init(Port_t port,
     return 0;
 }
 
-void serial_putc(Port_t port, char c) {
+void serial_putc(int port, char c) {
     if (c == '\n')
         outb(port_map[port], '\r');
 
     outb(port_map[port], c);
 }
 
-char serial_getc(Port_t port) {
+char serial_getc(int port) {
     int out;
 
     do {

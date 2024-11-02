@@ -3,7 +3,7 @@
 #include "clock.h"
 #include "malloc.h"
 #include "rand.h"
-#include "drivers/serial/serial.h"
+#include "serial.h"
 #include "sysinfo.h"
 #include "tty.h"
 #include "util.h"

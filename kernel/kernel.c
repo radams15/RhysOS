@@ -13,7 +13,7 @@
 #include "fs/tmpfs.h"
 
 #include "clock.h"
-#include "drivers/serial/serial.h"
+#include "serial.h"
 
 #define _STRINGIZE(x) #x
 #define STRINGIZE(x) _STRINGIZE(x)
