@@ -1,7 +1,6 @@
 #include "fat.h"
 
 #include "malloc.h"
-#include "stdio.h"
 #include "tty.h"
 #include "util.h"
 
@@ -307,6 +306,7 @@ FsNode_t* fat_init(int sector_start) {
     }
 
     num_root_nodes = 0;
+
 
     strcpy(root_node.name, "/");
     root_node.flags = FS_DIRECTORY;

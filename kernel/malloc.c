@@ -4,8 +4,7 @@
 #include "type.h"
 #include "util.h"
 
-unsigned int heap_begin_addr;
-unsigned int heap_end_addr;
+
 
 
 unsigned char* heap_begin;
@@ -35,12 +34,12 @@ struct BlkHeader* parse_block(unsigned char* ptr) {
     struct BlkHeader* header = (struct BlkHeader*) ptr;
 
     if(ptr == NULL) {
-        error("Invalid block parse (NULL)");
+        // error("Invalid block parse (NULL)"); 
         return NULL;
     }
 
     if(header->magic != magic) {
-        error("Invalid block magic!");
+        // error("Invalid block magic!"); 
         return NULL;
     }
 
@@ -72,9 +71,15 @@ void* malloc(unsigned int size) {
 
     struct BlkHeader* header = parse_block(heap_begin);
 
+    if(header == NULL) {
+        printf("Malloc error: failed to find initial header\n");
+        return NULL;
+    }
+
     int i=0;
     while(header != NULL) {
         i++;
+        /* printf("Block: %x\n", header); */
         if(header->length >= size && header->free) {
             goto found_block;
         }
@@ -82,10 +87,10 @@ void* malloc(unsigned int size) {
         header = parse_block(header->next);
     }
 
+    printf("kmalloc: failed to allocate memory\n");
     return NULL;
 
 found_block:
-
     if(header->length > size) {
         header = split(header, size);
     }
@@ -94,24 +99,46 @@ found_block:
 
     unsigned char* out = ((unsigned char*) header) + sizeof(struct BlkHeader);
 
+    /* printf("kmalloc (%d): %x\n", size, out); */
     return out;
+}
+
+void condense_memory() {
+    struct BlkHeader* header = parse_block(heap_begin);
+    struct BlkHeader* next;
+    unsigned int length;
+
+    while(header != NULL) {
+        next = parse_block(header->next);
+
+        if(next == NULL) {
+            break;
+        }
+
+        if(header->free && next->free) {
+            length = header->length + next->length + (2 * sizeof(struct BlkHeader));
+        
+            defn_header((unsigned char*) header, length, (unsigned char*) next->next, 1);
+        }
+
+        header = next;
+    }
+    printf("\n");
 }
 
 void free(void* ptr) {
     struct BlkHeader* header = mem_get_header(ptr);
 
     if(header == NULL) {
-        error("Invalid kernel free");
+        printf("Invalid kernel free (%x)\n", ptr);
         return;
     }
 
-    struct BlkHeader* next = parse_block(header->next);
-    unsigned int length = header->length;
-    if(next->free) {
-        length += next->length + sizeof(struct BlkHeader);
-    }
+    printf("kfree: %x\n", ptr);
 
-    defn_header((unsigned char*) header, length, (unsigned char*) next, 1);
+    header->free = TRUE;
+
+    condense_memory();
 }
 
 int memmgr_init() {

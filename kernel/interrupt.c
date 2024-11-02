@@ -28,26 +28,41 @@ int i21_handler(SyscallArgs_t* args) {
             char** argv =
                 malloc(args->b * sizeof(char));  // array of args to populate
 
+            if(argv == NULL) {
+                printf("Unable to malloc argv: %d\n", args->b*sizeof(char));
+                return 2;
+            }
+
             seg_copy((char*)args->c, (char*)argv, args->b * sizeof(char*),
                      args->ds,
                      KERNEL_SEGMENT);  // copy argv pointers themselves, i.e.
-                                     // addresses of the argv elements
+                                       // addresses of the argv elements
 
             for (int i = 0; i < args->b; i++) {
                 char* addr = argv[i];  // address in calling segment
-                argv[i] = malloc(argv_item_size *
-                                 sizeof(char));  // allocate space for the
-                                                 // argument in kernel segment
-
+                unsigned int n = argv_item_size * sizeof(char);
+                void* arg_space = malloc(n); // Unsure why assigning to a
+                                             // variable fixes memory corruption here.
+                 
+                argv[i] = (char**) arg_space;  // allocate space for the
+                                               // argument in kernel segment
+                if(argv[i] == NULL || argv[i] == 0xf52e) {
+                    printf("Unable to malloc argv[i]\n");
+                    return 2;
+                }
+            
+                /* printf("Malloc(%d) argv[i](%x/%x)\n", n, argv[i]); */
+            
                 seg_copy(addr, argv[i], argv_item_size, args->ds, KERNEL_SEGMENT);
             }
 
             seg_copy((char*)args->a, (char*)name, sizeof(name), args->ds,
                      KERNEL_SEGMENT);
             int ret =
-                exec(name, args->b, argv, args->d, args->e, args->f, TRUE);
+                exec(name, args->b, argv, args->d, args->e, args->f, FALSE);
 
             for (int i = 0; i < args->b; i++) {
+                /* printf("Free argv: %x\n", argv[i]); */
                 free(argv[i]);
             }
             free(argv);
@@ -114,6 +129,7 @@ int i21_handler(SyscallArgs_t* args) {
             break;
 
         case 8:
+            print_string("Free: ");printi(args->a, 16);print_char('\n');
             free((void*)args->a);
             break;
 

@@ -1,6 +1,8 @@
 #ifndef RHYSOS_TTY_H
 #define RHYSOS_TTY_H
 
+#include <stdarg.h>
+
 enum {
     GRAPHICS_MONO_80x25 = 0x3,
     GRAPHICS_MONO_40x25 = 0x1,
@@ -51,6 +53,8 @@ char getch();
 void set_graphics_mode(int mode, int fnt);
 int get_graphics_mode();
 void cls();
+
+void printf(char* text, ...);
 
 void graphics_init();
 
