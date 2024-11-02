@@ -5,52 +5,11 @@
 #define SERIAL_ECHO 1
 #endif
 
-#ifndef BIOS_SERIAL
-#define BIOS_SERIAL 0
-#endif
-
 int interrupt(int number, int AX, int BX, int CX, int DX);
 
-#if BIOS_SERIAL
-int serial_init(int port,
-                int baud,
-                int parity,
-                int stop_bits,
-                int data_bits) {
-    int code;
-    code = (baud << 4) + (parity << 2) + (stop_bits << 1) + (data_bits);
+static unsigned int port_map[] = {0x3f8, 0x2F8, 0x3E8};
 
-    interrupt(0x14, (0x00 << 8) + code, 0, 0, port);
-
-    return 0;
-}
-
-void serial_putc(int port, char c) {
-    if (c == '\n')
-        serial_putc(port, '\r');
-
-    interrupt(0x14, (0x01 << 8) + c, 0, 0, port);
-}
-
-char serial_getc(int port) {
-    int out;
-
-    do {
-        out = interrupt(0x14, (0x02 << 8), 0, 0, port);
-    } while (out == 0);
-
-#if SERIAL_ECHO
-    serial_putc(port, out);
-#endif
-
-    return out;
-}
-
-#else
-
-unsigned int port_map[] = {0x3f8, 0x2F8, 0x3E8};
-
-int serial_init(int port,
+int io_serial_init(int port,
                 int baud,
                 int parity,
                 int stop_bits,
@@ -79,14 +38,14 @@ int serial_init(int port,
     return 0;
 }
 
-void serial_putc(int port, char c) {
+void io_serial_putc(int port, char c) {
     if (c == '\n')
         outb(port_map[port], '\r');
 
     outb(port_map[port], c);
 }
 
-char serial_getc(int port) {
+char io_serial_getc(int port) {
     int out;
 
     do {
@@ -99,5 +58,3 @@ char serial_getc(int port) {
 
     return out;
 }
-
-#endif
