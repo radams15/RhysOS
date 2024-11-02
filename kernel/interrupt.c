@@ -28,8 +28,8 @@ int i21_handler(SyscallArgs_t* args) {
             char** argv =
                 malloc(args->b * sizeof(char));  // array of args to populate
 
-            if(argv == NULL) {
-                printf("Unable to malloc argv: %d\n", args->b*sizeof(char));
+            if (argv == NULL) {
+                printf("Unable to malloc argv: %d\n", args->b * sizeof(char));
                 return 2;
             }
 
@@ -41,19 +41,21 @@ int i21_handler(SyscallArgs_t* args) {
             for (int i = 0; i < args->b; i++) {
                 char* addr = argv[i];  // address in calling segment
                 unsigned int n = argv_item_size * sizeof(char);
-                void* arg_space = malloc(n); // Unsure why assigning to a
-                                             // variable fixes memory corruption here.
-                 
-                argv[i] = (char**) arg_space;  // allocate space for the
-                                               // argument in kernel segment
-                if(argv[i] == NULL || argv[i] == 0xf52e) {
+                void* arg_space =
+                    malloc(n);  // Unsure why assigning to a
+                                // variable fixes memory corruption here.
+
+                argv[i] = (char**)arg_space;  // allocate space for the
+                                              // argument in kernel segment
+                if (argv[i] == NULL || argv[i] == 0xf52e) {
                     printf("Unable to malloc argv[i]\n");
                     return 2;
                 }
-            
+
                 /* printf("Malloc(%d) argv[i](%x/%x)\n", n, argv[i]); */
-            
-                seg_copy(addr, argv[i], argv_item_size, args->ds, KERNEL_SEGMENT);
+
+                seg_copy(addr, argv[i], argv_item_size, args->ds,
+                         KERNEL_SEGMENT);
             }
 
             seg_copy((char*)args->a, (char*)name, sizeof(name), args->ds,
@@ -129,7 +131,9 @@ int i21_handler(SyscallArgs_t* args) {
             break;
 
         case 8:
-            print_string("Free: ");printi(args->a, 16);print_char('\n');
+            print_string("Free: ");
+            printi(args->a, 16);
+            print_char('\n');
             free((void*)args->a);
             break;
 

@@ -46,7 +46,7 @@ void scroll() {
     ypos--;
 }
 
-void abort(){}
+void abort() {}
 
 void print_char(int c) {
     print_char_colour(
@@ -187,7 +187,6 @@ int get_graphics_mode() {
     return graphics_mode;
 }
 
-
 void vprintf(register char* text, register va_list args) {
     BOOL skip_next = FALSE;
     int i;
@@ -242,8 +241,6 @@ void printf(char* text, ...) {
 
     va_end(ptr);
 }
-
-
 
 void cls() {
     xpos = 0;

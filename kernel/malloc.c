@@ -4,9 +4,6 @@
 #include "type.h"
 #include "util.h"
 
-
-
-
 unsigned char* heap_begin;
 unsigned char* heap_end;
 unsigned char* heap;
@@ -15,12 +12,15 @@ unsigned int heap_size;
 const static unsigned char magic = 0xBE;
 
 void error(const char* msg) {
-    print_string((char*) msg);
+    print_string((char*)msg);
     print_char('\n');
 }
 
-int defn_header(unsigned char* ptr, unsigned len, unsigned char* next, unsigned char free) {
-    struct BlkHeader* header = (struct BlkHeader*) ptr;
+int defn_header(unsigned char* ptr,
+                unsigned len,
+                unsigned char* next,
+                unsigned char free) {
+    struct BlkHeader* header = (struct BlkHeader*)ptr;
 
     header->magic = magic;
     header->length = len;
@@ -31,15 +31,15 @@ int defn_header(unsigned char* ptr, unsigned len, unsigned char* next, unsigned 
 }
 
 struct BlkHeader* parse_block(unsigned char* ptr) {
-    struct BlkHeader* header = (struct BlkHeader*) ptr;
+    struct BlkHeader* header = (struct BlkHeader*)ptr;
 
-    if(ptr == NULL) {
-        // error("Invalid block parse (NULL)"); 
+    if (ptr == NULL) {
+        // error("Invalid block parse (NULL)");
         return NULL;
     }
 
-    if(header->magic != magic) {
-        // error("Invalid block magic!"); 
+    if (header->magic != magic) {
+        // error("Invalid block magic!");
         return NULL;
     }
 
@@ -56,31 +56,31 @@ struct BlkHeader* split(struct BlkHeader* block, unsigned int size) {
     unsigned int old_size = block->length;
     unsigned int new_size = old_size - (size + sizeof(struct BlkHeader));
 
-    block += size + sizeof(struct BlkHeader); // increment block pointer
+    block += size + sizeof(struct BlkHeader);  // increment block pointer
 
-    defn_header((unsigned char*) block, new_size, block->next, 1);
-    defn_header((unsigned char*) out, size, (unsigned char*) block, 1);
+    defn_header((unsigned char*)block, new_size, block->next, 1);
+    defn_header((unsigned char*)out, size, (unsigned char*)block, 1);
 
     return out;
 }
 
 void* malloc(unsigned int size) {
-    if(size == 0) {
+    if (size == 0) {
         return NULL;
     }
 
     struct BlkHeader* header = parse_block(heap_begin);
 
-    if(header == NULL) {
+    if (header == NULL) {
         printf("Malloc error: failed to find initial header\n");
         return NULL;
     }
 
-    int i=0;
-    while(header != NULL) {
+    int i = 0;
+    while (header != NULL) {
         i++;
         /* printf("Block: %x\n", header); */
-        if(header->length >= size && header->free) {
+        if (header->length >= size && header->free) {
             goto found_block;
         }
 
@@ -91,13 +91,13 @@ void* malloc(unsigned int size) {
     return NULL;
 
 found_block:
-    if(header->length > size) {
+    if (header->length > size) {
         header = split(header, size);
     }
 
-    defn_header((unsigned char*) header, header->length, header->next, 0);
+    defn_header((unsigned char*)header, header->length, header->next, 0);
 
-    unsigned char* out = ((unsigned char*) header) + sizeof(struct BlkHeader);
+    unsigned char* out = ((unsigned char*)header) + sizeof(struct BlkHeader);
 
     /* printf("kmalloc (%d): %x\n", size, out); */
     return out;
@@ -108,17 +108,19 @@ void condense_memory() {
     struct BlkHeader* next;
     unsigned int length;
 
-    while(header != NULL) {
+    while (header != NULL) {
         next = parse_block(header->next);
 
-        if(next == NULL) {
+        if (next == NULL) {
             break;
         }
 
-        if(header->free && next->free) {
-            length = header->length + next->length + (2 * sizeof(struct BlkHeader));
-        
-            defn_header((unsigned char*) header, length, (unsigned char*) next->next, 1);
+        if (header->free && next->free) {
+            length =
+                header->length + next->length + (2 * sizeof(struct BlkHeader));
+
+            defn_header((unsigned char*)header, length,
+                        (unsigned char*)next->next, 1);
         }
 
         header = next;
@@ -129,7 +131,7 @@ void condense_memory() {
 void free(void* ptr) {
     struct BlkHeader* header = mem_get_header(ptr);
 
-    if(header == NULL) {
+    if (header == NULL) {
         printf("Invalid kernel free (%x)\n", ptr);
         return;
     }
@@ -142,26 +144,17 @@ void free(void* ptr) {
 }
 
 int memmgr_init() {
-    heap = (unsigned char*) &heap_begin_addr;
-    heap_size = (unsigned char*) &heap_end_addr - (unsigned char*) &heap_begin_addr;
+    heap = (unsigned char*)&heap_begin_addr;
+    heap_size =
+        (unsigned char*)&heap_end_addr - (unsigned char*)&heap_begin_addr;
 
     heap_begin = heap;
     heap_end = heap_begin + heap_size;
 
-    defn_header(heap_begin, heap_size-sizeof(struct BlkHeader), NULL, 1);
+    defn_header(heap_begin, heap_size - sizeof(struct BlkHeader), NULL, 1);
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
 
 void* realloc(void* ptr, unsigned int size) {
     /*if (ptr == NULL)
@@ -192,7 +185,6 @@ void* realloc(void* ptr, unsigned int size) {
     error("Realloc unimplemented!");
     return NULL;
 }
-
 
 int a20_available() {
     return interrupt(0x15, 0x2403, 0, 0, 0);

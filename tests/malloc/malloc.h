@@ -9,4 +9,4 @@ int memmgr_init();
 unsigned char* kmalloc(unsigned int size);
 void kfree(unsigned char* ptr);
 
-#endif //MALLOC_MALLOC_H
+#endif  // MALLOC_MALLOC_H

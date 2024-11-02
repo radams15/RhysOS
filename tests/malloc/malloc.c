@@ -2,8 +2,8 @@
 // Created by rhys on 05/03/24.
 //
 
-#include <malloc.h>
 #include "malloc.h"
+#include <malloc.h>
 
 unsigned char* heap_begin;
 unsigned char* heap_end;
@@ -11,7 +11,7 @@ unsigned char* heap;
 
 const static unsigned char magic = 0xBE;
 
-unsigned int heap_size = 640*1024; // 640k memory
+unsigned int heap_size = 640 * 1024;  // 640k memory
 
 struct BlkHeader {
     unsigned char magic;
@@ -24,8 +24,11 @@ void error(const char* msg) {
     fprintf(stderr, "%s\n", msg);
 }
 
-int defn_header(unsigned char* ptr, unsigned len, unsigned char* next, unsigned char free) {
-    struct BlkHeader* header = (struct BlkHeader*) ptr;
+int defn_header(unsigned char* ptr,
+                unsigned len,
+                unsigned char* next,
+                unsigned char free) {
+    struct BlkHeader* header = (struct BlkHeader*)ptr;
 
     header->magic = magic;
     header->length = len;
@@ -36,14 +39,14 @@ int defn_header(unsigned char* ptr, unsigned len, unsigned char* next, unsigned 
 }
 
 struct BlkHeader* parse_block(unsigned char* ptr) {
-    struct BlkHeader* header = (struct BlkHeader*) ptr;
+    struct BlkHeader* header = (struct BlkHeader*)ptr;
 
-    if(ptr == NULL) {
+    if (ptr == NULL) {
         error("Invalid block parse (NULL)");
         return NULL;
     }
 
-    if(header->magic != magic) {
+    if (header->magic != magic) {
         error("Invalid block magic!");
         return NULL;
     }
@@ -57,25 +60,25 @@ struct BlkHeader* split(struct BlkHeader* block, unsigned int size) {
     unsigned int old_size = block->length;
     unsigned int new_size = old_size - (size + sizeof(struct BlkHeader));
 
-    block += size + sizeof(struct BlkHeader); // increment block pointer
+    block += size + sizeof(struct BlkHeader);  // increment block pointer
 
-    defn_header((unsigned char*) block, new_size, block->next, 1);
-    defn_header((unsigned char*) out, size, (unsigned char*) block, 1);
+    defn_header((unsigned char*)block, new_size, block->next, 1);
+    defn_header((unsigned char*)out, size, (unsigned char*)block, 1);
 
     return out;
 }
 
 unsigned char* kmalloc(unsigned int size) {
-    if(size == 0) {
+    if (size == 0) {
         return NULL;
     }
 
     struct BlkHeader* header = parse_block(heap_begin);
 
-    int i=0;
-    while(header != NULL) {
+    int i = 0;
+    while (header != NULL) {
         i++;
-        if(header->length >= size && header->free) {
+        if (header->length >= size && header->free) {
             goto found_block;
         }
 
@@ -86,37 +89,38 @@ unsigned char* kmalloc(unsigned int size) {
 
 found_block:
 
-    if(header->length > size) {
+    if (header->length > size) {
         header = split(header, size);
     }
 
     printf("%d blocks\n", i);
 
-    defn_header((unsigned char*) header, header->length, header->next, 0);
+    defn_header((unsigned char*)header, header->length, header->next, 0);
 
-    unsigned char* out = ((unsigned char*) header) + sizeof(struct BlkHeader);
+    unsigned char* out = ((unsigned char*)header) + sizeof(struct BlkHeader);
 
     return out;
 }
 
-// int defn_header(unsigned char* ptr, unsigned len, unsigned char* next, unsigned char free)
-void kfree(unsigned char *ptr) {
+// int defn_header(unsigned char* ptr, unsigned len, unsigned char* next,
+// unsigned char free)
+void kfree(unsigned char* ptr) {
     ptr -= sizeof(struct BlkHeader);
 
     struct BlkHeader* header = parse_block(ptr);
 
-    if(header == NULL) {
+    if (header == NULL) {
         error("Invalid kernel free");
         return;
     }
 
     struct BlkHeader* next = parse_block(header->next);
     unsigned int length = header->length;
-    if(next->free) {
+    if (next->free) {
         length += next->length + sizeof(struct BlkHeader);
     }
 
-    defn_header((unsigned char*) header, length, (unsigned char*) next, 1);
+    defn_header((unsigned char*)header, length, (unsigned char*)next, 1);
 }
 
 int memmgr_init() {
@@ -125,7 +129,7 @@ int memmgr_init() {
     heap_begin = heap;
     heap_end = heap_begin + heap_size;
 
-    defn_header(heap_begin, heap_size-sizeof(struct BlkHeader), NULL, 1);
+    defn_header(heap_begin, heap_size - sizeof(struct BlkHeader), NULL, 1);
 
     return 0;
 }

@@ -60,11 +60,13 @@ void* malloc(uint16 size) {
     BlkHeader_t* header = (BlkHeader_t*)&heap_begin;
     while (1) {
         if (header == NULL) {
-            fprintf(stderr, "[STDLIB] Memory allocation error (out of blocks)!\n");
+            fprintf(stderr,
+                    "[STDLIB] Memory allocation error (out of blocks)!\n");
             return 0;
         }
         if (header->magic != HEAP_MAGIC) {
-            fprintf(stderr, "[STDLIB] Memory allocation error (invalid magic = %x)!\n",
+            fprintf(stderr,
+                    "[STDLIB] Memory allocation error (invalid magic = %x)!\n",
                     header->magic);
             return 0;
         }
@@ -129,8 +131,8 @@ void free(void* ptr) {
     BlkHeader_t* header = (unsigned int*)ptr - sizeof(BlkHeader_t);
 
     if (header->magic != HEAP_MAGIC) {
-        fprintf(stderr, "[STDLIB] Invalid free of pointer %x (magic = %x)\n", header,
-                header->magic);
+        fprintf(stderr, "[STDLIB] Invalid free of pointer %x (magic = %x)\n",
+                header, header->magic);
         return;
     }
 

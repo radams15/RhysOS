@@ -22,11 +22,13 @@ void start(int argc, char** argv_ext, int should_free) {
     char** argv = 0;
     if (argc != 0) {
         argv = malloc(argc * sizeof(char));
-        seg_copy(argv_ext, argv_in, argc * sizeof(char*), KERNEL_SEGMENT, my_ds);
+        seg_copy(argv_ext, argv_in, argc * sizeof(char*), KERNEL_SEGMENT,
+                 my_ds);
 
         for (int i = 0; i < argc; i++) {
             argv[i] = malloc(argv_item_size * sizeof(char));
-            seg_copy(argv_in[i], argv[i], argv_item_size, KERNEL_SEGMENT, my_ds);
+            seg_copy(argv_in[i], argv[i], argv_item_size, KERNEL_SEGMENT,
+                     my_ds);
             if (should_free)
                 kfree(argv_in[i]);
         }

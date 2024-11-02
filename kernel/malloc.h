@@ -15,7 +15,6 @@ void free(void* ptr);
 
 struct BlkHeader* mem_get_header(void* ptr);
 
-
 int a20_available();
 int a20_enable();
 

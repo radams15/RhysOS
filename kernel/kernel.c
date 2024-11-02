@@ -1,12 +1,12 @@
 #include "fs/fs.h"
 #include "interrupt.h"
 #include "malloc.h"
+#include "pmode.h"
 #include "proc.h"
 #include "rand.h"
 #include "sysinfo.h"
 #include "tty.h"
 #include "util.h"
-#include "pmode.h"
 
 #include "fs/devfs.h"
 #include "fs/fat.h"
@@ -135,18 +135,18 @@ int init(struct SystemInfo* info) {
                   "Failed to initialise /dev/com2\n", COM2, BAUD_9600,
                   PARITY_NONE, STOPBITS_ONE, DATABITS_8);
 
-    MUST_COMPLETE(init_interrupts, "Interrupts enabled\n", 
-                  "Interrupts failed to initialise\n"); 
-  
+    MUST_COMPLETE(init_interrupts, "Interrupts enabled\n",
+                  "Interrupts failed to initialise\n");
+
     struct TimeDelta time_val;
     time(&time_val);
     srand(time_val.tick + time_val.sec + time_val.min + time_val.hr);
 
     fs_root = fat_init(info->rootfs_start);
     FsNode_t* fs_dev = devfs_init();
-    // FsNode_t* fs_tmp = tmpfs_init(); 
+    // FsNode_t* fs_tmp = tmpfs_init();
     fs_mount("dev", fs_root, fs_dev);
-    // fs_mount("tmp", fs_root, fs_tmp); 
+    // fs_mount("tmp", fs_root, fs_tmp);
     print_string("Root filesystem mounted\n");
 
     stdin = open("/dev/stdin", O_RDONLY);
@@ -154,9 +154,9 @@ int init(struct SystemInfo* info) {
     stderr = open("/dev/stderr", O_WRONLY);
 
     char* shell_argv[] = {"shell", "login.bat"};
-    // exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE); 
+    // exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
     exec("shell", 0, NULL, stdin, stdout, stderr, FALSE);
-    
+
     close(stdin);
     close(stdout);
     close(stderr);

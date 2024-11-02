@@ -1,7 +1,7 @@
 #include "pmode.h"
-#include "tty.h"
-#include "fs/fs.h"
 #include "fs/fat.h"
+#include "fs/fs.h"
+#include "tty.h"
 
 int call_pmode();
 
@@ -14,7 +14,8 @@ int pmode_exec(struct FsNode* fs_node) {
 
     int cluster = fs_node->start_sector;
 
-    read_lba_to_segment(0, cluster_to_lba(cluster), (int)&header, KERNEL_SEGMENT);
+    read_lba_to_segment(0, cluster_to_lba(cluster), (int)&header,
+                        KERNEL_SEGMENT);
 
     if (header.magic[0] != 'R' || header.magic[1] != 'Z') {
         print_string("Invalid header magic!\n");
