@@ -13,6 +13,8 @@ use Data::Dumper;
 
 use Config::Simple;
 
+chomp(my $tag = `git describe --tags`);
+
 my $ASM = 'nasm';
 my $CC = 'ia16-elf-gcc -fno-inline -nostdlib -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore -DRHYSOS';
 my $CXX = 'ia16-elf-g++ -fno-inline -nostdlib -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore -fno-unwind-tables -fno-rtti -fno-exceptions -DRHYSOS';
@@ -27,7 +29,7 @@ my $HEAP_ADDR = '0x9000';
 
 my $FLOPPY_SECTORS = 2880; # 1.44M floppy
 
-my $KERNEL_FLAGS = "-Wall -DSTACK_SEG=$STACK_SEG -DBOOT2_SEG=$BOOT2_SEG -DHEAP_ADDRESS=$HEAP_ADDR -DKERNEL_SEGMENT=$KERNEL_SEGMENT";
+my $KERNEL_FLAGS = "-Wall -Werror -DRELEASE_VERSION=\"$tag\" -DSTACK_SEG=$STACK_SEG -DBOOT2_SEG=$BOOT2_SEG -DHEAP_ADDRESS=$HEAP_ADDR -DKERNEL_SEGMENT=$KERNEL_SEGMENT";
 my $PROGRAM_FLAGS = "-Wall -DKERNEL_SEGMENT=$KERNEL_SEGMENT";
 
 my $KERNEL_NASM_FLAGS = '-W-gnu-elf-extensions';

@@ -1,6 +1,5 @@
 #include "util.h"
 
-#include "malloc.h"
 #include "tty.h"
 #include "type.h"
 
