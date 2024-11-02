@@ -79,7 +79,7 @@ void* malloc(unsigned int size) {
     int i=0;
     while(header != NULL) {
         i++;
-        printf("Block: %x\n", header);
+        /* printf("Block: %x\n", header); */
         if(header->length >= size && header->free) {
             goto found_block;
         }
@@ -87,7 +87,7 @@ void* malloc(unsigned int size) {
         header = parse_block(header->next);
     }
 
-    printf("Malloc: failed to allocate memory\n");
+    printf("kmalloc: failed to allocate memory\n");
     return NULL;
 
 found_block:
@@ -99,7 +99,7 @@ found_block:
 
     unsigned char* out = ((unsigned char*) header) + sizeof(struct BlkHeader);
 
-    printf("Malloc: %x\n", header);
+    /* printf("kmalloc (%d): %x\n", size, out); */
     return out;
 }
 
@@ -115,15 +115,10 @@ void condense_memory() {
             break;
         }
 
-        printf("%x\n", header->length);
-
         if(header->free && next->free) {
-            printf("Consense %x, %x; ", header, next);
             length = header->length + next->length + (2 * sizeof(struct BlkHeader));
         
             defn_header((unsigned char*) header, length, (unsigned char*) next->next, 1);
-        } else {
-            printf("No (%d, %d); ", header->free, next->free);
         }
 
         header = next;
@@ -135,24 +130,15 @@ void free(void* ptr) {
     struct BlkHeader* header = mem_get_header(ptr);
 
     if(header == NULL) {
-        printi(ptr, 16);
-        error("Invalid kernel free");
+        printf("Invalid kernel free (%x)\n", ptr);
         return;
     }
 
-    printf("Free: %x\n", ptr);
+    printf("kfree: %x\n", ptr);
 
     header->free = TRUE;
 
     condense_memory();
-
-    // struct BlkHeader* next = parse_block(header->next); 
-    // unsigned int length = header->length; 
-    // if(next->free) { 
-        // length += next->length + sizeof(struct BlkHeader); 
-    // } 
-//  
-    // defn_header((unsigned char*) header, length, (unsigned char*) next, 1); 
 }
 
 int memmgr_init() {
