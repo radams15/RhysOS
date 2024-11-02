@@ -134,7 +134,7 @@ void free(void* ptr) {
         return;
     }
 
-    printf("kfree: %x\n", ptr);
+    /* printf("kfree: %x\n", ptr); */
 
     header->free = TRUE;
 
