@@ -156,8 +156,8 @@ int init(struct SystemInfo* info) {
     stderr = open("/dev/stderr", O_WRONLY);
 
     char* shell_argv[] = {"shell", "login.bat"};
-    // exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
-    exec("shell", 0, NULL, stdin, stdout, stderr, FALSE);
+    exec("shell", 2, shell_argv, stdin, stdout, stderr, FALSE);
+    /* exec("shell", 0, NULL, stdin, stdout, stderr, FALSE); */
 
     close(stdin);
     close(stdout);

@@ -17,9 +17,7 @@ int serial_init_port(Port_t port,
                 Parity_t parity,
                 StopBits_t stop_bits,
                 DataBits_t data_bits) {
-    int fail = serial_driver.init(port, baud, parity, stop_bits, data_bits);
-
-    return fail;
+    return serial_driver.init(port, baud, parity, stop_bits, data_bits);
 }
 
 int serial_putc(Port_t port, char c) {
