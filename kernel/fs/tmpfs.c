@@ -1,7 +1,6 @@
 #include "devfs.h"
 
 #include "malloc.h"
-#include "serial.h"
 #include "tty.h"
 #include "util.h"
 

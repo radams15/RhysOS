@@ -25,13 +25,32 @@ typedef enum StopBits { STOPBITS_ONE = 0, STOPBITS_TWO = 1 } StopBits_t;
 
 typedef enum DataBits { DATABITS_7 = 2, DATABITS_8 = 3 } DataBits_t;
 
-int serial_init(Port_t port,
+typedef int(*serial_init_t)(int, int, int, int, int);
+typedef int(*serial_putc_t)(int, char);
+typedef char(*serial_getc_t)(int);
+
+typedef struct SerialDriver {
+    serial_init_t init;
+    serial_putc_t putc;
+    serial_getc_t getc;
+} SerialDriver_t;
+
+typedef struct SerialPort {
+    struct SerialDriver* driver;
+    int portnum;
+} SerialPort_t;
+
+extern struct SerialDriver serial_driver;
+
+int serial_load();
+
+int serial_init_port(Port_t port,
                 Baud_t baud,
                 Parity_t parity,
                 StopBits_t stop_bits,
                 DataBits_t data_bits);
 
-void serial_putc(Port_t port, char c);
+int serial_putc(Port_t port, char c);
 char serial_getc(Port_t port);
 
 #endif

@@ -3,7 +3,6 @@
 #include "fs/fat.h"
 #include "fs/fs.h"
 #include "pmode.h"
-#include "serial.h"
 #include "tty.h"
 #include "util.h"
 
