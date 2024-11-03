@@ -51,7 +51,7 @@ _call_far:
 	add sp, 12 ; pop all of the program args
 	pop bp ; restore stack frame for call_far
 	
-    mov ax, KERNEL_SEGMENT ; restore kernel data segment
+    mov ax, KERNEL_DATA_SEGMENT ; restore kernel data segment
     mov ds, ax
 
     mov ax, [stackseg] ; restore kernel stack

@@ -276,10 +276,10 @@ FsNode_t* fat_init(int sector_start) {
         root_nodes[i].name[0] = 0;
     }
 
-    read_lba_to_segment(0, sector_start, (int)&fat_sector, KERNEL_SEGMENT);
-    read_lba_to_segment(0, sector_start + 18, (int)&root_dir, KERNEL_SEGMENT);
+    read_lba_to_segment(0, sector_start, (int)&fat_sector, KERNEL_DATA_SEGMENT);
+    read_lba_to_segment(0, sector_start + 18, (int)&root_dir, KERNEL_DATA_SEGMENT);
     read_lba_to_segment(0, sector_start + 19, (int)&root_dir[16],
-                        KERNEL_SEGMENT);
+                        KERNEL_DATA_SEGMENT);
 
     unsigned char frame[3];
     unsigned int i, f1, f2, curr;
