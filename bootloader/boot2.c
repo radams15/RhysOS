@@ -207,11 +207,19 @@ int main() {
     for (int i = 0; i < 32; i++) {
         struct DirectoryEntry* file = &root_dir[i];
 
-        if (strncmp(file->fullname, "KERNEL  BIN", 11) == 0) {
+        if (strncmp(file->fullname, "KERNEL  DSB", 11) == 0) {
 #if ENABLE_SPLASH
-            print("Loading kernel: [");
+            print("Loading kernel data: [");
 #endif
-            load_segment(0, file->cluster, (char*)0x1000, KERNEL_SEGMENT);
+            load_segment(0, file->cluster, (char*)0x7200, KERNEL_DATA_SEGMENT);
+#if ENABLE_SPLASH
+            print("]\n");
+#endif
+        } else if (strncmp(file->fullname, "KERNEL  CSB", 11) == 0) {
+#if ENABLE_SPLASH
+            print("Loading kernel code: [");
+#endif
+            load_segment(0, file->cluster, (char*)0x1000, KERNEL_CODE_SEGMENT);
 #if ENABLE_SPLASH
             print("]\n");
 #endif

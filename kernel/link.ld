@@ -13,6 +13,7 @@ SECTIONS
         _text_end_addr = .;
     }
 
+    . = 0x7200;
     .data :
     {
         _data_begin_addr = .;

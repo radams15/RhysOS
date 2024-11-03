@@ -20,17 +20,18 @@ my $CC = 'ia16-elf-gcc -fno-inline -nostdlib -ffreestanding -march=i8086 -mtune=
 my $CXX = 'ia16-elf-g++ -fno-inline -nostdlib -ffreestanding -march=i8086 -mtune=i8086 -fleading-underscore -fno-unwind-tables -fno-rtti -fno-exceptions -DRHYSOS';
 my $LD = 'ia16-elf-ld';
 
-my $KERNEL_SEGMENT = '0x3000';
+my $KERNEL_CODE_SEGMENT = '0x2000';
+my $KERNEL_DATA_SEGMENT = '0x3000';
 
 my $BOOT2_SEG = '0x9000';
 my $STACK_SEG = $BOOT2_SEG;
 
-my $HEAP_ADDR = '0x9000';
+my $HEAP_ADDR = '0x1000';
 
 my $FLOPPY_SECTORS = 2880; # 1.44M floppy
 
-my $KERNEL_FLAGS = "-Wall -DRELEASE_VERSION=\"$tag\" -DSTACK_SEG=$STACK_SEG -DBOOT2_SEG=$BOOT2_SEG -DHEAP_ADDRESS=$HEAP_ADDR -DKERNEL_SEGMENT=$KERNEL_SEGMENT";
-my $PROGRAM_FLAGS = "-Wall -DKERNEL_SEGMENT=$KERNEL_SEGMENT";
+my $KERNEL_FLAGS = "-Wall -DRELEASE_VERSION=\"$tag\" -DSTACK_SEG=$STACK_SEG -DBOOT2_SEG=$BOOT2_SEG -DHEAP_ADDRESS=$HEAP_ADDR -DKERNEL_CODE_SEGMENT=$KERNEL_CODE_SEGMENT -DKERNEL_DATA_SEGMENT=$KERNEL_DATA_SEGMENT";
+my $PROGRAM_FLAGS = "-Wall -DKERNEL_CODE_SEGMENT=$KERNEL_CODE_SEGMENT -DKERNEL_DATA_SEGMENT=$KERNEL_DATA_SEGMENT";
 
 my $KERNEL_NASM_FLAGS = '-W-gnu-elf-extensions';
 
@@ -86,9 +87,10 @@ sub kernel {
 	
 	&run("$LD -Tkernel/link.ld -nostdlib -o build/kernel.elf -d build/kernel/kernel_nasm.o ".(join ' ', @objs));
 	
-	&run("objcopy -O binary build/kernel.elf build/kernel.bin");
+	&run("objcopy -O binary --only-section=.data build/kernel.elf build/kernel.dsb");
+	&run("objcopy -O binary --only-section=.text build/kernel.elf build/kernel.csb");
 
-	'build/kernel.bin';
+	'build/kernel.dsb', 'build/kernel.csb';
 }
 
 sub stdlib {	
@@ -237,7 +239,7 @@ sub img {
 	&run("dd if=/dev/zero of=build/system.img bs=512 count=2880");
         &run("mkdosfs -F12 build/system.img");
 	
-	&run("mcopy -i build/system.img ".(join ' ', $boot2, $kernel, @$extra_files)." ::");
+	&run("mcopy -i build/system.img ".(join ' ', $boot2, @$kernel, @$extra_files)." ::");
 	
 	&run("dd if=$boot1 of=build/system.img bs=512 count=1 conv=notrunc");
 	
@@ -250,11 +252,11 @@ sub qemu {
 
 sub build {
 	my ($boot1, $boot2) = &bootloader;
-	my $kernel = &kernel;
+	my @kernel = &kernel;
 	my @runtime = &runtime;
 	my $stdlib = &stdlib;
 	my @programs = &programs(\@runtime, $stdlib);
-	&img($boot1, $boot2, $kernel, [@programs, 'docs/syscalls.md', <root/*>]);
+	&img($boot1, $boot2, \@kernel, [@programs, 'docs/syscalls.md', <root/*>]);
 }
 
 sub clean {

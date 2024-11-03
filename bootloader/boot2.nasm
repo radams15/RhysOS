@@ -67,7 +67,7 @@ _call_kernel:
 	mov cx, [bp+6]
 	mov dx, [bp+4]
 	
-    mov ax, KERNEL_SEGMENT
+    mov ax, KERNEL_DATA_SEGMENT
     mov ds, ax
     mov ss, ax
     mov es, ax
@@ -77,7 +77,7 @@ _call_kernel:
     push dx
     push 00 ; ??
     
-    jmp KERNEL_SEGMENT:0x1000
+    jmp KERNEL_CODE_SEGMENT:0x1000
     
     pop bp
     ret

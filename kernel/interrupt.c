@@ -35,7 +35,7 @@ int i21_handler(SyscallArgs_t* args) {
 
             seg_copy((char*)args->c, (char*)argv, args->b * sizeof(char*),
                      args->ds,
-                     KERNEL_SEGMENT);  // copy argv pointers themselves, i.e.
+                     KERNEL_DATA_SEGMENT);  // copy argv pointers themselves, i.e.
                                        // addresses of the argv elements
 
             for (int i = 0; i < args->b; i++) {
@@ -55,11 +55,11 @@ int i21_handler(SyscallArgs_t* args) {
                 /* printf("Malloc(%d) argv[i](%x/%x)\n", n, argv[i]); */
 
                 seg_copy(addr, argv[i], argv_item_size, args->ds,
-                         KERNEL_SEGMENT);
+                         KERNEL_DATA_SEGMENT);
             }
 
             seg_copy((char*)args->a, (char*)name, sizeof(name), args->ds,
-                     KERNEL_SEGMENT);
+                     KERNEL_DATA_SEGMENT);
             int ret =
                 exec(name, args->b, argv, args->d, args->e, args->f, FALSE);
 
@@ -75,7 +75,7 @@ int i21_handler(SyscallArgs_t* args) {
         case 2: {
             char name[128];
             seg_copy((char*)args->a, (char*)name, sizeof(name), args->ds,
-                     KERNEL_SEGMENT);
+                     KERNEL_DATA_SEGMENT);
 
             return list_directory(name, (FsNode_t*)args->b, args->c, args->ds);
         }
@@ -94,7 +94,7 @@ int i21_handler(SyscallArgs_t* args) {
                 len = read(args->a, (unsigned char*)buf, SYSCALL_BUF_SIZ);
                 ret += len;
 
-                seg_copy((char*)buf, dst, len, KERNEL_SEGMENT, args->ds);
+                seg_copy((char*)buf, dst, len, KERNEL_DATA_SEGMENT, args->ds);
 
                 dst += ret;
             }
@@ -102,7 +102,7 @@ int i21_handler(SyscallArgs_t* args) {
             if (read_len) {
                 len = read(args->a, (unsigned char*)buf, read_len);
                 ret += len;
-                seg_copy((char*)buf, dst, read_len, KERNEL_SEGMENT, args->ds);
+                seg_copy((char*)buf, dst, read_len, KERNEL_DATA_SEGMENT, args->ds);
             }
 
             return ret;
@@ -111,14 +111,14 @@ int i21_handler(SyscallArgs_t* args) {
         case 4: {
             char text[SYSCALL_BUF_SIZ];
             seg_copy((char*)args->b, (char*)text, sizeof(text), args->ds,
-                     KERNEL_SEGMENT);
+                     KERNEL_DATA_SEGMENT);
             return write(args->a, (unsigned char*)text, args->c);
         }
 
         case 5: {
             char name[SYSCALL_BUF_SIZ];
             seg_copy((char*)args->a, (char*)name, sizeof(name), args->ds,
-                     KERNEL_SEGMENT);
+                     KERNEL_DATA_SEGMENT);
             return open(name, args->b);
         }
 
@@ -142,13 +142,13 @@ int i21_handler(SyscallArgs_t* args) {
             Stat_t dst;
 
             seg_copy((char*)args->a, (char*)name, sizeof(name), args->ds,
-                     KERNEL_SEGMENT);
+                     KERNEL_DATA_SEGMENT);
 
             int ret = stat(name, &dst);
 
             if (ret == 0) {
                 seg_copy((char*)&dst, (char*)args->b, sizeof(Stat_t),
-                         KERNEL_SEGMENT, args->ds);
+                         KERNEL_DATA_SEGMENT, args->ds);
             }
 
             return ret;
@@ -168,11 +168,11 @@ int i21_handler(SyscallArgs_t* args) {
 int handle_interrupt_21(int* ax, int ss, int cx, int dx) {
     SyscallArgs_t arg_data;
     seg_copy((char*)ax, (char*)&arg_data, sizeof(SyscallArgs_t), ss,
-             KERNEL_SEGMENT);
+             KERNEL_DATA_SEGMENT);
 
     arg_data.num = i21_handler(&arg_data);
 
-    seg_copy((char*)&arg_data, (char*)ax, sizeof(SyscallArgs_t), KERNEL_SEGMENT,
+    seg_copy((char*)&arg_data, (char*)ax, sizeof(SyscallArgs_t), KERNEL_DATA_SEGMENT,
              ss);
 
     return 0;

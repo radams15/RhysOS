@@ -35,7 +35,7 @@ void main(int src_ds, void* boot_ptr) {
     struct SystemInfo info;
 
     seg_copy((char*)boot_ptr, (char*)&info, sizeof(struct SystemInfo), src_ds,
-             KERNEL_SEGMENT);
+             KERNEL_DATA_SEGMENT);
 
     err = init(&info);
 
