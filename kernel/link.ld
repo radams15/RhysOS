@@ -4,7 +4,7 @@ ENTRY(_main);
 
 SECTIONS
 {
-    OVERLAY (0x1000) : AT (0x1000) {
+    OVERLAY (0x1000) : AT (0x4000) {
         .text
         {
             _text_begin_addr = .;
