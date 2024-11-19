@@ -210,22 +210,34 @@ unsigned int rand_read(FsNode_t* node,
     return 2;
 }
 
-void devfs_setup() {
-    int i = 0;
+int devfs_register_device_n(
+        int i,
+        const char* name,
+        uint16_t length,
+        ReadFunc read_func,
+        WriteFunc write_func
+ ) {
 
-    strcpyz(root_nodes[i].name, "stdout");
+    strcpyz(root_nodes[i].name, name);
     root_nodes[i].flags = FS_FILE;
     root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
+    root_nodes[i].length = length;
     root_nodes[i].offset = 0;
-    root_nodes[i].read = 0;
-    root_nodes[i].write = stdout_write;
+    root_nodes[i].read = read_func;
+    root_nodes[i].write = write_func;
     root_nodes[i].create = 0;
     root_nodes[i].close = 0;
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
+
+    return 0;
+}
+
+void devfs_setup() {
+    int i = 0;
+
+    devfs_register_device_n(i, "stdout", 1, NULL, stdout_write);
 
     i++;
 
@@ -241,7 +253,6 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
 
     i++;
 
@@ -257,7 +268,6 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
 
     i++;
 
@@ -273,7 +283,6 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
 
     i++;
 
@@ -289,7 +298,6 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
 
     i++;
 
@@ -305,7 +313,6 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
 
     i++;
 
@@ -321,7 +328,6 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
 
     i++;
 
@@ -337,7 +343,6 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
 
     i++;
 
@@ -353,7 +358,6 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
 
     i++;
 
@@ -369,7 +373,6 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
 
     i++;
 
@@ -385,7 +388,6 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
 
     i++;
 
@@ -401,7 +403,6 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
 
     i++;
 
@@ -417,7 +418,8 @@ void devfs_setup() {
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    num_root_nodes++;
+
+    num_root_nodes = i;
 }
 
 FsNode_t* devfs_init() {

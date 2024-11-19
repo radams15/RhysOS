@@ -12,19 +12,26 @@ typedef struct DirEnt {
 
 typedef struct FsNode {
     char name[FILE_NAME_MAX];
-    unsigned int flags;  // node type, etc
+    struct {
+        unsigned int flags;  // node type, etc
+        void* flags_func;
+    };
     unsigned int inode;
     unsigned int start_sector;
-    unsigned int length;  // size in bytes.
+    struct {
+        unsigned int length;  // size in bytes.
+        void* length_func;
+    };
     unsigned int offset;  // used by seek
     void* read;
     void* write;
-    void* open;
+    void* create;
     void* close;
     void* readdir;
     void* finddir;
     struct FsNode* ref;  // Pointer to symlink or mount
 } FsNode_t;
+
 
 typedef struct Stat {
     char name[FILE_NAME_MAX];
