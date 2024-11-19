@@ -56,6 +56,8 @@ typedef unsigned int (*CloseFunc)(struct FsNode*);
 typedef struct DirEnt* (*ReaddirFunc)(struct FsNode*, unsigned int);
 typedef struct FsNode* (*FinddirFunc)(struct FsNode*, char* name);
 
+typedef unsigned int (*UIntFunc)();
+
 typedef struct DirEnt {
     char name[FILE_NAME_MAX];
     unsigned int inode;
@@ -63,10 +65,16 @@ typedef struct DirEnt {
 
 typedef struct FsNode {
     char name[FILE_NAME_MAX];
-    unsigned int flags;  // node type, etc
+    struct {
+        unsigned int flags;  // node type, etc
+        UIntFunc flags_func;
+    };
     unsigned int inode;
     unsigned int start_sector;
-    unsigned int length;  // size in bytes.
+    struct {
+        unsigned int length;  // size in bytes.
+        UIntFunc length_func;
+    };
     unsigned int offset;  // used by seek
     ReadFunc read;
     WriteFunc write;

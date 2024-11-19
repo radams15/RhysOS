@@ -8,6 +8,9 @@
 #define MAX_MOUNTS 4
 #define SECTORS_PER_TRACK 18
 
+#define FFLAGS(h) (h->flags_func == NULL? h->flags : h->flags_func())
+#define FLENGTH(h) (h->length_func == NULL? h->length : h->length_func())
+
 extern int interrupt(int number, int AX, int BX, int CX, int DX);
 
 FsNode_t* open_files[MAX_OPEN_FILES];
@@ -30,17 +33,6 @@ int fs_mount(const char* name, FsNode_t* parent, FsNode_t* child) {
 
     return 1;
 }
-
-// FsNode_t* get_mount(FsNode_t* fsnode, char* name) {
-// for (int i = 0; i < MAX_MOUNTS; i++) {
-// if (fsnode == mounts[i].parent &&
-// mounts[i].child != NULL && strcmp(name, mounts[i].name) == 0) {
-// return mounts[i].child;
-// }
-// }
-//
-// return NULL;
-// }
 
 int write(int fh, unsigned char* buffer, unsigned int size) {
     return fs_write(fh_get_node(fh), fh_get_node(fh)->offset, size, buffer);
@@ -133,9 +125,12 @@ int stat(const char* name, Stat_t* stat) {
     }
 
     strcpy(stat->name, handle->name);
-    stat->flags = handle->flags;
+    stat->flags = FFLAGS(handle);
+
     stat->inode = handle->inode;
-    stat->length = handle->length;
+
+    stat->length = FLENGTH(handle);
+
     stat->offset = handle->offset;
 
     return 0;
@@ -220,7 +215,7 @@ unsigned int fs_close(FsNode_t* node) {
 }
 
 DirEnt_t* fs_readdir(FsNode_t* node, unsigned int index) {
-    if (node->readdir != 0 && (node->flags & 0x07) == FS_DIRECTORY) {
+    if (node->readdir != 0 && (FFLAGS(node) & 0x07) == FS_DIRECTORY) {
         return node->readdir(node, index);
     }
 
@@ -228,7 +223,7 @@ DirEnt_t* fs_readdir(FsNode_t* node, unsigned int index) {
 }
 
 FsNode_t* fs_finddir(FsNode_t* node, char* name) {
-    if (node->finddir != 0 && (node->flags & 0x07) == FS_DIRECTORY) {
+    if (node->finddir != 0 && (FFLAGS(node) & 0x07) == FS_DIRECTORY) {
         return node->finddir(node, name);
     }
 
