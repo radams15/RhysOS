@@ -218,7 +218,7 @@ int devfs_register_device_n(
         WriteFunc write_func
  ) {
 
-    memcpy(root_nodes[i].name, name, strlen(name)+1);
+    strcpyz(root_nodes[i].name, name);
     root_nodes[i].flags = FS_FILE;
     root_nodes[i].inode = i;
     root_nodes[i].length = length;
@@ -234,48 +234,33 @@ int devfs_register_device_n(
     return 0;
 }
 
+int devfs_register_device(
+        const char* name,
+        uint16_t length,
+        ReadFunc read_func,
+        WriteFunc write_func
+ ) {
+    int out = devfs_register_device_n(num_root_nodes, name, length, read_func, write_func);
+    num_root_nodes++;
+    return out;
+}
+
 void devfs_setup() {
-    int i = 0;
+    num_root_nodes = 0;
 
-    devfs_register_device_n(i, "stdout", 1, NULL, stdout_write);
-    i++;
-
-    devfs_register_device_n(i, "stdin", 1, stdin_read, NULL);
-    i++;
-    
-    devfs_register_device_n(i, "stderr", 1, NULL, stderr_write);
-    i++;
-    
-    devfs_register_device_n(i, "con", 1, stdin_read, stdout_write);
-    i++;
-    
-    devfs_register_device_n(i, "lowmem", 2, lowmem_read, NULL);
-    i++;
-    
-    devfs_register_device_n(i, "highmem", 2, highmem_read, NULL);
-    i++;
-
-    devfs_register_device_n(i, "graphmode", 1, graphics_mode_read, graphics_mode_write);
-    i++;
-    
-    devfs_register_device_n(i, "com1", 1, com1_read, com1_write);
-    i++;
-    
-    devfs_register_device_n(i, "com2", 1, com2_read, com2_write);
-    i++;
-    
-    devfs_register_device_n(i, "time", 1, time_read, NULL);
-    i++;
-    
-    devfs_register_device_n(i, "ttybg", 1, NULL, tty_bg_write);
-    i++;
-    
-    devfs_register_device_n(i, "ttyfg", 1, NULL, tty_fg_write);
-    i++;
-    
-    devfs_register_device_n(i, "rand", 1, rand_read, NULL);
-
-    num_root_nodes = i+1;
+    devfs_register_device("stdout", 1, NULL, stdout_write);
+    devfs_register_device("stdin", 1, stdin_read, NULL);
+    devfs_register_device("stderr", 1, NULL, stderr_write);
+    devfs_register_device("con", 1, stdin_read, stdout_write);
+    devfs_register_device("lowmem", 2, lowmem_read, NULL);
+    devfs_register_device("highmem", 2, highmem_read, NULL);
+    devfs_register_device("graphmode", 1, graphics_mode_read, graphics_mode_write);
+    devfs_register_device("com1", 1, com1_read, com1_write);
+    devfs_register_device("com2", 1, com2_read, com2_write);
+    devfs_register_device("time", 1, time_read, NULL);
+    devfs_register_device("ttybg", 1, NULL, tty_bg_write);
+    devfs_register_device("ttyfg", 1, NULL, tty_fg_write);
+    devfs_register_device("rand", 1, rand_read, NULL);
 }
 
 FsNode_t* devfs_init() {

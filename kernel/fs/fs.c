@@ -54,7 +54,7 @@ FsNode_t* create_file(char* name) {
     buf[strlen(name)] = 0;
 
     char* last_slash = NULL;
-    for (char* c = buf; *c != NULL; c++) {
+    for (char* c = buf; *c != 0; c++) {
         if (*c == '/')
             last_slash = c;
     }
