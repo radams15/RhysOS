@@ -11,9 +11,9 @@ SESSIONEXISTS=$(tmux list-sessions | grep $NAME)
 
 if [ "$SESSIONEXISTS" = "" ]
 then
-    tmux new-session -d -s $NAME 'vim'
+    tmux new-session -d -s $NAME 'bash -c vim'
     tmux rename-window -t 0 'Vim'
-    tmux send-keys -t 'Vim' C-m C-l C-t C-m
+    # tmux send-keys -t 'Vim' C-m C-l C-t C-m
 
     tmux new-window -t $NAME:1 -n 'Shell' $SHELL_CMD
     tmux send-keys -t 'Shell' C-m 'clear' C-m

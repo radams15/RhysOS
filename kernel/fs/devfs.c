@@ -80,53 +80,27 @@ unsigned int stdin_read(FsNode_t* node,
     return size;
 }
 
-unsigned int com1_read(FsNode_t* node,
+unsigned int com_read(FsNode_t* node,
                        unsigned int offset,
                        unsigned int size,
                        unsigned char* buffer) {
     int i;
 
     for (i = 0; i < size; i++) {
-        buffer[i] = serial_getc(COM1);
+        buffer[i] = serial_getc(node->meta);
     }
 
     return size;
 }
 
-unsigned int com1_write(FsNode_t* node,
+unsigned int com_write(FsNode_t* node,
                         unsigned int offset,
                         unsigned int size,
                         unsigned char* buffer) {
     int i;
 
     for (i = offset; i < size; i++) {
-        serial_putc(COM1, buffer[i]);
-    }
-
-    return size;
-}
-
-unsigned int com2_read(FsNode_t* node,
-                       unsigned int offset,
-                       unsigned int size,
-                       unsigned char* buffer) {
-    int i;
-
-    for (i = 0; i < size; i++) {
-        buffer[i] = serial_getc(COM2);
-    }
-
-    return size;
-}
-
-unsigned int com2_write(FsNode_t* node,
-                        unsigned int offset,
-                        unsigned int size,
-                        unsigned char* buffer) {
-    int i;
-
-    for (i = offset; i < size; i++) {
-        serial_putc(COM2, buffer[i]);
+        serial_putc(node->meta, buffer[i]);
     }
 
     return size;
@@ -215,7 +189,8 @@ int devfs_register_device_n(
         const char* name,
         uint16_t length,
         ReadFunc read_func,
-        WriteFunc write_func
+        WriteFunc write_func,
+        unsigned int meta
  ) {
 
     strcpyz(root_nodes[i].name, name);
@@ -230,6 +205,7 @@ int devfs_register_device_n(
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
+    root_nodes[i].meta = meta;
 
     return 0;
 }
@@ -240,7 +216,19 @@ int devfs_register_device(
         ReadFunc read_func,
         WriteFunc write_func
  ) {
-    int out = devfs_register_device_n(num_root_nodes, name, length, read_func, write_func);
+    int out = devfs_register_device_n(num_root_nodes, name, length, read_func, write_func, 0);
+    num_root_nodes++;
+    return out;
+}
+
+int devfs_register_device_m(
+        const char* name,
+        uint16_t length,
+        ReadFunc read_func,
+        WriteFunc write_func,
+        unsigned int meta
+ ) {
+    int out = devfs_register_device_n(num_root_nodes, name, length, read_func, write_func, meta);
     num_root_nodes++;
     return out;
 }
@@ -255,8 +243,8 @@ void devfs_setup() {
     devfs_register_device("lowmem", 2, lowmem_read, NULL);
     devfs_register_device("highmem", 2, highmem_read, NULL);
     devfs_register_device("graphmode", 1, graphics_mode_read, graphics_mode_write);
-    devfs_register_device("com1", 1, com1_read, com1_write);
-    devfs_register_device("com2", 1, com2_read, com2_write);
+    // devfs_register_device_m("com1", 1, com_read, com_write, COM1);
+    // devfs_register_device_m("com2", 1, com_read, com_write, COM2);
     devfs_register_device("time", 1, time_read, NULL);
     devfs_register_device("ttybg", 1, NULL, tty_bg_write);
     devfs_register_device("ttyfg", 1, NULL, tty_fg_write);
