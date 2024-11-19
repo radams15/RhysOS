@@ -218,7 +218,7 @@ int devfs_register_device_n(
         WriteFunc write_func
  ) {
 
-    strcpyz(root_nodes[i].name, name);
+    memcpy(root_nodes[i].name, name, strlen(name)+1);
     root_nodes[i].flags = FS_FILE;
     root_nodes[i].inode = i;
     root_nodes[i].length = length;
@@ -238,188 +238,44 @@ void devfs_setup() {
     int i = 0;
 
     devfs_register_device_n(i, "stdout", 1, NULL, stdout_write);
-
     i++;
 
-    strcpyz(root_nodes[i].name, "stdin");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = stdin_read;
-    root_nodes[i].write = 0;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
+    devfs_register_device_n(i, "stdin", 1, stdin_read, NULL);
+    i++;
+    
+    devfs_register_device_n(i, "stderr", 1, NULL, stderr_write);
+    i++;
+    
+    devfs_register_device_n(i, "con", 1, stdin_read, stdout_write);
+    i++;
+    
+    devfs_register_device_n(i, "lowmem", 2, lowmem_read, NULL);
+    i++;
+    
+    devfs_register_device_n(i, "highmem", 2, highmem_read, NULL);
     i++;
 
-    strcpyz(root_nodes[i].name, "stderr");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = 0;
-    root_nodes[i].write = stderr_write;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
+    devfs_register_device_n(i, "graphmode", 1, graphics_mode_read, graphics_mode_write);
     i++;
-
-    strcpyz(root_nodes[i].name, "con");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = stdin_read;
-    root_nodes[i].write = stdout_write;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
+    
+    devfs_register_device_n(i, "com1", 1, com1_read, com1_write);
     i++;
-
-    strcpyz(root_nodes[i].name, "highmem");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 2;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = highmem_read;
-    root_nodes[i].write = 0;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
+    
+    devfs_register_device_n(i, "com2", 1, com2_read, com2_write);
     i++;
-
-    strcpyz(root_nodes[i].name, "lowmem");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 2;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = lowmem_read;
-    root_nodes[i].write = 0;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
+    
+    devfs_register_device_n(i, "time", 1, time_read, NULL);
     i++;
-
-    strcpyz(root_nodes[i].name, "graphmode");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = graphics_mode_read;
-    root_nodes[i].write = graphics_mode_write;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
+    
+    devfs_register_device_n(i, "ttybg", 1, NULL, tty_bg_write);
     i++;
-
-    strcpyz(root_nodes[i].name, "com1");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = com1_read;
-    root_nodes[i].write = com1_write;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
+    
+    devfs_register_device_n(i, "ttyfg", 1, NULL, tty_fg_write);
     i++;
+    
+    devfs_register_device_n(i, "rand", 1, rand_read, NULL);
 
-    strcpyz(root_nodes[i].name, "com2");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = com2_read;
-    root_nodes[i].write = com2_write;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
-    i++;
-
-    strcpyz(root_nodes[i].name, "time");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = time_read;
-    root_nodes[i].write = 0;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
-    i++;
-
-    strcpyz(root_nodes[i].name, "ttybg");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = 0;
-    root_nodes[i].write = tty_bg_write;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
-    i++;
-
-    strcpyz(root_nodes[i].name, "ttyfg");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = 0;
-    root_nodes[i].write = tty_fg_write;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
-    i++;
-
-    strcpyz(root_nodes[i].name, "rand");
-    root_nodes[i].flags = FS_FILE;
-    root_nodes[i].inode = i;
-    root_nodes[i].length = 1;
-    root_nodes[i].offset = 0;
-    root_nodes[i].read = rand_read;
-    root_nodes[i].write = 0;
-    root_nodes[i].create = 0;
-    root_nodes[i].close = 0;
-    root_nodes[i].readdir = 0;
-    root_nodes[i].finddir = 0;
-    root_nodes[i].ref = 0;
-
-    num_root_nodes = i;
+    num_root_nodes = i+1;
 }
 
 FsNode_t* devfs_init() {
