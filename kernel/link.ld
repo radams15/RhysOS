@@ -7,6 +7,7 @@ SECTIONS
     OVERLAY (0x1000) : AT (0x4000) {
         .text
         {
+            . = ALIGN(0x4);
             _text_begin_addr = .;
             *(.text);
             _text_end_addr = .;
@@ -14,6 +15,7 @@ SECTIONS
 
         .data
         {
+            . = ALIGN(0x4);
             _data_begin_addr = .;
             *(.data);
             *(.rodata*);

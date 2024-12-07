@@ -30,7 +30,7 @@ typedef struct FsNode {
     void* readdir;
     void* finddir;
     struct FsNode* ref;  // Pointer to symlink or mount
-    unsigned int meta;
+    // unsigned int meta;
 } FsNode_t;
 
 

@@ -83,7 +83,7 @@ typedef struct FsNode {
     ReaddirFunc readdir;
     FinddirFunc finddir;
     struct FsNode* ref;  // Pointer to symlink or mount
-    unsigned int meta;
+    // unsigned int meta;
 } FsNode_t;
 
 typedef struct FsMount {

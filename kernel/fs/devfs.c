@@ -8,7 +8,7 @@
 #include "tty.h"
 #include "util.h"
 
-#define MAX_FILES 16
+#define MAX_FILES 20
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define SECTOR_SIZE 512
 
@@ -87,7 +87,7 @@ unsigned int com_read(FsNode_t* node,
     int i;
 
     for (i = 0; i < size; i++) {
-        buffer[i] = serial_getc(node->meta);
+        /* buffer[i] = serial_getc(node->meta); */
     }
 
     return size;
@@ -100,7 +100,7 @@ unsigned int com_write(FsNode_t* node,
     int i;
 
     for (i = offset; i < size; i++) {
-        serial_putc(node->meta, buffer[i]);
+        /* serial_putc(node->meta, buffer[i]); */
     }
 
     return size;
@@ -193,6 +193,11 @@ int devfs_register_device_n(
         unsigned int meta
  ) {
 
+    if(i > MAX_FILES) {
+        printf("Error, creating more DEVFS files than capable of!\n");
+        return 1;
+    }
+
     strcpyz(root_nodes[i].name, name);
     root_nodes[i].flags = FS_FILE;
     root_nodes[i].inode = i;
@@ -205,7 +210,7 @@ int devfs_register_device_n(
     root_nodes[i].readdir = 0;
     root_nodes[i].finddir = 0;
     root_nodes[i].ref = 0;
-    root_nodes[i].meta = meta;
+    /* root_nodes[i].meta = meta; */
 
     return 0;
 }
@@ -229,11 +234,13 @@ int devfs_register_device_m(
         unsigned int meta
  ) {
     int out = devfs_register_device_n(num_root_nodes, name, length, read_func, write_func, meta);
+
     num_root_nodes++;
     return out;
 }
 
 void devfs_setup() {
+
     num_root_nodes = 0;
 
     devfs_register_device("stdout", 1, NULL, stdout_write);
@@ -243,8 +250,8 @@ void devfs_setup() {
     devfs_register_device("lowmem", 2, lowmem_read, NULL);
     devfs_register_device("highmem", 2, highmem_read, NULL);
     devfs_register_device("graphmode", 1, graphics_mode_read, graphics_mode_write);
-    // devfs_register_device_m("com1", 1, com_read, com_write, COM1);
-    // devfs_register_device_m("com2", 1, com_read, com_write, COM2);
+    /* devfs_register_device_m("com1", 1, com_read, com_write, COM1); */
+    /* devfs_register_device_m("com2", 1, com_read, com_write, COM2); */
     devfs_register_device("time", 1, time_read, NULL);
     devfs_register_device("ttybg", 1, NULL, tty_bg_write);
     devfs_register_device("ttyfg", 1, NULL, tty_fg_write);
@@ -266,9 +273,10 @@ FsNode_t* devfs_init() {
     root_node.ref = 0;
 
     root_nodes = malloc(MAX_FILES * sizeof(FsNode_t));
-
-    if (root_nodes == NULL)
+    if (root_nodes == NULL) {
+        printf("Failed to allocate memory for devfs\n");
         return NULL;
+    }
 
     num_root_nodes = 0;
 
