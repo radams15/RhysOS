@@ -10,10 +10,19 @@ int running = 1;
 
 #ifdef RHYSOS
 
-#define getchar() getch()
 #define putchar(c) putc(c)
 #define strtol(a, b, c) strtoi(a, b, c)
 #define exit(a) end(a)
+
+char getchar() {
+    char c = ngetch();
+
+    if(c != '\b') {
+        putc(c);
+    }
+
+    return c;
+}
 
 void end(char code) {
     running = 0;
@@ -447,7 +456,7 @@ char get(char** charbuf) {
 /* tokenize into buf[], return first character of buf[] */
 char scan(char** charbuf) {
     I i = 0;
-    while (seeing(' '))
+    while (seeing(' ') || seeing('\b'))
         look(charbuf);
     if (seeing('(') || seeing(')') || seeing('\''))
         buf[i++] = get(charbuf);
