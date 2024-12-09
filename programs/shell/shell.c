@@ -127,8 +127,8 @@ int run_line(char* line, int length) {
 int loop() {
     char line[1024];
 
-    printf(prompt);
-    int len = readline(line);
+    printf("%s", prompt);
+    int len = readline(&line);
     line[len - 1] = 0;
 
     printf("\n");

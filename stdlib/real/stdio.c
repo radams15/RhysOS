@@ -109,12 +109,17 @@ int freadline(int fh, char* buffer) {
 }
 
 int readline(char* buffer) {
-    char* buffer_head = buffer;
+    const char* buffer_head = buffer;
     char c;
     int len = 0;
 
     while ((c = getch()) != '\n') {
-        if (c == 0x8 && buffer != buffer_head) {  // backspace
+        if (c == 0x8) {  // backspace
+            if(buffer == buffer_head) {
+                putc(' ');
+                continue;
+            }
+
             len--;
             *(buffer--) = ' ';
 

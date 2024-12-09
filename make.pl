@@ -26,7 +26,7 @@ my $KERNEL_DATA_SEGMENT = '0x3000';
 my $BOOT2_SEG = '0x9000';
 my $STACK_SEG = $BOOT2_SEG;
 
-my $HEAP_ADDR = '0x5000';
+my $HEAP_ADDR = '0x6000';
 
 my $FLOPPY_SECTORS = 2880; # 1.44M floppy
 
