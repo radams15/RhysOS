@@ -119,7 +119,7 @@ sub stdlib {
 	
 	&run("ar -rcs build/stdlib/real/libstdlib.a ".(join ' ', @objs));
 	
-	"-Lbuild/stdlib/real -lstdlib";
+    "build/stdlib/%s/libstdlib.a";
 }
 
 sub runtime {
@@ -127,8 +127,11 @@ sub runtime {
 	&run("$ASM -felf runtime/crt0.pmode.nasm -Istdlib/protected/ -o build/crt0_pmode_nasm.o $PROGRAM_FLAGS -W-gnu-elf-extensions");
 	
 	&run("$CC -c runtime/crt0.c -Istdlib/real -o build/crt0.o $PROGRAM_FLAGS");
+
+	&run("ar -rcs build/crt0.real.a build/crt0_nasm.o build/crt0.o");
+	&run("ar -rcs build/crt0.protected.a build/crt0_pmode_nasm.o");
 	
-	["build/crt0_nasm.o", "build/crt0.o"], ["build/crt0_pmode_nasm.o"];
+    return 'build/crt0.%s.a';
 }
 
 sub padding {
@@ -186,12 +189,14 @@ sub programs {
 			
 		}
 
-        my @runtime = @{ ($conf->param('protected_mode')? $runtime->[1] : $runtime->[0]) };
-        $stdlib = $conf->param('pmode')? '' : $stdlib;
+        my $mode = $conf->param('mode') // 'real';
+        my $runtime_str = sprintf($runtime, $mode);
+        my $stdlib_str = sprintf($stdlib, $mode);
+        print STDERR "$stdlib_str";
 		
 		my $out = "$folder/".$conf->param('name');
 		
-		&run("$LD -o $out.elf -d -Tprograms/link.ld ".($conf->param('runtime')? " @runtime " : "").join(' ', @objs). ($conf->param('stdlib')?" $stdlib":'') );
+		&run("$LD -o $out.elf -d -Tprograms/link.ld ".($conf->param('runtime')? " $runtime_str " : "").join(' ', @objs). ($conf->param('stdlib')? " $stdlib_str " : ""));
 
         &run("objcopy -O binary $out.elf $out.bin");
 
@@ -253,9 +258,9 @@ sub qemu {
 sub build {
 	my ($boot1, $boot2) = &bootloader;
 	my @kernel = &kernel;
-	my @runtime = &runtime;
+	my $runtime = &runtime;
 	my $stdlib = &stdlib;
-	my @programs = &programs(\@runtime, $stdlib);
+	my @programs = &programs($runtime, $stdlib);
 	&img($boot1, $boot2, \@kernel, [@programs, 'docs/syscalls.md', <root/*>]);
 }
 
