@@ -93,7 +93,7 @@ sub kernel {
 	'build/kernel.dsb', 'build/kernel.csb';
 }
 
-sub stdlib {	
+sub stdlib_real {	
 	make_path("build/stdlib/real/") if !(-e 'build/stdlib/real');
 	my @objs;
 	
@@ -120,6 +120,42 @@ sub stdlib {
 	&run("ar -rcs build/stdlib/real/libstdlib.a ".(join ' ', @objs));
 	
     "build/stdlib/%s/libstdlib.a";
+}
+
+sub stdlib_protected {	
+	make_path("build/stdlib/protected/") if !(-e 'build/stdlib/protected');
+	my @objs;
+	
+	for my $c_file (&find('stdlib/protected/*.c')) {		
+		(my $out = $c_file) =~ s:stdlib/(.*)\.c:build/stdlib/$1.o:;
+		&run("$CC -c $c_file -Istdlib/protected -o $out $PROGRAM_FLAGS");
+		
+		push @objs, $out;
+	}
+	
+	for my $c_file (&find('stdlib/protected/*.cpp')) {		
+		(my $out = $c_file) =~ s:stdlib/(.*)\.cpp:build/stdlib/$1.mm.o:;
+		&run("$CXX -c $c_file -Istdlib/protected -o $out $PROGRAM_FLAGS");
+		
+		push @objs, $out;
+	}
+	
+	for my $asm_file (&find('stdlib/protected/*.nasm')) {
+		(my $out = $asm_file) =~ s:stdlib/(.*)\.nasm:build/stdlib/$1_nasm.o:;
+		&run("$ASM -felf $asm_file -Istdlib/protected -o $out $PROGRAM_FLAGS -W-gnu-elf-extensions");
+		push @objs, $out;
+	}
+	
+	&run("ar -rcs build/stdlib/protected/libstdlib.a ".(join ' ', @objs));
+	
+    "build/stdlib/%s/libstdlib.a";
+}
+
+sub stdlib {
+    &stdlib_real;
+    &stdlib_protected;
+
+    return "build/stdlib/%s/libstdlib.a";
 }
 
 sub runtime {
