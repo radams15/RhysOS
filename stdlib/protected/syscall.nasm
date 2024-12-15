@@ -1,4 +1,4 @@
-bits 16
+bits 32
 
 global _interrupt
 global _ds
@@ -30,9 +30,9 @@ _interrupt_%1:
 	mov cx,[bp+8]
 	mov dx,[bp+10]
 
-        int 0x%1
+    int 0x%1
         
-        pop ds
+    pop ds
 	
 	pop bp
 	ret

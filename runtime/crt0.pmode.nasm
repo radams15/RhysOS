@@ -29,9 +29,7 @@ _crt0:
    mov  bx, 0x10          ; select descriptor 2, instead of 1
    mov  ds, bx            ; 10h = 10000b
 
-   mov bx, 0x0f01         ; attrib/char of smiley
-   mov eax, 0x0b8000      ; note 32 bit offset
-   mov word [ds:eax], bx
+   call _main
 
    and al,0xFE            ; back to realmode
    mov  cr0, eax          ; by toggling bit again
